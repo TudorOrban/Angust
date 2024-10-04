@@ -15,6 +15,7 @@ fn main() {
         message: "Hello, world!".to_string(),
     };
 
-    let app = Application::new(initial_state);
+    let mut app = Application::new(initial_state, String::from("New Test App"));
     
+    app.run();
 }

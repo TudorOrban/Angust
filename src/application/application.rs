@@ -1,5 +1,5 @@
 use skia_safe::{gpu::gl::FramebufferInfo, Point};
-use winit::{application::ApplicationHandler, event::{ElementState, KeyEvent, Modifiers, MouseButton, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow}, window};
+use winit::{application::ApplicationHandler, event::{ElementState, KeyEvent, Modifiers, MouseButton, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}, window};
 use gl_rs as gl;
 use glutin::{display::GetGlDisplay, prelude::GlDisplay, surface::GlSurface};
 use std::{ffi::CString, num::NonZeroU32};
@@ -12,16 +12,16 @@ pub struct Application<State> {
     pub state: State,
     windowing_system: WindowingSystem,
     fb_info: FramebufferInfo,
-    event_loop: winit::event_loop::EventLoop<()>,
+    event_loop: Option<EventLoop<()>>,
     modifiers: Modifiers,
     mouse_position: Option<Point>,
 }
 
 impl<State> Application<State> {
-    pub fn new(initial_state: State) -> Self {
-        let event_loop = winit::event_loop::EventLoop::new()
+    pub fn new(initial_state: State, app_title: String) -> Self {
+        let event_loop = EventLoop::new()
             .expect("Failed to create event loop");
-        let windowing_system = WindowingSystem::new(&event_loop);
+        let windowing_system = WindowingSystem::new(&event_loop, app_title);
 
         gl::load_with(|s| {
             windowing_system
@@ -53,16 +53,18 @@ impl<State> Application<State> {
             state: initial_state,
             windowing_system,
             fb_info,
-            event_loop,
+            event_loop: Some(event_loop),
             modifiers: Modifiers::default(),
             mouse_position: None,
         }
     }
 
-    pub fn run<F, G>(&mut self) {
-        // self.event_loop
-        //     .run_app(self)
-        //     .expect("Failed to run the application");
+    pub fn run(&mut self) {
+        if let Some(event_loop) = self.event_loop.take() {  // Take the event loop, leaving None
+            event_loop.run_app(self).expect("Failed to run the application");
+        } else {
+            panic!("Event loop already consumed or not initialized");
+        }
     }
 }
 

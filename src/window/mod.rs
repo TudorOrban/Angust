@@ -24,9 +24,9 @@ pub struct WindowingSystem {
 }
 
 impl WindowingSystem {
-    pub fn new(event_loop: &EventLoop<()>) -> Self {
+    pub fn new(event_loop: &EventLoop<()>, app_title: String) -> Self {
         let window_attributes = WindowAttributes::default()
-            .with_title("Cartan")
+            .with_title(app_title)
             .with_inner_size(LogicalSize::new(1200, 800));
 
         let template = ConfigTemplateBuilder::new()
