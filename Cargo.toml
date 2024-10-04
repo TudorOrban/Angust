@@ -3,6 +3,10 @@ name = "reast"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "reast"
+path = "src/lib.rs"
+
 [dependencies]
 winit = "0.30.2"
 glutin = "0.32.0"
