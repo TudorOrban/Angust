@@ -1522,6 +1522,7 @@ dependencies = [
  "glutin",
  "glutin-winit",
  "kuchiki",
+ "lazy_static",
  "raw-window-handle",
  "skia-safe",
  "winit",

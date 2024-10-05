@@ -19,9 +19,10 @@ winit = "0.30.2"
 glutin = "0.32.0"
 glutin-winit = "0.5.0"
 raw-window-handle = "0.6.0"
+
 gl-rs = { version = "0.14.0", package = "gl" }
 skia-safe = { version = "0.78.2", features = ["gl"] }
 
-
+lazy_static = "1.4"
 
 kuchiki = "0.8"

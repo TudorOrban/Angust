@@ -8,6 +8,10 @@ pub trait Element {
     fn update(&mut self);
     fn handle_event(&mut self, cursor_position: Point, event_type: &EventType);
 
+    fn set_id(&mut self, id: String);
+    fn set_position(&mut self, position: Position);
+    fn set_size(&mut self, size: Size);
+
     fn get_id(&self) -> String;
     fn get_element_type(&self) -> ElementType;
     fn get_position(&self) -> Position;
