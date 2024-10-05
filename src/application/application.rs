@@ -1,12 +1,10 @@
 use skia_safe::{gpu::gl::FramebufferInfo, Point};
-use winit::{application::ApplicationHandler, event::{ElementState, KeyEvent, Modifiers, MouseButton, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}, window};
+use winit::{application::ApplicationHandler, event::{ElementState, KeyEvent, Modifiers, MouseButton, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}};
 use gl_rs as gl;
-use glutin::{display::GetGlDisplay, prelude::GlDisplay, surface::GlSurface};
-use std::{ffi::CString, fs, num::NonZeroU32, path::PathBuf};
-use std::env;
+use glutin::{config::GlConfig, display::GetGlDisplay, prelude::GlDisplay, surface::GlSurface};
+use std::{ffi::CString, num::NonZeroU32};
 
-use crate::{parsing::html_parser::{parse_html_content, traverse}, window::WindowingSystem};
-
+use crate::{rendering::{elements::element::EventType, renderer::Renderer}, window::WindowingSystem};
 
 
 pub struct Application<State> {
@@ -16,13 +14,14 @@ pub struct Application<State> {
     event_loop: Option<EventLoop<()>>,
     modifiers: Modifiers,
     mouse_position: Option<Point>,
+    renderer: Renderer,
 }
 
 impl<State> Application<State> {
     pub fn new(initial_state: State, app_title: String) -> Self {
         let event_loop = EventLoop::new()
             .expect("Failed to create event loop");
-        let windowing_system = WindowingSystem::new(&event_loop, app_title);
+        let mut windowing_system = WindowingSystem::new(&event_loop, app_title);
 
         gl::load_with(|s| {
             windowing_system
@@ -42,32 +41,13 @@ impl<State> Application<State> {
             }
         };
 
-        // let renderer = Renderer::new(
-        //     &windowing.window, 
-        //     &mut windowing.gr_context, 
-        //     fb_info, 
-        //     windowing.gl_config.num_samples() as usize, 
-        //     windowing.gl_config.stencil_size() as usize
-        // );
-        let project_root = env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| {
-            // Fallback: Use the directory where the executable is located
-            env::current_exe()
-                .expect("Failed to find executable path")
-                .parent()
-                .expect("Failed to resolve executable directory")
-                .to_path_buf()
-                .display()
-                .to_string()
-        });
-    
-        let mut path = PathBuf::from(project_root);
-        path.push("resources/index.html"); // Append the relative path to index.html
-        println!("Path: {:?}", path);
-        let html_content = fs::read_to_string(path)
-            .expect("Failed to read HTML content");
-        let document = parse_html_content(html_content.as_str());
-
-        traverse(&document);
+        let renderer = Renderer::new(
+            &windowing_system.window, 
+            &mut windowing_system.gr_context, 
+            fb_info, 
+            windowing_system.gl_config.num_samples() as usize, 
+            windowing_system.gl_config.stencil_size() as usize
+        );
 
         Self {
             state: initial_state,
@@ -76,6 +56,7 @@ impl<State> Application<State> {
             event_loop: Some(event_loop),
             modifiers: Modifiers::default(),
             mouse_position: None,
+            renderer,
         }
     }
 
@@ -112,7 +93,7 @@ impl<State> ApplicationHandler for Application<State> {
                     NonZeroU32::new(height.max(1)).unwrap(),
                 );
             
-                // self.renderer.resize_surface(&self.windowing_system.window, &mut self.windowing_system.gr_context, self.fb_info, self.windowing_system.gl_config.num_samples() as usize, self.windowing_system.gl_config.stencil_size() as usize);
+                self.renderer.resize_surface(&self.windowing_system.window, &mut self.windowing_system.gr_context, self.fb_info, self.windowing_system.gl_config.num_samples() as usize, self.windowing_system.gl_config.stencil_size() as usize);
                 self.windowing_system.window.request_redraw();
             }
             WindowEvent::ModifiersChanged(new_modifiers) => {
@@ -121,7 +102,7 @@ impl<State> ApplicationHandler for Application<State> {
             WindowEvent::MouseInput { state, button, .. } => {
                 if let (ElementState::Pressed, MouseButton::Left) = (state, button) {
                     if let Some(mouse_position) = self.mouse_position {
-                        // self.renderer.handle_event(mouse_position, EventType::MouseClick);
+                        self.renderer.handle_event(mouse_position, EventType::MouseClick);
                         self.windowing_system.window.request_redraw();
                     }
                 }
@@ -140,7 +121,7 @@ impl<State> ApplicationHandler for Application<State> {
             }
             WindowEvent::RedrawRequested => {
                 // Render and flush the Skia context
-                // self.renderer.render_frame(&mut self.windowing_system.gr_context);
+                self.renderer.render_frame(&mut self.windowing_system.gr_context);
                 self.windowing_system.gr_context.flush_and_submit();
 
                 // Swap buffers to show the rendered content

@@ -1,6 +1,6 @@
 use skia_safe::{Canvas, Point};
 
-use super::{common_types::{Position, Size}, element::{Element, ElementType, EventType}, styles::Styles};
+use super::{common_types::{Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
 
 
 pub struct Container {
@@ -9,6 +9,19 @@ pub struct Container {
     size: Size,
     styles: Styles,
     children: Vec<Box<dyn Element>>,
+}
+
+impl Container {
+    pub fn new() -> Self {
+        let id = IDGenerator::get();
+        Self {
+            _id: id,
+            position: Position::default(),
+            size: Size::default(),
+            styles: Styles::default(),
+            children: Vec::new(),
+        }
+    }
 }
 
 impl Element for Container {
