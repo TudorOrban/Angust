@@ -11,6 +11,7 @@ pub trait Element {
     fn set_id(&mut self, id: String);
     fn set_position(&mut self, position: Position);
     fn set_size(&mut self, size: Size);
+    fn add_child(&mut self, child: Box<dyn Element>);
 
     fn get_id(&self) -> String;
     fn get_element_type(&self) -> ElementType;

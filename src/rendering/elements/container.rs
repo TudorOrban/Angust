@@ -4,7 +4,6 @@ use crate::rendering::rendering_interface::element_renderer::ElementRenderer;
 
 use super::{common_types::{Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
 
-
 pub struct Container {
     _id: String,
     position: Position,
@@ -23,6 +22,16 @@ impl Container {
             styles: Styles::default(),
             children: Vec::new(),
         }
+    }
+    
+    pub fn add_children(&mut self, children: Vec<Box<dyn Element>>) -> &mut Self {
+        self.children.extend(children);
+        self
+    }
+
+    pub fn set_styles(&mut self, styles: Styles) -> &mut Self {
+        self.styles = styles;
+        self
     }
 }
 
@@ -64,6 +73,10 @@ impl Element for Container {
 
     fn set_size(&mut self, size: Size) {
         self.size = size;
+    }
+
+    fn add_child(&mut self, child: Box<dyn Element>) {
+        self.children.push(child);
     }
 
     fn get_id(&self) -> String {

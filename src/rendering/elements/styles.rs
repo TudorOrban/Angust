@@ -3,7 +3,7 @@ use skia_safe::Color;
 use super::common_types::Size;
 
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Styles {
     pub display: Option<DisplayType>,
     pub flex_direction: Option<FlexDirection>,
@@ -43,7 +43,7 @@ impl Default for Styles {
 }
 
 // Layout properties
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum DisplayType {
     Block,          // The element takes up the full width of its container, starting on a new line.
     InlineBlock,    // The element does not start on a new line but can have width and height set.
@@ -56,7 +56,7 @@ impl Default for DisplayType {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum FlexDirection {
     Row,            // Lay out children horizontally.
     Column,         // Lay out children vertically.
@@ -68,7 +68,7 @@ impl Default for FlexDirection {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum FlexWrap {
     NoWrap,         // All children are laid out in a single line.
     Wrap,           // Children wrap around to additional lines as needed.
@@ -81,7 +81,7 @@ impl Default for FlexWrap {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum JustifyContent {
     FlexStart,      // Items are aligned at the start of the container.
     FlexEnd,        // Items are aligned at the end of the container.
@@ -96,7 +96,7 @@ impl Default for JustifyContent {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum AlignItems {
     FlexStart,      // Items are aligned at the start of the cross axis.
     FlexEnd,        // Items are aligned at the end of the cross axis.
@@ -111,7 +111,7 @@ impl Default for AlignItems {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum AlignContent {
     FlexStart,      // Lines are packed at the start of the container.
     FlexEnd,        // Lines are packed at the end of the container.
@@ -127,7 +127,7 @@ impl Default for AlignContent {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Overflow {
     Visible,        // Content is not clipped and may be rendered outside the container.
     Hidden,         // Content is clipped, and no scrollbars are provided.
@@ -143,7 +143,7 @@ impl Default for Overflow {
 }
 
 // Dimension properties
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct SizingPolicy {
     pub width: Option<f32>,
     pub height: Option<f32>,
@@ -176,7 +176,7 @@ impl Default for SizeMode {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Spacing {
     pub spacing_x: f32,
     pub spacing_y: f32,
@@ -191,7 +191,7 @@ impl Default for Spacing {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Margin {
     pub top: f32,
     pub right: f32,
@@ -210,7 +210,7 @@ impl Default for Margin {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Padding {
     pub top: f32,
     pub right: f32,
@@ -230,7 +230,7 @@ impl Default for Padding {
 }
 
 // Appearance properties
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Border {
     pub width: f32,
     pub color: Color,
@@ -247,7 +247,7 @@ impl Default for Border {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct BorderRadius {
     pub top_left: f32,
     pub top_right: f32,
@@ -266,7 +266,7 @@ impl Default for BorderRadius {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Directions {
     pub horizontal: bool,
     pub vertical: bool,

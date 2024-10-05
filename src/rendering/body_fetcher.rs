@@ -1,6 +1,6 @@
 use std::{env, fs, path::PathBuf};
 
-use crate::{parsing::html_parser::{parse_html_content, traverse}, rendering::elements::container::Container};
+use crate::parsing::html_parser::{map_dom_to_elements, parse_html_content};
 
 use super::elements::element::Element;
 
@@ -18,12 +18,12 @@ pub fn fetch_ui_body() -> Box<dyn Element> {
 
     let mut path = PathBuf::from(project_root);
     path.push("resources/index.html"); // Append the relative path to index.html
-    println!("Path: {:?}", path);
+
     let html_content = fs::read_to_string(path)
         .expect("Failed to read HTML content");
-    let document = parse_html_content(html_content.as_str());
 
-    traverse(&document);
+    let dom = parse_html_content(html_content.as_str());
 
-    Box::new(Container::new())
+    map_dom_to_elements(&dom)
+        .expect("Failed to map DOM to elements")
 }

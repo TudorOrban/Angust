@@ -23,6 +23,7 @@ impl Renderer {
         );
 
         let mut ui_body: Box<dyn Element> = fetch_ui_body();
+
         let screen_size = window.inner_size();
         ui_body.compute_allocation_plan(); // Start backwards recursion to plan space allocations
         ui_body.enact_allocation_plan( // Start forwards recursion to allocate space
