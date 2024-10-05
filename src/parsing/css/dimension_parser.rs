@@ -6,7 +6,8 @@ pub fn update_dimension_style(styles: &mut Styles, key: &str, value: &str) {
     if styles.sizing_policy.is_none() {
         styles.sizing_policy = Some(SizingPolicy::default());
     }
-    let sizing_policy = styles.sizing_policy.as_mut().unwrap();  // It's now safe to unwrap
+    let sizing_policy = styles.sizing_policy.as_mut().unwrap();
+
     match key {
         "width" => sizing_policy.width = dimension,
         "height" => sizing_policy.height = dimension,

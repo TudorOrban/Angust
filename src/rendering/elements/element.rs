@@ -22,8 +22,12 @@ pub trait Element {
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>>;
     
     // Layout system
-    fn compute_allocation_plan(&mut self);
-    fn enact_allocation_plan(&mut self, allocated_position: Position, allocated_size: Size);
+    fn set_natural_size(&mut self, size: Size);
+    fn set_requested_size(&mut self, size: Size);
+    fn get_natural_size(&self) -> Size;
+    fn get_requested_size(&self) -> Option<Size>;
+    fn estimate_size(&mut self);
+    fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size);
 }
 
 

@@ -39,14 +39,11 @@ fn process_div_element(elem_data: &kuchiki::ElementData, node: &NodeRef) -> Box<
     let mut container = Container::new();
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes);
-    println!("Styles: {:?}", styles);
     container.set_styles(styles);
 
     node.children()
         .filter_map(|child| map_dom_to_elements(&child))
         .for_each(|child_element| container.add_child(child_element));
-
-    println!("Container {:?}, {:?}, {:?}", container.get_id(), container.get_position(), container.get_size());
 
     Box::new(container)
 }
@@ -54,7 +51,7 @@ fn process_div_element(elem_data: &kuchiki::ElementData, node: &NodeRef) -> Box<
 fn handle_text_node(text: &str) {
     let trimmed_text = text.trim();
     if !trimmed_text.is_empty() {
-        println!("Text: {}", trimmed_text);
+        // println!("Text: {}", trimmed_text);
     }
 }
 

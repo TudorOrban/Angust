@@ -1,6 +1,6 @@
 use skia_safe::{Canvas, Color, Point};
 
-use crate::rendering::rendering_interface::element_renderer::ElementRenderer;
+use crate::rendering::{layout::estimate_size::{estimate_leaf_container_size, estimate_parent_container_size}, rendering_interface::element_renderer::ElementRenderer};
 
 use super::{common_types::{Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
 
@@ -8,8 +8,10 @@ pub struct Container {
     _id: String,
     position: Position,
     size: Size,
+    natural_size: Size,
+    requested_size: Option<Size>,
     styles: Styles,
-    children: Vec<Box<dyn Element>>,
+    pub children: Vec<Box<dyn Element>>,
 }
 
 impl Container {
@@ -19,6 +21,8 @@ impl Container {
             _id: id,
             position: Position::default(),
             size: Size::default(),
+            natural_size: Size::default(),
+            requested_size: None,
             styles: Styles::default(),
             children: Vec::new(),
         }
@@ -103,11 +107,37 @@ impl Element for Container {
         Some(&mut self.children)
     }
     
-    fn compute_allocation_plan(&mut self) {
-
+    // Layout system
+    fn set_natural_size(&mut self, size: Size) {
+        self.natural_size = size;
     }
 
-    fn enact_allocation_plan(&mut self, allocated_position: Position, allocated_size: Size) {
+    fn set_requested_size(&mut self, size: Size) {
+        self.requested_size = Some(size);
+    }
+
+    fn get_natural_size(&self) -> Size {
+        self.natural_size
+    }
+
+    fn get_requested_size(&self) -> Option<Size> {
+        self.requested_size
+    }
+
+    // Traverse the tree from leaves to root and estimate the size of each container.
+    fn estimate_size(&mut self) {
+        if !self.children.is_empty() {
+            for child in &mut self.children {
+                child.estimate_size();
+            }
+
+            estimate_parent_container_size(self);
+        } else {
+            estimate_leaf_container_size(self);
+        }
+    }
+
+    fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size) {
 
     }
 }
