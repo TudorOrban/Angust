@@ -1,7 +1,5 @@
 use skia_safe::Color;
 
-use super::common_types::Size;
-
 
 #[derive(Clone, Copy, Debug)]
 pub struct Styles {
@@ -12,7 +10,7 @@ pub struct Styles {
     pub align_items: Option<AlignItems>,
     pub align_content: Option<AlignContent>,
     pub overflow: Option<Overflow>,
-    pub size: Option<SizingPolicy>,
+    pub sizing_policy: Option<SizingPolicy>,
     pub margin: Option<Margin>,
     pub padding: Option<Padding>,
     pub spacing: Option<Spacing>,
@@ -31,7 +29,7 @@ impl Default for Styles {
             align_items: Some(AlignItems::default()),
             align_content: Some(AlignContent::default()),
             overflow: Some(Overflow::default()),
-            size: Some(SizingPolicy::default()),
+            sizing_policy: Some(SizingPolicy::default()),
             margin: Some(Margin::default()),
             padding: Some(Padding::default()),
             spacing: Some(Spacing::default()),
@@ -145,9 +143,12 @@ impl Default for Overflow {
 // Dimension properties
 #[derive(Clone, Copy, Debug)]
 pub struct SizingPolicy {
-    pub width: Option<f32>,
-    pub height: Option<f32>,
-    pub mode: Option<SizeMode>,
+    pub width: Option<Dimension>,
+    pub height: Option<Dimension>,
+    pub min_width: Option<Dimension>,
+    pub max_width: Option<Dimension>,
+    pub min_height: Option<Dimension>,
+    pub max_height: Option<Dimension>,
 }
 
 impl Default for SizingPolicy {
@@ -155,76 +156,93 @@ impl Default for SizingPolicy {
         Self {
             width: None,
             height: None,
-            mode: Some(SizeMode::default()),
+            min_width: None,
+            max_width: None,
+            min_height: None,
+            max_height: None,
         }
     }
 }
 
 #[derive(Clone, Copy, Debug)]
-pub enum SizeMode {
-    Auto,              // Element sizes itself based on its content.
-    Exact(Size),   // Use the specified width and height in pixels.
-    FillParent,        // Expand to fill the available space, respecting max constraints if provided.
-    FitParentWidth,    // Expand to fill the available width, respecting max constraints if provided.
-    FitParentHeight,   // Expand to fill the available height, respecting max constraints if provided.
-    Percent(f32),      // Use a percentage of the available space, e.g., width: 50%.
+pub struct Dimension {
+    pub value: f32,
+    pub unit: Unit,
 }
 
-impl Default for SizeMode {
+impl Default for Dimension {
     fn default() -> Self {
-        Self::Auto
+        Self {
+            value: 0.0,
+            unit: Unit::default(),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum Unit {
+    Px,
+    Vh,
+    Vw,
+    Rem,
+    Percent,
+}
+
+impl Default for Unit {
+    fn default() -> Self {
+        Self::Px
     }
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct Spacing {
-    pub spacing_x: f32,
-    pub spacing_y: f32,
+    pub spacing_x: Dimension,
+    pub spacing_y: Dimension,
 }
 
 impl Default for Spacing {
     fn default() -> Self {
         Self {
-            spacing_x: 0.0,
-            spacing_y: 0.0,
+            spacing_x: Dimension::default(),
+            spacing_y: Dimension::default(),
         }
     }
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct Margin {
-    pub top: f32,
-    pub right: f32,
-    pub bottom: f32,
-    pub left: f32,
+    pub top: Dimension,
+    pub right: Dimension,
+    pub bottom: Dimension,
+    pub left: Dimension,
 }
 
 impl Default for Margin {
     fn default() -> Self {
         Self {
-            top: 0.0,
-            right: 0.0,
-            bottom: 0.0,
-            left: 0.0,
+            top: Dimension::default(),
+            right: Dimension::default(),
+            bottom: Dimension::default(),
+            left: Dimension::default(),
         }
     }
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct Padding {
-    pub top: f32,
-    pub right: f32,
-    pub bottom: f32,
-    pub left: f32,
+    pub top: Dimension,
+    pub right: Dimension,
+    pub bottom: Dimension,
+    pub left: Dimension,
 }
 
 impl Default for Padding {
     fn default() -> Self {
         Self {
-            top: 0.0,
-            right: 0.0,
-            bottom: 0.0,
-            left: 0.0,
+            top: Dimension::default(),
+            right: Dimension::default(),
+            bottom: Dimension::default(),
+            left: Dimension::default(),
         }
     }
 }
@@ -249,19 +267,19 @@ impl Default for Border {
 
 #[derive(Clone, Copy, Debug)]
 pub struct BorderRadius {
-    pub top_left: f32,
-    pub top_right: f32,
-    pub bottom_right: f32,
-    pub bottom_left: f32,
+    pub top_left: Dimension,
+    pub top_right: Dimension,
+    pub bottom_right: Dimension,
+    pub bottom_left: Dimension,
 }
 
 impl Default for BorderRadius {
     fn default() -> Self {
         Self {
-            top_left: 0.0,
-            top_right: 0.0,
-            bottom_right: 0.0,
-            bottom_left: 0.0,
+            top_left: Dimension::default(),
+            top_right: Dimension::default(),
+            bottom_right: Dimension::default(),
+            bottom_left: Dimension::default(),
         }
     }
 }

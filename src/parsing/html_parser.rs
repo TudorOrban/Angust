@@ -1,12 +1,12 @@
 use kuchiki::parse_html;
-use kuchiki::Attributes;
 use kuchiki::NodeData;
 use kuchiki::NodeRef;
 use kuchiki::traits::TendrilSink;
 
 use crate::rendering::elements::container::Container;
 use crate::rendering::elements::element::Element;
-use crate::rendering::elements::styles::Styles;
+
+use super::css_parser;
 
 pub fn parse_html_content(html: &str) -> NodeRef {
     parse_html().one(html)
@@ -38,7 +38,8 @@ fn process_document_nodes(node: &NodeRef) -> Option<Box<dyn Element>> {
 fn process_div_element(elem_data: &kuchiki::ElementData, node: &NodeRef) -> Box<dyn Element> {
     let mut container = Container::new();
     let attributes = elem_data.attributes.borrow();
-    let styles = parse_styles(&attributes);
+    let styles = css_parser::parse_styles(&attributes);
+    println!("Styles: {:?}", styles);
     container.set_styles(styles);
 
     node.children()
@@ -71,27 +72,4 @@ fn general_traversal(node: &NodeRef) -> Option<Box<dyn Element>> {
     }
 
     root_element
-}
-
-
-fn parse_styles(attributes: &Attributes) -> Styles {
-    let mut styles = Styles::default();
-
-    if let Some(class_name) = attributes.get("class") {
-        styles = apply_class_styles(class_name);
-    }
-
-    if let Some(style_attr) = attributes.get("style") {
-        styles = parse_inline_styles(style_attr);
-    }
-
-    styles
-}
-
-fn apply_class_styles(class_name: &str) -> Styles {
-    Styles::default()
-}
-
-fn parse_inline_styles(style_str: &str) -> Styles {
-    Styles::default()
 }
