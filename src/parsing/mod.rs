@@ -1,2 +1,2 @@
-pub mod html_parser;
-pub mod css_parser;
+pub mod html;
+pub mod css;

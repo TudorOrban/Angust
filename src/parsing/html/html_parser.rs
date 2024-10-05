@@ -3,10 +3,10 @@ use kuchiki::NodeData;
 use kuchiki::NodeRef;
 use kuchiki::traits::TendrilSink;
 
+use crate::parsing::css::css_parser;
 use crate::rendering::elements::container::Container;
 use crate::rendering::elements::element::Element;
 
-use super::css_parser;
 
 pub fn parse_html_content(html: &str) -> NodeRef {
     parse_html().one(html)
