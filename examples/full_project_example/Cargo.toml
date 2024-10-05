@@ -1,0 +1,11 @@
+[package]
+name = "full_project_example"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+reast = { path = "../../" } 
+
+[[bin]]
+name = "full_project_example"
+path = "main.rs"
