@@ -16,7 +16,8 @@ pub struct Styles {
     pub margin: Option<Margin>,
     pub padding: Option<Padding>,
     pub spacing: Option<Spacing>,
-    pub color: Option<Color>,
+    pub background_color: Option<Color>,
+    pub text_color: Option<Color>,
     pub border: Option<Border>,
 }
 
@@ -34,7 +35,8 @@ impl Default for Styles {
             margin: Some(Margin::default()),
             padding: Some(Padding::default()),
             spacing: Some(Spacing::default()),
-            color: Some(Color::TRANSPARENT),
+            background_color: Some(Color::TRANSPARENT),
+            text_color: Some(Color::BLACK),
             border: Some(Border::default()),
         }
     }

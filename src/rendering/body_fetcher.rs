@@ -1,6 +1,6 @@
 use std::{env, fs, path::PathBuf};
 
-use crate::{parsing::html_parser::{parse_html_content, traverse}, rendering::elements::{common_types::Position, container::Container}};
+use crate::{parsing::html_parser::{parse_html_content, traverse}, rendering::elements::container::Container};
 
 use super::elements::element::Element;
 

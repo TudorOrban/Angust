@@ -1,4 +1,6 @@
-use skia_safe::{Canvas, Point};
+use skia_safe::{Canvas, Color, Point};
+
+use crate::rendering::rendering_interface::element_renderer::ElementRenderer;
 
 use super::{common_types::{Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
 
@@ -26,15 +28,30 @@ impl Container {
 
 impl Element for Container {
     fn render(&self, canvas: &Canvas) {
-
+        ElementRenderer::render_element(
+            canvas,
+            self.position,
+            self.size,
+            self.styles.background_color.unwrap_or(Color::TRANSPARENT),
+            self.styles.border.unwrap_or_default().width,
+            self.styles.border.unwrap_or_default().color,
+        );
+    
+        for child in &self.children {
+            child.render(canvas);
+        }
     }
 
     fn update(&mut self) {
-
+        for child in &mut self.children {
+            child.update();
+        }
     }
-
+    
     fn handle_event(&mut self, cursor_position: Point, event_type: &EventType) {
-
+        for child in &mut self.children {
+            child.handle_event(cursor_position, event_type);
+        }
     }
 
     fn set_id(&mut self, id: String) {
