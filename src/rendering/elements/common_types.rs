@@ -1,3 +1,5 @@
+use super::styles::Dimension;
+
 
 #[derive(Clone, Copy, Debug)]
 pub struct Position {
@@ -36,6 +38,21 @@ impl Default for Space {
         Self {
             horizontal: 0.0,
             vertical: 0.0,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct OptionalSize {
+    pub width: Option<Dimension>,
+    pub height: Option<Dimension>,
+}
+
+impl Default for OptionalSize {
+    fn default() -> Self {
+        Self {
+            width: None,
+            height: None,
         }
     }
 }

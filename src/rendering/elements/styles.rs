@@ -62,7 +62,7 @@ pub enum FlexDirection {
 
 impl Default for FlexDirection {
     fn default() -> Self {
-        Self::Row
+        Self::Column
     }
 }
 

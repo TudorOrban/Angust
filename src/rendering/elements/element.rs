@@ -1,6 +1,6 @@
 use skia_safe::{Canvas, Point};
 
-use super::{common_types::{Position, Size}, styles::Styles};
+use super::{common_types::{OptionalSize, Position, Size}, styles::Styles};
 
 // This is the trait that all Reast elements must implement.
 pub trait Element {
@@ -23,9 +23,9 @@ pub trait Element {
     
     // Layout system
     fn set_natural_size(&mut self, size: Size);
-    fn set_requested_size(&mut self, size: Size);
+    fn set_requested_size(&mut self, optional_size: OptionalSize);
     fn get_natural_size(&self) -> Size;
-    fn get_requested_size(&self) -> Option<Size>;
+    fn get_requested_size(&self) -> OptionalSize;
     fn estimate_size(&mut self);
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size);
 }
