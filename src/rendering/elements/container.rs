@@ -2,8 +2,8 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{
     layout::{
-        allocate_space::allocate_space_to_children,
-        estimate_size::{estimate_leaf_container_size, estimate_parent_container_size},
+        space_allocator::allocate_space_to_children,
+        size_estimator::{estimate_leaf_container_sizes, estimate_parent_container_sizes},
     },
     rendering_interface::element_renderer::ElementRenderer,
 };
@@ -135,6 +135,24 @@ impl Element for Container {
         self.requested_size.clone()
     }
 
+    fn get_effective_size(&self) -> Size {
+        let effective_width = if let Some(width) = self.get_requested_size().width {
+            width.value
+        } else {
+            self.get_natural_size().width
+        };
+        let effective_height = if let Some(height) = self.get_requested_size().height {
+            height.value
+        } else {
+            self.get_natural_size().height
+        };
+
+        Size {
+            width: effective_width,
+            height: effective_height,
+        }
+    }
+
     // Traverse the tree from leaves to root and estimate the size of each container.
     fn estimate_size(&mut self) {
         if !self.children.is_empty() {
@@ -142,9 +160,9 @@ impl Element for Container {
                 child.estimate_size();
             }
 
-            estimate_parent_container_size(self);
+            estimate_parent_container_sizes(self);
         } else {
-            estimate_leaf_container_size(self);
+            estimate_leaf_container_sizes(self);
         }
     }
 
