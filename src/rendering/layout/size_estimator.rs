@@ -6,13 +6,19 @@ use crate::rendering::elements::{common_types::{OptionalSize, Size}, container::
  * based on the children's *effective* sizes (i.e. requested if specified, natural otherwise).
  */
 pub fn estimate_parent_container_sizes(container: &mut Container) {
+    let flex_direction = container.get_styles().flex_direction.unwrap_or_default();
+
     let mut width: f32 = 0.0;
     let mut height: f32 = 0.0;
 
-    let flex_direction = container.get_styles().flex_direction.unwrap_or_default();
+    width += container.get_styles().padding.unwrap_or_default().left.value + container.get_styles().padding.unwrap_or_default().right.value;
+    height += container.get_styles().padding.unwrap_or_default().top.value + container.get_styles().padding.unwrap_or_default().bottom.value;
     
     for child in &container.children {
         let child_effective_size = child.get_effective_size();
+
+        width += child.get_styles().margin.unwrap_or_default().left.value;
+        height += child.get_styles().margin.unwrap_or_default().top.value;
 
         match flex_direction {
             FlexDirection::Row => {
@@ -24,6 +30,9 @@ pub fn estimate_parent_container_sizes(container: &mut Container) {
                 height += child_effective_size.height;
             },
         }
+
+        width += child.get_styles().margin.unwrap_or_default().right.value;
+        height += child.get_styles().margin.unwrap_or_default().bottom.value;
     }
     
     container.set_natural_size(Size { width, height });
