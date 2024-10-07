@@ -54,7 +54,7 @@ impl Default for DisplayType {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FlexDirection {
     Row,            // Lay out children horizontally.
     Column,         // Lay out children vertically.

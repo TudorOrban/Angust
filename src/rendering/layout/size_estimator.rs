@@ -17,13 +17,14 @@ pub fn estimate_parent_container_sizes(container: &mut Container) {
     for child in &container.children {
         let child_effective_size = child.get_effective_size();
 
-        width += child.get_styles().margin.unwrap_or_default().left.value;
-        height += child.get_styles().margin.unwrap_or_default().top.value;
-
         match flex_direction {
             FlexDirection::Row => {
+                width += child.get_styles().margin.unwrap_or_default().left.value;
                 width += child_effective_size.width;
+                width += child.get_styles().margin.unwrap_or_default().right.value;
                 height = height.max(child_effective_size.height);
+                height += child.get_styles().margin.unwrap_or_default().top.value;
+                height += child.get_styles().margin.unwrap_or_default().bottom.value;
             },
             FlexDirection::Column => {
                 width = width.max(child_effective_size.width);
@@ -31,8 +32,6 @@ pub fn estimate_parent_container_sizes(container: &mut Container) {
             },
         }
 
-        width += child.get_styles().margin.unwrap_or_default().right.value;
-        height += child.get_styles().margin.unwrap_or_default().bottom.value;
     }
     
     container.set_natural_size(Size { width, height });
