@@ -1,12 +1,24 @@
 use skia_safe::Color;
 
-use crate::rendering::elements::styles::Styles;
+use crate::rendering::elements::styles::{Border, Styles};
+
+use super::dimension_parser::parse_dimension;
 
 
 pub fn update_appearance_style(styles: &mut Styles, key: &str, value: &str) {
     match key {
         "background-color" => styles.background_color = parse_color(value),
         "color" => styles.text_color = parse_color(value),
+        "border-width" => styles.border = Some(Border {
+            width: parse_dimension(value).unwrap_or_default(),
+            color: styles.border.unwrap_or_default().color,
+            radius: styles.border.unwrap_or_default().radius,
+        }),
+        "border-color" => styles.border = Some(Border {
+            width: styles.border.unwrap_or_default().width,
+            color: parse_color(value).unwrap_or(Color::BLACK),
+            radius: styles.border.unwrap_or_default().radius,
+        }),
         _ => println!("Unhandled color property: {}", key),
     }
 }

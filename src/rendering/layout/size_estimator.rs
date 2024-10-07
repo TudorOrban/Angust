@@ -37,11 +37,15 @@ pub fn estimate_parent_container_sizes(container: &mut Container) {
 }
 
 pub fn estimate_leaf_container_sizes(container: &mut Container) {
+    container.set_natural_size(Size {
+        width: container.get_styles().padding.unwrap_or_default().horizontal(),
+        height: container.get_styles().padding.unwrap_or_default().vertical(),
+    });
+    
     if let Some(sizing_policy) = container.get_styles().sizing_policy {
         container.set_requested_size(OptionalSize {
             width: sizing_policy.width,
             height: sizing_policy.height,
         });
-        container.set_natural_size(Size::default()); // Size 0 for leaf containers
     }
 }

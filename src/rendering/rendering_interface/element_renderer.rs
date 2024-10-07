@@ -1,6 +1,6 @@
 use skia_safe::{Canvas, Color, Paint, PaintStyle, Point, Rect};
 
-use crate::rendering::elements::common_types::{Position, Size};
+use crate::rendering::elements::{common_types::{Position, Size}, styles::Dimension};
 
 
 
@@ -14,7 +14,7 @@ impl ElementRenderer {
         position: Position, 
         size: Size, 
         background_color: Color,
-        border_width: f32,
+        border_width: Dimension,
         border_color: Color
     ) {
         let row_rect = Rect::from_point_and_size(
@@ -28,10 +28,13 @@ impl ElementRenderer {
         paint.set_style(PaintStyle::Fill);
         paint.set_color(background_color);
         canvas.draw_rect(row_rect, &paint);
-    
+         
+        if border_width.value == 0.0 {
+            // return; // Draw all borders for now
+        }
         paint.set_anti_alias(true);
         paint.set_style(PaintStyle::Stroke);
-        paint.set_stroke_width(border_width);
+        paint.set_stroke_width(border_width.value);
         paint.set_color(border_color);
         canvas.draw_rect(row_rect, &paint);
     }

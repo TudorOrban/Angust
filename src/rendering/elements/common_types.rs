@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 use super::styles::Dimension;
 
 
@@ -24,6 +26,17 @@ impl Default for Size {
         Self {
             width: 0.0,
             height: 0.0,
+        }
+    }
+}
+
+impl Add for Size {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self {
+            width: self.width + other.width,
+            height: self.height + other.height,
         }
     }
 }

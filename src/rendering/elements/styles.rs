@@ -247,10 +247,20 @@ impl Default for Padding {
     }
 }
 
+impl Padding {
+    pub fn horizontal(&self) -> f32 {
+        self.left.value + self.right.value
+    }
+
+    pub fn vertical(&self) -> f32 {
+        self.top.value + self.bottom.value
+    }
+}
+
 // Appearance properties
 #[derive(Clone, Copy, Debug)]
 pub struct Border {
-    pub width: f32,
+    pub width: Dimension,
     pub color: Color,
     pub radius: BorderRadius,
 }
@@ -258,8 +268,8 @@ pub struct Border {
 impl Default for Border {
     fn default() -> Self {
         Self {
-            width: 0.0,
-            color: Color::TRANSPARENT,
+            width: Dimension::default(),
+            color: Color::BLACK,
             radius: BorderRadius::default(),
         }
     }
