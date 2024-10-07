@@ -9,18 +9,22 @@ pub fn estimate_parent_container_sizes(container: &mut Container) {
     let flex_direction = container.get_styles().flex_direction.unwrap_or_default();
 
     let padding = container.get_styles().padding.unwrap_or_default();
+    let spacing = container.get_styles().spacing.unwrap_or_default();
     let mut width: f32 = padding.left.value + padding.right.value;
     let mut height: f32 = padding.top.value;
 
     // Compute natural size of the container based on the children's effective sizes
-    for child in &container.children {
+    for (index, child) in container.children.iter_mut().enumerate() {
         let margin = child.get_styles().margin.unwrap_or_default();
         let child_effective_size = child.get_effective_size();
 
         match flex_direction {
             FlexDirection::Row => {
+                if index > 0 {
+                    width += spacing.spacing_x.value;
+                }
                 width += margin.left.value + child_effective_size.width + margin.right.value;
-                height = height.max(child_effective_size.height + padding.top.value + padding.bottom.value);
+                height = height.max(child_effective_size.height + padding.top.value + padding.bottom.value + spacing.spacing_y.value * index as f32);
             },
             FlexDirection::Column => {
                 width = width.max(child_effective_size.width);
