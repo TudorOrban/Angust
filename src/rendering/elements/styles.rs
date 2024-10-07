@@ -66,7 +66,7 @@ impl Default for FlexDirection {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FlexWrap {
     NoWrap,         // All children are laid out in a single line.
     Wrap,           // Children wrap around to additional lines as needed.
@@ -79,7 +79,7 @@ impl Default for FlexWrap {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum JustifyContent {
     FlexStart,      // Items are aligned at the start of the container.
     FlexEnd,        // Items are aligned at the end of the container.
@@ -125,7 +125,7 @@ impl Default for AlignContent {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Overflow {
     Visible,        // Content is not clipped and may be rendered outside the container.
     Hidden,         // Content is clipped, and no scrollbars are provided.
@@ -136,7 +136,7 @@ pub enum Overflow {
 
 impl Default for Overflow {
     fn default() -> Self {
-        Self::Visible
+        Self::Auto
     }
 }
 
