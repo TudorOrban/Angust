@@ -2,8 +2,7 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{
     layout::{
-        space_allocator::allocate_space_to_children,
-        size_estimator::{estimate_leaf_container_sizes, estimate_parent_container_sizes},
+        size_estimator, space_allocation_system::container::container_space_allocator,
     },
     rendering_interface::element_renderer::ElementRenderer,
 };
@@ -160,9 +159,9 @@ impl Element for Container {
                 child.estimate_sizes();
             }
 
-            estimate_parent_container_sizes(self);
+            size_estimator::estimate_parent_container_sizes(self);
         } else {
-            estimate_leaf_container_sizes(self);
+            size_estimator::estimate_leaf_container_sizes(self);
         }
     }
 
@@ -171,6 +170,6 @@ impl Element for Container {
         self.position = allocated_position;
         self.size = allocated_size;
 
-        allocate_space_to_children(self, allocated_position, allocated_size);
+        container_space_allocator::allocate_space_to_children(self, allocated_position, allocated_size);
     }
 }

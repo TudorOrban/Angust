@@ -1,40 +1,5 @@
-use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::Element, styles::{AlignItems, FlexDirection, Margin, Padding}};
+use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::Element, styles::{AlignItems, Margin}};
 
-
-pub fn allocate_space_to_children(container: &mut Container, allocated_position: Position, allocated_size: Size) {
-    let flex_direction = container.get_styles().flex_direction.unwrap_or_default();
-
-    if flex_direction == FlexDirection::Row {
-        allocate_space_to_children_row_flex(container, allocated_position, allocated_size);
-        return;
-    } 
-
-    let mut current_position = allocated_position;
-
-    current_position.x += container.get_styles().padding.unwrap_or_default().left.value;
-    current_position.y += container.get_styles().padding.unwrap_or_default().top.value;
-
-    for child in &mut container.children {
-        let child_effective_size = child.get_effective_size();
-
-        current_position.x += child.get_styles().margin.unwrap_or_default().left.value;
-        current_position.y += child.get_styles().margin.unwrap_or_default().top.value;
-
-        child.allocate_space(current_position, child_effective_size);
-
-        match flex_direction {
-            FlexDirection::Row => {
-                current_position.x += child_effective_size.width;
-            },
-            FlexDirection::Column => {
-                current_position.y += child_effective_size.height;
-            },
-        }
-        
-        current_position.x += child.get_styles().margin.unwrap_or_default().right.value;
-        current_position.y += child.get_styles().margin.unwrap_or_default().bottom.value;
-    }
-}
 
 pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_position: Position, allocated_size: Size) {
     let padding = container.get_styles().padding.unwrap_or_default();
@@ -50,7 +15,7 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
         let child_effective_size = child.get_effective_size();
         let margin = child.get_styles().margin.unwrap_or_default();
 
-        let child_position = compute_child_position(
+        let child_position = compute_child_position_row(
             child_effective_size, margin, align_items, max_height, current_position
         );
         child.allocate_space(child_position, child_effective_size);
@@ -59,7 +24,7 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
     }
 }
 
-fn compute_child_position(
+fn compute_child_position_row(
     child_effective_size: Size,
     margin: Margin,
     align_items: AlignItems, 
@@ -83,7 +48,7 @@ fn get_y_offset_based_on_align_items(
         AlignItems::FlexStart => margin.top.value,
         AlignItems::FlexEnd => max_height - child_effective_size.height - margin.bottom.value,
         AlignItems::Center => (max_height - child_effective_size.height) / 2.0 + margin.top.value,
-        AlignItems::Stretch | AlignItems::Baseline => margin.top.value, // Simplified; Baseline would need additional logic
+        AlignItems::Stretch | AlignItems::Baseline => margin.top.value, // Simplified; Baseline needs additional logic
     }
 }
 
@@ -93,5 +58,5 @@ fn get_max_child_height(container: &Container) -> f32 {
         let child_effective_size = child.get_effective_size();
         let total_child_height = margin.top.value + child_effective_size.height + margin.bottom.value;
         f32::max(acc, total_child_height)
-    }) + container.get_styles().padding.unwrap_or_default().top.value + container.get_styles().padding.unwrap_or_default().bottom.value
+    }) + container.get_styles().padding.unwrap_or_default().vertical()
 }
