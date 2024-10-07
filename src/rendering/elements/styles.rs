@@ -228,6 +228,16 @@ impl Default for Margin {
     }
 }
 
+impl Margin {
+    pub fn horizontal(&self) -> f32 {
+        self.left.value + self.right.value
+    }
+
+    pub fn vertical(&self) -> f32 {
+        self.top.value + self.bottom.value
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct Padding {
     pub top: Dimension,

@@ -33,7 +33,7 @@ fn compute_child_position_column(
     let x_offset = get_x_offset_based_on_align_items(align_items, max_width, child_effective_size, margin);
     Position {
         x: current_position.x + x_offset,
-        y: current_position.y,
+        y: current_position.y + margin.top.value,
     }
 }
 

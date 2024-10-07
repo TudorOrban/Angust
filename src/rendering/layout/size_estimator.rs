@@ -8,10 +8,10 @@ use crate::rendering::elements::{common_types::{OptionalSize, Size}, container::
 pub fn estimate_parent_container_sizes(container: &mut Container) {
     let flex_direction = container.get_styles().flex_direction.unwrap_or_default();
 
-    let padding = container.get_styles().padding.unwrap_or_default();
+    let parent_padding = container.get_styles().padding.unwrap_or_default();
     let spacing = container.get_styles().spacing.unwrap_or_default();
-    let mut width: f32 = padding.left.value + padding.right.value;
-    let mut height: f32 = padding.top.value;
+    let mut width: f32 = parent_padding.horizontal();
+    let mut height: f32 = parent_padding.vertical();
 
     // Compute natural size of the container based on the children's effective sizes
     for (index, child) in container.children.iter_mut().enumerate() {
@@ -24,11 +24,14 @@ pub fn estimate_parent_container_sizes(container: &mut Container) {
                     width += spacing.spacing_x.value;
                 }
                 width += margin.left.value + child_effective_size.width + margin.right.value;
-                height = height.max(child_effective_size.height + padding.top.value + padding.bottom.value + spacing.spacing_y.value * index as f32);
+                height = height.max(child_effective_size.height + parent_padding.vertical() + margin.vertical());
             },
             FlexDirection::Column => {
-                width = width.max(child_effective_size.width);
-                height += child_effective_size.height;
+                if index > 0 {
+                    height += spacing.spacing_y.value;
+                }
+                height += margin.top.value + child_effective_size.height + margin.bottom.value;
+                width = width.max(child_effective_size.width + parent_padding.horizontal() + margin.horizontal());
             },
         }
 
