@@ -8,23 +8,19 @@ use crate::rendering::elements::{common_types::{OptionalSize, Size}, container::
 pub fn estimate_parent_container_sizes(container: &mut Container) {
     let flex_direction = container.get_styles().flex_direction.unwrap_or_default();
 
-    let mut width: f32 = 0.0;
-    let mut height: f32 = 0.0;
+    let padding = container.get_styles().padding.unwrap_or_default();
+    let mut width: f32 = padding.left.value + padding.right.value;
+    let mut height: f32 = padding.top.value;
 
-    width += container.get_styles().padding.unwrap_or_default().left.value + container.get_styles().padding.unwrap_or_default().right.value;
-    height += container.get_styles().padding.unwrap_or_default().top.value + container.get_styles().padding.unwrap_or_default().bottom.value;
-    
+    // Compute natural size of the container based on the children's effective sizes
     for child in &container.children {
+        let margin = child.get_styles().margin.unwrap_or_default();
         let child_effective_size = child.get_effective_size();
 
         match flex_direction {
             FlexDirection::Row => {
-                width += child.get_styles().margin.unwrap_or_default().left.value;
-                width += child_effective_size.width;
-                width += child.get_styles().margin.unwrap_or_default().right.value;
-                height = height.max(child_effective_size.height);
-                height += child.get_styles().margin.unwrap_or_default().top.value;
-                height += child.get_styles().margin.unwrap_or_default().bottom.value;
+                width += margin.left.value + child_effective_size.width + margin.right.value;
+                height = height.max(child_effective_size.height + padding.top.value + padding.bottom.value);
             },
             FlexDirection::Column => {
                 width = width.max(child_effective_size.width);

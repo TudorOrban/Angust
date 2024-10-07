@@ -25,7 +25,7 @@ impl Renderer {
         let mut ui_body: Box<dyn Element> = fetch_ui_body();
 
         let screen_size = window.inner_size();
-        ui_body.estimate_size(); // Start backwards recursion to estimate element sizes
+        ui_body.estimate_sizes(); // Start backwards recursion to estimate element sizes
         ui_body.allocate_space( // Start forwards recursion to allocate space
             Position { x: 0.0, y: 0.0 },
             Size { width: screen_size.width as f32, height: screen_size.height as f32 

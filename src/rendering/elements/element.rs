@@ -27,7 +27,7 @@ pub trait Element {
     fn get_natural_size(&self) -> Size;
     fn get_requested_size(&self) -> OptionalSize;
     fn get_effective_size(&self) -> Size;
-    fn estimate_size(&mut self);
+    fn estimate_sizes(&mut self);
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size);
 }
 

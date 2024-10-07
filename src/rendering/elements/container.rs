@@ -153,11 +153,11 @@ impl Element for Container {
         }
     }
 
-    // Traverse the tree from leaves to root and estimate the size of each container.
-    fn estimate_size(&mut self) {
+    // Traverse the DOM from leaves to root and estimate the size of each container.
+    fn estimate_sizes(&mut self) {
         if !self.children.is_empty() {
             for child in &mut self.children {
-                child.estimate_size();
+                child.estimate_sizes();
             }
 
             estimate_parent_container_sizes(self);
@@ -166,6 +166,7 @@ impl Element for Container {
         }
     }
 
+    // Traverse the DOM from root to leaves and allocate space to each container.
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size) {
         self.position = allocated_position;
         self.size = allocated_size;
