@@ -46,10 +46,9 @@ fn find_max_child_height_index(container: &Container) -> usize {
     let mut max_child_height_index: usize = 0;
 
     for (index, child) in container.children.iter().enumerate() {
-        let margin = child.get_styles().margin.unwrap_or_default();
         let child_effective_size = child.get_effective_size();
 
-        let total_child_height = margin.top.value + child_effective_size.height + margin.bottom.value;
+        let total_child_height = child_effective_size.height;
 
         if total_child_height > max_child_height {
             max_child_height = total_child_height;
@@ -59,21 +58,6 @@ fn find_max_child_height_index(container: &Container) -> usize {
 
     max_child_height_index
 }
-
-// fn get_max_child_height(container: &Container) -> f32 {
-//     let mut max_child_height: f32 = 0.0;
-
-//     for child in &container.children {
-//         let margin = child.get_styles().margin.unwrap_or_default();
-//         let child_effective_size = child.get_effective_size();
-
-//         let total_child_height = margin.top.value + child_effective_size.height + margin.bottom.value;
-
-//         max_child_height = f32::max(max_child_height, total_child_height);
-//     }
-
-//     max_child_height
-// }
 
 fn compute_child_position_row(
     child_effective_size: Size,
@@ -102,10 +86,7 @@ fn get_y_offset_based_on_align_items(
     let offset = match align_items {
         AlignItems::FlexStart => margin.top.value,
         AlignItems::FlexEnd => child_max_height - child_effective_size.height - margin.bottom.value,
-        AlignItems::Center => {
-            let mid_point = (child_max_height - child_effective_size.height) / 2.0;
-            mid_point + margin.top.value
-        },
+        AlignItems::Center => (child_max_height - child_effective_size.height) / 2.0 + margin.top.value,
         AlignItems::Stretch | AlignItems::Baseline => margin.top.value, // Simplified; Baseline needs additional logic
     };
 
