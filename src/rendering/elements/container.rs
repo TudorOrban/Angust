@@ -11,7 +11,7 @@ use super::{
     common_types::{OptionalSize, Position, Size},
     element::{Element, ElementType, EventType},
     element_id_generator::IDGenerator,
-    styles::Styles,
+    styles::{Directions, Styles},
 };
 
 pub struct Container {
@@ -21,6 +21,7 @@ pub struct Container {
     natural_size: Size,
     requested_size: OptionalSize,
     styles: Styles,
+    pub is_overflowing: Directions,
     pub children: Vec<Box<dyn Element>>,
 }
 
@@ -35,6 +36,7 @@ impl Container {
             requested_size: OptionalSize::default(),
             styles: Styles::default(),
             children: Vec::new(),
+            is_overflowing: Directions { horizontal: false, vertical: false },
         }
     }
 
@@ -62,6 +64,20 @@ impl Element for Container {
 
         for child in &self.children {
             child.render(canvas);
+        }
+
+        if self.is_overflowing.horizontal {
+            ElementRenderer::render_scrollbar(
+                canvas,
+                Position {
+                    x: self.position.x,
+                    y: self.position.y + self.size.height - 10.0,
+                },
+                Size {
+                    width: self.size.width,
+                    height: 10.0,
+                },
+            );
         }
     }
 

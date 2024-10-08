@@ -14,17 +14,14 @@ pub struct Scrollbar {
 }
 
 impl Scrollbar {
-    pub fn new() -> Self {
+    pub fn new(directions: Directions) -> Self {
         let id = IDGenerator::get();
         Self {
             _id: id,
             position: Position::default(),
             size: Size::default(),
-            requested_size: OptionalSize::default(),
-            directions: Directions {
-                horizontal: false,
-                vertical: false,
-            },
+            directions: directions,
+            requested_size: get_scrollbar_requested_size(directions),
             // natural_size: Size::default(),
             // requested_size: OptionalSize::default(),
             // styles: Styles::default(),
@@ -117,32 +114,36 @@ impl Element for Scrollbar {
 
     // Traverse the DOM from leaves to root and estimate the size of each container.
     fn estimate_sizes(&mut self) {
-        let default_scrollbar_thickness = 10.0;
-        let scrollbar_main_axis_dimension = Dimension {
-            value: 100.0,
-            unit: Unit::Percent,
-        };
-        let scrollbar_cross_axis_dimension = Dimension {
-            value: default_scrollbar_thickness,
-            unit: Unit::Px,
-        };
-
-        if self.directions.horizontal {
-            self.requested_size = OptionalSize {
-                width: Some(scrollbar_main_axis_dimension),
-                height: Some(scrollbar_cross_axis_dimension),
-            }
-        } else {
-            self.requested_size = OptionalSize {
-                width: Some(scrollbar_cross_axis_dimension),
-                height: Some(scrollbar_main_axis_dimension),
-            }
-        }
+        self.requested_size = get_scrollbar_requested_size(self.directions);
     }
 
     // Traverse the DOM from root to leaves and allocate space to each container.
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size) {
         self.position = allocated_position;
         self.size = allocated_size;
+    }
+}
+
+fn get_scrollbar_requested_size(directions: Directions) -> OptionalSize {
+    let default_scrollbar_thickness = 10.0;
+    let scrollbar_main_axis_dimension = Dimension {
+        value: 100.0,
+        unit: Unit::Percent,
+    };
+    let scrollbar_cross_axis_dimension = Dimension {
+        value: default_scrollbar_thickness,
+        unit: Unit::Px,
+    };
+
+    if directions.horizontal {
+        return OptionalSize {
+            width: Some(scrollbar_main_axis_dimension),
+            height: Some(scrollbar_cross_axis_dimension),
+        }
+    } else {
+        return OptionalSize {
+            width: Some(scrollbar_cross_axis_dimension),
+            height: Some(scrollbar_main_axis_dimension),
+        }
     }
 }

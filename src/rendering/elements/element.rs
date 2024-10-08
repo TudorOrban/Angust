@@ -38,6 +38,7 @@ pub enum EventType {
     KeyPress(char),
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub enum ElementType {
     Container,
     Button,

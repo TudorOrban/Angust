@@ -1,4 +1,4 @@
-use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::Element, styles::{AlignItems, FlexWrap, JustifyContent, Margin, Overflow, Spacing}};
+use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::{Element, ElementType}, scrollbar::Scrollbar, styles::{AlignItems, Directions, FlexWrap, JustifyContent, Margin, Overflow, Spacing}};
 
 pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_position: Position, allocated_size: Size) {
     let padding = container.get_styles().padding.unwrap_or_default();
@@ -6,6 +6,11 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
     let align_items = container.get_styles().align_items.unwrap_or_default();
     let flex_wrap = container.get_styles().flex_wrap.unwrap_or_default();
     let overflow = container.get_styles().overflow.unwrap_or_default();
+
+    let children_requested_width = precompute_requested_children_width(container);
+    if overflow == Overflow::Auto && children_requested_width > allocated_size.width {
+        container.is_overflowing = Directions { horizontal: true, vertical: false };
+    }
 
     let children_max_height_index = find_max_child_height_index(container);
     let max_height_child = &container.children[children_max_height_index];
@@ -39,6 +44,17 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
         current_position.x += allocated_space;
         remaining_allocated_width -= allocated_space;
     }
+}
+
+fn precompute_requested_children_width(container: &Container) -> f32 {
+    let spacing = container.get_styles().spacing.unwrap_or_default();
+
+    container.children.iter().fold(0.0, |acc, child| {
+        let child_effective_size = child.get_effective_size();
+        let child_margin = child.get_styles().margin.unwrap_or_default();
+        let total_child_width = child_margin.horizontal() + child_effective_size.width + spacing.spacing_x.value;
+        acc + total_child_width
+    })
 }
 
 fn find_max_child_height_index(container: &Container) -> usize {

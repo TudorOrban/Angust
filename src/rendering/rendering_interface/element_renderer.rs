@@ -55,7 +55,5 @@ impl ElementRenderer {
         paint.set_color(Color::from_argb(255, 200, 200, 200));
 
         canvas.draw_rect(scrollbar_rect, &paint);
-
-
     }
 }
