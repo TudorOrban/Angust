@@ -13,12 +13,56 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
     let children_max_height = max_height_child.get_effective_size().height;
     let max_height_child_margin = max_height_child.get_styles().margin.unwrap_or_default();
 
+    let mut current_position = allocated_position;
+    current_position.x += padding.left.value;
+    current_position.y += padding.top.value;
+
+    let mut parent_remaining_width = allocated_size.width;
+
     let parent_effective_width = precompute_effective_width(container);
-    let deficit = allocated_size.width - parent_effective_width;
+    let mut deficit = allocated_size.width - parent_effective_width;
     if deficit > 0.0 {
         if container.get_styles().flex_wrap.unwrap_or_default() == FlexWrap::NoWrap {
             if container.get_styles().overflow.unwrap_or_default() != Overflow::Visible {
-                resolve_row_width_deficit(container, deficit);
+
+                let variable_width_children: Vec<&Box<dyn Element>> = container.children.iter()
+                    .filter(|child| child.get_requested_size().width.is_none())
+                    .collect();
+
+                let default_flex_shrink = 1.0;
+                let total_shrink_factor = variable_width_children.iter()
+                    .map(|child| child.get_natural_size().width * default_flex_shrink)
+                    .sum::<f32>();
+                
+                let mut remaining_deficit = deficit;
+                
+                for child in variable_width_children.iter() {
+                    let natural_width = child.get_natural_size().width;
+                    let shrink_factor = default_flex_shrink;
+                    let shrink_amount = if total_shrink_factor > 0.0 {
+                        (natural_width * shrink_factor / total_shrink_factor) * remaining_deficit
+                    } else {
+                        0.0
+                    };
+                
+                    let new_width = (natural_width - shrink_amount).max(child.get_natural_size().width);
+                    let actual_shrink = natural_width - new_width;
+                    remaining_deficit -= actual_shrink;
+                
+                    // Set the new width to the child...
+                
+                    // Check if remaining_deficit is sufficiently resolved
+                    if remaining_deficit <= 0.0 {
+                        break; // No more shrinking needed
+                    }
+                }
+                
+                if remaining_deficit > 0.0 {
+
+                }
+                
+
+                return;
             } else {
                 // Clip content during loop
             }
@@ -32,17 +76,12 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
             // Similarly
         }
     }
-    let mut parent_remaining_width = allocated_size.width - padding.left.value - padding.right.value;
-
-    let mut current_position = allocated_position;
-    current_position.x += padding.left.value;
-    current_position.y += padding.top.value;
 
     for child in &mut container.children {
         let child_effective_size = child.get_effective_size();
         let margin = child.get_styles().margin.unwrap_or_default();
 
-        let child_position = compute_child_position_row(
+        let child_position = compute_row_child_position(
             current_position, align_items, child_effective_size, children_max_height, max_height_child_margin, margin
         );
 
@@ -59,7 +98,7 @@ fn precompute_effective_width(container: &Container) -> f32 {
     let spacing = container.get_styles().spacing.unwrap_or_default();
 
     let mut total_width = padding.left.value + padding.right.value;
-    let mut total_spacing = spacing.spacing_x.value * (container.children.len() as f32 - 1.0);
+    let total_spacing = spacing.spacing_x.value * (container.children.len() as f32 - 1.0);
 
     for child in &container.children {
         let margin = child.get_styles().margin.unwrap_or_default();
@@ -88,7 +127,7 @@ fn find_max_child_height_index(container: &Container) -> usize {
     max_child_height_index
 }
 
-fn compute_child_position_row(
+fn compute_row_child_position(
     current_position: Position,
     align_items: AlignItems, 
     child_effective_size: Size,
