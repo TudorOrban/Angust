@@ -1,12 +1,11 @@
-use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::Element, styles::{AlignItems, FlexWrap, JustifyContent, Margin, Overflow}};
-
-use super::row_deficit_resolver::resolve_row_width_deficit;
-
+use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::Element, styles::{AlignItems, FlexWrap, JustifyContent, Margin, Overflow, Spacing}};
 
 pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_position: Position, allocated_size: Size) {
     let padding = container.get_styles().padding.unwrap_or_default();
     let spacing = container.get_styles().spacing.unwrap_or_default();
     let align_items = container.get_styles().align_items.unwrap_or_default();
+    let flex_wrap = container.get_styles().flex_wrap.unwrap_or_default();
+    let overflow = container.get_styles().overflow.unwrap_or_default();
 
     let children_max_height_index = find_max_child_height_index(container);
     let max_height_child = &container.children[children_max_height_index];
@@ -17,96 +16,29 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
     current_position.x += padding.left.value;
     current_position.y += padding.top.value;
 
-    let mut parent_remaining_width = allocated_size.width;
-
-    let parent_effective_width = precompute_effective_width(container);
-    let mut deficit = allocated_size.width - parent_effective_width;
-    if deficit > 0.0 {
-        if container.get_styles().flex_wrap.unwrap_or_default() == FlexWrap::NoWrap {
-            if container.get_styles().overflow.unwrap_or_default() != Overflow::Visible {
-
-                let variable_width_children: Vec<&Box<dyn Element>> = container.children.iter()
-                    .filter(|child| child.get_requested_size().width.is_none())
-                    .collect();
-
-                let default_flex_shrink = 1.0;
-                let total_shrink_factor = variable_width_children.iter()
-                    .map(|child| child.get_natural_size().width * default_flex_shrink)
-                    .sum::<f32>();
-                
-                let mut remaining_deficit = deficit;
-                
-                for child in variable_width_children.iter() {
-                    let natural_width = child.get_natural_size().width;
-                    let shrink_factor = default_flex_shrink;
-                    let shrink_amount = if total_shrink_factor > 0.0 {
-                        (natural_width * shrink_factor / total_shrink_factor) * remaining_deficit
-                    } else {
-                        0.0
-                    };
-                
-                    let new_width = (natural_width - shrink_amount).max(child.get_natural_size().width);
-                    let actual_shrink = natural_width - new_width;
-                    remaining_deficit -= actual_shrink;
-                
-                    // Set the new width to the child...
-                
-                    // Check if remaining_deficit is sufficiently resolved
-                    if remaining_deficit <= 0.0 {
-                        break; // No more shrinking needed
-                    }
-                }
-                
-                if remaining_deficit > 0.0 {
-
-                }
-                
-
-                return;
-            } else {
-                // Clip content during loop
-            }
-        } else {
-            // Wrap content during loop
-        }
-    } else if deficit < 0.0 {
-        if container.get_styles().justify_content.unwrap_or_default() == JustifyContent::SpaceBetween {
-            // Distribute space between children
-        } else {
-            // Similarly
-        }
-    }
+    let mut remaining_allocated_width = allocated_size.width - padding.horizontal();
 
     for child in &mut container.children {
-        let child_effective_size = child.get_effective_size();
-        let margin = child.get_styles().margin.unwrap_or_default();
+        if remaining_allocated_width <= 0.0 && flex_wrap == FlexWrap::NoWrap && overflow != Overflow::Visible {
+            break;
+        }
 
-        let child_position = compute_row_child_position(
-            current_position, align_items, child_effective_size, children_max_height, max_height_child_margin, margin
+        let child_effective_size = child.get_effective_size();
+        let child_margin = child.get_styles().margin.unwrap_or_default();
+
+        let child_allocated_position = compute_row_child_position(
+            current_position, align_items, child_effective_size, children_max_height, max_height_child_margin, child_margin
+        );
+        let child_allocated_size = determine_allocated_size(
+            child_effective_size, remaining_allocated_width, flex_wrap, overflow, child_margin, spacing
         );
 
-        child.allocate_space(child_position, child_effective_size);
+        child.allocate_space(child_allocated_position, child_allocated_size);
 
-        let allocated_space = spacing.spacing_x.value + margin.left.value + child_effective_size.width + margin.right.value;
+        let allocated_space = spacing.spacing_x.value + child_margin.left.value + child_allocated_size.width + child_margin.right.value;
         current_position.x += allocated_space;
-        parent_remaining_width -= allocated_space;
+        remaining_allocated_width -= allocated_space;
     }
-}
-
-fn precompute_effective_width(container: &Container) -> f32 {
-    let padding = container.get_styles().padding.unwrap_or_default();
-    let spacing = container.get_styles().spacing.unwrap_or_default();
-
-    let mut total_width = padding.left.value + padding.right.value;
-    let total_spacing = spacing.spacing_x.value * (container.children.len() as f32 - 1.0);
-
-    for child in &container.children {
-        let margin = child.get_styles().margin.unwrap_or_default();
-        let child_effective_size = child.get_effective_size();
-        total_width += margin.left.value + child_effective_size.width + margin.right.value;
-    }
-
-    total_width + total_spacing
 }
 
 fn find_max_child_height_index(container: &Container) -> usize {
@@ -133,14 +65,14 @@ fn compute_row_child_position(
     child_effective_size: Size,
     children_max_height: f32, 
     max_height_child_margin: Margin,
-    margin: Margin,
+    child_margin: Margin,
 ) -> Position {
     let y_offset = get_y_offset_based_on_align_items(
-        align_items, child_effective_size, children_max_height, max_height_child_margin, margin
+        align_items, child_effective_size, children_max_height, max_height_child_margin, child_margin
     );
 
     Position {
-        x: margin.left.value + current_position.x,
+        x: child_margin.left.value + current_position.x,
         y: current_position.y + y_offset,
     }
 }
@@ -150,12 +82,39 @@ fn get_y_offset_based_on_align_items(
     child_effective_size: Size,
     children_max_height: f32,
     max_height_child_margin: Margin,
-    margin: Margin,
+    child_margin: Margin,
 ) -> f32 {
     match align_items {
-        AlignItems::FlexStart => margin.top.value,
-        AlignItems::FlexEnd => children_max_height + max_height_child_margin.vertical() - child_effective_size.height - margin.bottom.value,
+        AlignItems::FlexStart => child_margin.top.value,
+        AlignItems::FlexEnd => children_max_height + max_height_child_margin.vertical() - child_effective_size.height - child_margin.bottom.value,
         AlignItems::Center => (children_max_height - child_effective_size.height) / 2.0 + max_height_child_margin.top.value,
-        AlignItems::Stretch | AlignItems::Baseline => margin.top.value, // Simplified; Baseline needs additional logic
+        AlignItems::Stretch | AlignItems::Baseline => child_margin.top.value, // Simplified; Baseline needs additional logic
+    }
+}
+
+fn determine_allocated_size(
+    child_effective_size: Size,
+    remaining_allocated_width: f32,
+    flex_wrap: FlexWrap,
+    overflow: Overflow,
+    child_margin: Margin,
+    spacing: Spacing
+) -> Size {
+    if flex_wrap != FlexWrap::NoWrap {
+        return child_effective_size; // To be implemented later
+    }
+
+    if overflow == Overflow::Visible {
+        return child_effective_size;
+    }
+
+    let needed_width = child_margin.horizontal() + spacing.spacing_x.value + child_effective_size.width;
+    if needed_width <= remaining_allocated_width {
+        return child_effective_size; // No need to clip
+    }
+
+    Size {
+        width: (remaining_allocated_width - child_margin.horizontal() - spacing.spacing_x.value).max(0.0),
+        height: child_effective_size.height,
     }
 }
