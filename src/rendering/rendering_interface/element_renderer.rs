@@ -38,4 +38,24 @@ impl ElementRenderer {
         paint.set_color(border_color);
         canvas.draw_rect(row_rect, &paint);
     }
+
+    pub fn render_scrollbar(
+        canvas: &Canvas,
+        position: Position,
+        size: Size,
+    ) {
+        let mut paint = Paint::default();
+        let scrollbar_rect = Rect::from_point_and_size(
+            Point::new(position.x,
+                       position.y),
+            (size.width,
+             size.height)
+        );
+        paint.set_style(PaintStyle::Fill);
+        paint.set_color(Color::from_argb(255, 200, 200, 200));
+
+        canvas.draw_rect(scrollbar_rect, &paint);
+
+
+    }
 }
