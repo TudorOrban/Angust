@@ -14,6 +14,7 @@ pub struct Application<State> {
     event_loop: Option<EventLoop<()>>,
     modifiers: Modifiers,
     mouse_position: Option<Point>,
+    is_mouse_pressed: bool,
     renderer: Renderer,
 }
 
@@ -56,6 +57,7 @@ impl<State> Application<State> {
             event_loop: Some(event_loop),
             modifiers: Modifiers::default(),
             mouse_position: None,
+            is_mouse_pressed: false,
             renderer,
         }
     }
@@ -100,13 +102,24 @@ impl<State> ApplicationHandler for Application<State> {
                 self.modifiers = new_modifiers;
             }
             WindowEvent::MouseInput { state, button, .. } => {
-                if let (ElementState::Pressed, MouseButton::Left) = (state, button) {
-                    if let Some(mouse_position) = self.mouse_position {
-                        self.renderer.handle_event(mouse_position, EventType::MouseClick);
-                        self.windowing_system.window.request_redraw();
-                    }
+                match (state, button) {
+                    (ElementState::Pressed, MouseButton::Left) => {
+                        self.is_mouse_pressed = true;
+                        if let Some(mouse_position) = self.mouse_position {
+                            self.renderer.handle_event(mouse_position, EventType::MouseDown);
+                            self.windowing_system.window.request_redraw();
+                        }
+                    },
+                    (ElementState::Released, MouseButton::Left) => {
+                        self.is_mouse_pressed = false;
+                        if let Some(mouse_position) = self.mouse_position {
+                            self.renderer.handle_event(mouse_position, EventType::MouseUp);
+                            self.windowing_system.window.request_redraw();
+                        }
+                    },
+                    _ => ()
                 }
-            }
+            },
             WindowEvent::KeyboardInput {
                 event: KeyEvent { logical_key, .. },
                 ..
@@ -118,7 +131,14 @@ impl<State> ApplicationHandler for Application<State> {
             }
             WindowEvent::CursorMoved { position, .. } => {
                 self.mouse_position = Some(Point::new(position.x as f32, position.y as f32));
-            }
+
+                if self.is_mouse_pressed {
+                    if let Some(mouse_position) = self.mouse_position {
+                        self.renderer.handle_event(mouse_position, EventType::MouseDrag);
+                        self.windowing_system.window.request_redraw();
+                    }
+                }
+            },
             WindowEvent::RedrawRequested => {
                 // Render and flush the Skia context
                 self.renderer.render_frame(&mut self.windowing_system.gr_context);

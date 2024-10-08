@@ -1,4 +1,4 @@
-use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::{Element, ElementType}, scrollbar::Scrollbar, styles::{AlignItems, Directions, FlexWrap, JustifyContent, Margin, Overflow, Spacing}};
+use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::{Element, ElementType}, styles::{AlignItems, Directions, FlexWrap, JustifyContent, Margin, Overflow, Spacing}};
 
 pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_position: Position, allocated_size: Size) {
     let padding = container.get_styles().padding.unwrap_or_default();
@@ -9,7 +9,7 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
 
     let children_requested_width = precompute_requested_children_width(container);
     if overflow == Overflow::Auto && children_requested_width > allocated_size.width {
-        container.is_overflowing = Directions { horizontal: true, vertical: false };
+        container.scrollbar_state.is_overflowing = Directions { horizontal: true, vertical: false };
     }
 
     let children_max_height_index = find_max_child_height_index(container);

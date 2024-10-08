@@ -35,6 +35,9 @@ pub trait Element {
 pub enum EventType {
     MouseClick,
     MouseMove,
+    MouseDown,
+    MouseDrag,
+    MouseUp,
     KeyPress(char),
 }
 

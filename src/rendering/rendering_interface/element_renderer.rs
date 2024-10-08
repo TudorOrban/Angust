@@ -1,6 +1,6 @@
 use skia_safe::{Canvas, Color, Paint, PaintStyle, Point, Rect};
 
-use crate::rendering::elements::{common_types::{Position, Size}, styles::Dimension};
+use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions}};
 
 
 
@@ -43,7 +43,10 @@ impl ElementRenderer {
         canvas: &Canvas,
         position: Position,
         size: Size,
+        directions: Directions,
+        current_position: f32, // Between 0.0 and 1.0
     ) {
+        // Draw outer rectangle
         let mut paint = Paint::default();
         let scrollbar_rect = Rect::from_point_and_size(
             Point::new(position.x,
@@ -55,5 +58,25 @@ impl ElementRenderer {
         paint.set_color(Color::from_argb(255, 200, 200, 200));
 
         canvas.draw_rect(scrollbar_rect, &paint);
+
+        // Draw thumb
+        let thumb_size = Size {
+            width: size.width * 0.2,
+            height: size.height * 0.8,
+        };
+        let thumb_position = Position {
+            x: position.x + current_position * size.width - thumb_size.width / 2.0,
+            y: position.y,
+        };
+
+        let thumb_rect = Rect::from_point_and_size(
+            Point::new(thumb_position.x,
+                       thumb_position.y),
+            (thumb_size.width,
+             thumb_size.height)
+        );
+
+        paint.set_color(Color::from_argb(255, 100, 100, 100));
+        canvas.draw_rect(thumb_rect, &paint);
     }
 }

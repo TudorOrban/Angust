@@ -1,14 +1,14 @@
 use skia_safe::{Canvas, Color, Point};
 
-use crate::rendering::{
+use crate::{event_handling::scrollbar_movement_handler::handle_scrollbar_movement, rendering::{
     layout::{
         size_estimator, space_allocation_system::container::container_space_allocator,
     },
     rendering_interface::element_renderer::ElementRenderer,
-};
+}};
 
 use super::{
-    common_types::{OptionalSize, Position, Size},
+    common_types::{OptionalSize, Position, ScrollbarState, Size},
     element::{Element, ElementType, EventType},
     element_id_generator::IDGenerator,
     styles::{Directions, Styles},
@@ -21,8 +21,8 @@ pub struct Container {
     natural_size: Size,
     requested_size: OptionalSize,
     styles: Styles,
-    pub is_overflowing: Directions,
     pub children: Vec<Box<dyn Element>>,
+    pub scrollbar_state: ScrollbarState,
 }
 
 impl Container {
@@ -36,7 +36,7 @@ impl Container {
             requested_size: OptionalSize::default(),
             styles: Styles::default(),
             children: Vec::new(),
-            is_overflowing: Directions { horizontal: false, vertical: false },
+            scrollbar_state: ScrollbarState::default(),
         }
     }
 
@@ -66,7 +66,7 @@ impl Element for Container {
             child.render(canvas);
         }
 
-        if self.is_overflowing.horizontal {
+        if self.scrollbar_state.is_overflowing.horizontal {
             ElementRenderer::render_scrollbar(
                 canvas,
                 Position {
@@ -77,6 +77,11 @@ impl Element for Container {
                     width: self.size.width,
                     height: 10.0,
                 },
+                Directions {
+                    horizontal: true,
+                    vertical: false,
+                },
+                self.scrollbar_state.current_scroll_position.x,
             );
         }
     }
@@ -88,6 +93,8 @@ impl Element for Container {
     }
 
     fn handle_event(&mut self, cursor_position: Point, event_type: &EventType) {
+        handle_scrollbar_movement(self, cursor_position, event_type);
+        
         for child in &mut self.children {
             child.handle_event(cursor_position, event_type);
         }

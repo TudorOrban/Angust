@@ -1,6 +1,6 @@
 use std::ops::Add;
 
-use super::styles::Dimension;
+use super::styles::{Dimension, Directions};
 
 
 #[derive(Clone, Copy, Debug)]
@@ -66,6 +66,29 @@ impl Default for OptionalSize {
         Self {
             width: None,
             height: None,
+        }
+    }
+}
+
+pub struct ScrollbarState {
+    pub is_overflowing: Directions,
+    pub current_scroll_position: Position,
+    pub is_dragging: bool,
+    pub drag_start_position: Position,
+    pub drag_start_scroll_position: Position,
+}
+
+impl Default for ScrollbarState {
+    fn default() -> Self {
+        Self {
+            is_overflowing: Directions {
+                horizontal: false,
+                vertical: false,
+            },
+            current_scroll_position: Position::default(),
+            is_dragging: false,
+            drag_start_position: Position::default(),
+            drag_start_scroll_position: Position::default(),
         }
     }
 }
