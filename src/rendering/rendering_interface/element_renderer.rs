@@ -45,6 +45,7 @@ impl ElementRenderer {
         size: Size,
         directions: Directions,
         current_position: f32, // Between 0.0 and 1.0
+        thumb_scrollbar_width_ratio: f32,
     ) {
         // Draw outer rectangle
         let mut paint = Paint::default();
@@ -60,7 +61,6 @@ impl ElementRenderer {
         canvas.draw_rect(scrollbar_rect, &paint);
 
         // Draw thumb
-        let thumb_scrollbar_width_ratio = 0.2;
         let thumb_width = size.width * thumb_scrollbar_width_ratio;
         let thumb_size = Size {
             width: thumb_width,

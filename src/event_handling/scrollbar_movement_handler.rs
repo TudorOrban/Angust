@@ -12,8 +12,7 @@ pub fn handle_scrollbar_movement(
         return; // Implement vertical scrollbar handling later
     }
     
-    let thumb_scrollbar_width_ratio = 0.2;
-    let thumb_width = container.get_size().width * thumb_scrollbar_width_ratio;
+    let thumb_width = container.get_size().width * container.scrollbar_state.thumb_scrollbar_width_ratio;
     let track_width = container.get_size().width;
 
     let container_rect = Rect::from_point_and_size(
@@ -44,6 +43,8 @@ pub fn handle_scrollbar_movement(
                 let new_thumb_center = cursor_position.x - container.get_position().x;
                 let new_position = (new_thumb_center - thumb_width / 2.0) / (track_width - thumb_width);
                 container.scrollbar_state.current_scroll_position.x = new_position.clamp(0.0, 1.0);
+
+                container.allocate_space(container.get_position(), container.get_size());
             }
         }
         EventType::MouseDrag => {
@@ -51,6 +52,8 @@ pub fn handle_scrollbar_movement(
                 let adjusted_cursor_x = cursor_position.x - container.scrollbar_state.drag_start_position.x;
                 let new_x = adjusted_cursor_x / (track_width - thumb_width);
                 container.scrollbar_state.current_scroll_position.x = new_x.clamp(0.0, 1.0);
+    
+                container.allocate_space(container.get_position(), container.get_size());
             }
         }
         EventType::MouseUp => {
@@ -61,6 +64,8 @@ pub fn handle_scrollbar_movement(
                 let adjustment_factor = 0.01;
                 let new_position = container.scrollbar_state.current_scroll_position.x - delta * adjustment_factor;
                 container.scrollbar_state.current_scroll_position.x = new_position.clamp(0.0, 1.0);
+                
+                container.allocate_space(container.get_position(), container.get_size());
             }
         }
         _ => {}

@@ -82,6 +82,7 @@ impl Element for Container {
                     vertical: false,
                 },
                 self.scrollbar_state.current_scroll_position.x,
+                self.scrollbar_state.thumb_scrollbar_width_ratio
             );
         }
     }
@@ -94,7 +95,7 @@ impl Element for Container {
 
     fn handle_event(&mut self, cursor_position: Point, event_type: &EventType) {
         handle_scrollbar_movement(self, cursor_position, event_type);
-        
+
         for child in &mut self.children {
             child.handle_event(cursor_position, event_type);
         }

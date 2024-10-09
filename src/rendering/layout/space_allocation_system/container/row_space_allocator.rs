@@ -8,7 +8,9 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
     let overflow = container.get_styles().overflow.unwrap_or_default();
 
     let children_requested_width = precompute_requested_children_width(container);
+    let overflow_width = children_requested_width - (allocated_size.width - padding.horizontal());
     if overflow == Overflow::Auto && children_requested_width > allocated_size.width {
+        container.scrollbar_state.thumb_scrollbar_width_ratio = (allocated_size.width - padding.horizontal()) / children_requested_width;
         container.scrollbar_state.is_overflowing = Directions { horizontal: true, vertical: false };
     }
 
@@ -20,6 +22,11 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
     let mut current_position = allocated_position;
     current_position.x += padding.left.value;
     current_position.y += padding.top.value;
+
+    // Adjust current position based on the current scroll position
+    if container.scrollbar_state.is_overflowing.horizontal {
+        current_position.x -= container.scrollbar_state.current_scroll_position.x * overflow_width;
+    }
 
     let mut remaining_allocated_width = allocated_size.width - padding.horizontal();
 
@@ -114,7 +121,7 @@ fn determine_allocated_size(
     flex_wrap: FlexWrap,
     overflow: Overflow,
     child_margin: Margin,
-    spacing: Spacing
+    spacing: Spacing,
 ) -> Size {
     if flex_wrap != FlexWrap::NoWrap {
         return child_effective_size; // To be implemented later
