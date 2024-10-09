@@ -1,4 +1,4 @@
-use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::{Element, ElementType}, styles::{AlignItems, Directions, FlexWrap, JustifyContent, Margin, Overflow, Spacing}};
+use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::Element, styles::{AlignItems, Directions, FlexWrap, Margin, Overflow, Spacing}};
 
 pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_position: Position, allocated_size: Size) {
     let padding = container.get_styles().padding.unwrap_or_default();
@@ -7,12 +7,15 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
     let flex_wrap = container.get_styles().flex_wrap.unwrap_or_default();
     let overflow = container.get_styles().overflow.unwrap_or_default();
 
+    let container_starting_x = allocated_position.x + padding.left.value;
+    let container_ending_x = allocated_position.x + allocated_size.width - padding.right.value;
+    let effective_horizontal_space = allocated_size.width - padding.horizontal();
     let children_requested_width = precompute_requested_children_width(container);
-    let overflow_width = children_requested_width - (allocated_size.width - padding.horizontal());
     if overflow == Overflow::Auto && children_requested_width > allocated_size.width {
-        container.scrollbar_state.thumb_scrollbar_width_ratio = (allocated_size.width - padding.horizontal()) / children_requested_width;
+        container.scrollbar_state.thumb_scrollbar_width_ratio = effective_horizontal_space / children_requested_width;
         container.scrollbar_state.is_overflowing = Directions { horizontal: true, vertical: false };
     }
+    let current_scroll_position_x = container.scrollbar_state.current_scroll_position.x;
 
     let children_max_height_index = find_max_child_height_index(container);
     let max_height_child = &container.children[children_max_height_index];
@@ -23,18 +26,7 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
     current_position.x += padding.left.value;
     current_position.y += padding.top.value;
 
-    // Adjust current position based on the current scroll position
-    if container.scrollbar_state.is_overflowing.horizontal {
-        current_position.x -= container.scrollbar_state.current_scroll_position.x * overflow_width;
-    }
-
-    let mut remaining_allocated_width = allocated_size.width - padding.horizontal();
-
     for child in &mut container.children {
-        if remaining_allocated_width <= 0.0 && flex_wrap == FlexWrap::NoWrap && overflow != Overflow::Visible {
-            break;
-        }
-
         let child_effective_size = child.get_effective_size();
         let child_margin = child.get_styles().margin.unwrap_or_default();
 
@@ -42,14 +34,13 @@ pub fn allocate_space_to_children_row_flex(container: &mut Container, allocated_
             current_position, align_items, child_effective_size, children_max_height, max_height_child_margin, child_margin
         );
         let child_allocated_size = determine_allocated_size(
-            child_effective_size, remaining_allocated_width, flex_wrap, overflow, child_margin, spacing
+            child_effective_size, container_starting_x, container_ending_x, current_position.x, current_scroll_position_x, flex_wrap, overflow, child_margin, spacing
         );
 
         child.allocate_space(child_allocated_position, child_allocated_size);
 
         let allocated_space = spacing.spacing_x.value + child_margin.left.value + child_allocated_size.width + child_margin.right.value;
         current_position.x += allocated_space;
-        remaining_allocated_width -= allocated_space;
     }
 }
 
@@ -117,7 +108,10 @@ fn get_y_offset_based_on_align_items(
 
 fn determine_allocated_size(
     child_effective_size: Size,
-    remaining_allocated_width: f32,
+    container_starting_x: f32,
+    container_ending_x: f32,
+    current_position_x: f32,
+    current_scroll_position_x: f32, // Between 0.0 and 1.0
     flex_wrap: FlexWrap,
     overflow: Overflow,
     child_margin: Margin,
@@ -128,16 +122,29 @@ fn determine_allocated_size(
     }
 
     if overflow == Overflow::Visible {
-        return child_effective_size;
-    }
-
-    let needed_width = child_margin.horizontal() + spacing.spacing_x.value + child_effective_size.width;
-    if needed_width <= remaining_allocated_width {
         return child_effective_size; // No need to clip
     }
+    
+    let child_starting_x = current_position_x + child_margin.left.value;
+    let child_ending_x = child_starting_x + child_effective_size.width + child_margin.right.value;
 
-    Size {
-        width: (remaining_allocated_width - child_margin.horizontal() - spacing.spacing_x.value).max(0.0),
-        height: child_effective_size.height,
+    if child_starting_x < container_starting_x {
+        let overflow_x = container_starting_x - child_starting_x;
+        let allocated_width = child_effective_size.width - overflow_x;
+        return Size {
+            width: allocated_width,
+            height: child_effective_size.height,
+        };
     }
+
+    if child_ending_x > container_ending_x {
+        let overflow_x = child_ending_x - container_ending_x;
+        let allocated_width = child_effective_size.width - overflow_x;
+        return Size {
+            width: allocated_width,
+            height: child_effective_size.height,
+        };
+    }
+
+    child_effective_size
 }
