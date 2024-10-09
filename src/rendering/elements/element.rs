@@ -32,12 +32,14 @@ pub trait Element {
 }
 
 
+#[derive(Clone, Debug, PartialEq)]
 pub enum EventType {
     MouseClick,
     MouseMove,
     MouseDown,
     MouseDrag,
     MouseUp,
+    MouseRoll(f32),
     KeyPress(char),
 }
 

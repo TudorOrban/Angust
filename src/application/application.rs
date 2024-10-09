@@ -1,5 +1,5 @@
 use skia_safe::{gpu::gl::FramebufferInfo, Point};
-use winit::{application::ApplicationHandler, event::{ElementState, KeyEvent, Modifiers, MouseButton, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}};
+use winit::{application::ApplicationHandler, event::{ElementState, KeyEvent, Modifiers, MouseButton, MouseScrollDelta, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}};
 use gl_rs as gl;
 use glutin::{config::GlConfig, display::GetGlDisplay, prelude::GlDisplay, surface::GlSurface};
 use std::{ffi::CString, num::NonZeroU32};
@@ -83,10 +83,11 @@ impl<State> ApplicationHandler for Application<State> {
         event: WindowEvent,
     ) {
         match event {
+            // Window handling events
             WindowEvent::CloseRequested => {
                 event_loop.exit();
                 return;
-            }
+            },
             WindowEvent::Resized(physical_size) => {
                 let (width, height): (u32, u32) = physical_size.into();
                 self.windowing_system.gl_surface.resize(
@@ -97,10 +98,23 @@ impl<State> ApplicationHandler for Application<State> {
             
                 self.renderer.resize_surface(&self.windowing_system.window, &mut self.windowing_system.gr_context, self.fb_info, self.windowing_system.gl_config.num_samples() as usize, self.windowing_system.gl_config.stencil_size() as usize);
                 self.windowing_system.window.request_redraw();
-            }
+            },
             WindowEvent::ModifiersChanged(new_modifiers) => {
                 self.modifiers = new_modifiers;
+            },
+            WindowEvent::RedrawRequested => {
+                // Render and flush the Skia context
+                self.renderer.render_frame(&mut self.windowing_system.gr_context);
+                self.windowing_system.gr_context.flush_and_submit();
+
+                // Swap buffers to show the rendered content
+                self.windowing_system
+                    .gl_surface
+                    .swap_buffers(&self.windowing_system.gl_context)
+                    .expect("Failed to swap buffers");
             }
+
+            // Mouse and keyboard events
             WindowEvent::MouseInput { state, button, .. } => {
                 match (state, button) {
                     (ElementState::Pressed, MouseButton::Left) => {
@@ -120,15 +134,6 @@ impl<State> ApplicationHandler for Application<State> {
                     _ => ()
                 }
             },
-            WindowEvent::KeyboardInput {
-                event: KeyEvent { logical_key, .. },
-                ..
-            } => {
-                if self.modifiers.state().super_key() && logical_key == "q" {
-                    event_loop.exit();
-                }
-                self.windowing_system.window.request_redraw();
-            }
             WindowEvent::CursorMoved { position, .. } => {
                 self.mouse_position = Some(Point::new(position.x as f32, position.y as f32));
 
@@ -139,16 +144,25 @@ impl<State> ApplicationHandler for Application<State> {
                     }
                 }
             },
-            WindowEvent::RedrawRequested => {
-                // Render and flush the Skia context
-                self.renderer.render_frame(&mut self.windowing_system.gr_context);
-                self.windowing_system.gr_context.flush_and_submit();
-
-                // Swap buffers to show the rendered content
-                self.windowing_system
-                    .gl_surface
-                    .swap_buffers(&self.windowing_system.gl_context)
-                    .expect("Failed to swap buffers");
+            WindowEvent::MouseWheel { delta, .. } => {
+                let scroll_delta = match delta {
+                    MouseScrollDelta::LineDelta(_, y) => y * 5.0,
+                    MouseScrollDelta::PixelDelta(pos) => pos.y as f32,
+                };
+            
+                if let Some(mouse_position) = self.mouse_position {
+                    self.renderer.handle_event(mouse_position, EventType::MouseRoll(scroll_delta));
+                    self.windowing_system.window.request_redraw();
+                }
+            },
+            WindowEvent::KeyboardInput {
+                event: KeyEvent { logical_key, .. },
+                ..
+            } => {
+                if self.modifiers.state().super_key() && logical_key == "q" {
+                    event_loop.exit();
+                }
+                self.windowing_system.window.request_redraw();
             }
             _ => (),
         }
