@@ -60,12 +60,17 @@ impl ElementRenderer {
         canvas.draw_rect(scrollbar_rect, &paint);
 
         // Draw thumb
+        let thumb_scrollbar_width_ratio = 0.2;
+        let thumb_width = size.width * thumb_scrollbar_width_ratio;
         let thumb_size = Size {
-            width: size.width * 0.2,
+            width: thumb_width,
             height: size.height * 0.8,
         };
+        let max_left_position = position.x;
+        let max_right_position = position.x + size.width - thumb_width;
+
         let thumb_position = Position {
-            x: position.x + current_position * size.width - thumb_size.width / 2.0,
+            x: max_left_position + (current_position * (max_right_position - max_left_position)),
             y: position.y,
         };
 
