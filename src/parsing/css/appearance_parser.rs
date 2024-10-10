@@ -23,7 +23,7 @@ pub fn update_appearance_style(styles: &mut Styles, key: &str, value: &str) {
     }
 }
 
-fn parse_color(value: &str) -> Option<Color> {
+pub fn parse_color(value: &str) -> Option<Color> {
     // Handle rgb() and rgba() formats
     let trimmed_value = value.trim();
     if trimmed_value.starts_with("rgb(") && trimmed_value.ends_with(")") {

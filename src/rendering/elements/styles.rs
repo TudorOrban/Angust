@@ -14,9 +14,13 @@ pub struct Styles {
     pub margin: Option<Margin>,
     pub padding: Option<Padding>,
     pub spacing: Option<Spacing>,
+    pub border: Option<Border>,
     pub background_color: Option<Color>,
     pub text_color: Option<Color>,
-    pub border: Option<Border>,
+    pub font_size: Option<Dimension>,
+    pub font_family: Option<FontFamily>,
+    pub font_weight: Option<FontWeight>,
+    pub font_style: Option<FontStyle>,
 }
 
 impl Default for Styles {
@@ -36,6 +40,10 @@ impl Default for Styles {
             background_color: Some(Color::TRANSPARENT),
             text_color: Some(Color::BLACK),
             border: Some(Border::default()),
+            font_size: Some(Dimension { value: 16.0, unit: Unit::Px }),
+            font_family: Some(FontFamily::default()),
+            font_weight: Some(FontWeight::default()),
+            font_style: Some(FontStyle::default()),
         }
     }
 }
@@ -318,3 +326,90 @@ impl Default for Directions {
         }
     }
 }
+
+// Text properties
+#[derive(Clone, Copy, Debug)]
+pub enum FontFamily {
+    Arial,
+    Helvetica,
+    TimesNewRoman,
+    Courier,
+    Verdana,
+}
+
+impl Default for FontFamily {
+    fn default() -> Self {
+        Self::Arial
+    }
+}
+
+impl FontFamily {
+    pub fn to_string(&self) -> String {
+        match self {
+            Self::Arial => "Arial".to_string(),
+            Self::Helvetica => "Helvetica".to_string(),
+            Self::TimesNewRoman => "Times New Roman".to_string(),
+            Self::Courier => "Courier".to_string(),
+            Self::Verdana => "Verdana".to_string(),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum FontWeight {
+    FW100,
+    FW200,
+    FW300,
+    FW400,
+    FW500,
+    FW600,
+    FW700,
+    FW800,
+    FW900,
+}
+
+impl Default for FontWeight {
+    fn default() -> Self {
+        Self::FW400
+    }
+}
+
+impl FontWeight {
+    pub fn to_number(&self) -> u16 {
+        match self {
+            Self::FW100 => 100,
+            Self::FW200 => 200,
+            Self::FW300 => 300,
+            Self::FW400 => 400,
+            Self::FW500 => 500,
+            Self::FW600 => 600,
+            Self::FW700 => 700,
+            Self::FW800 => 800,
+            Self::FW900 => 900,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum FontStyle {
+    Normal,
+    Italic,
+    Oblique,
+}
+
+impl Default for FontStyle {
+    fn default() -> Self {
+        Self::Normal
+    }
+}
+
+impl FontStyle {
+    pub fn to_string(&self) -> String {
+        match self {
+            Self::Normal => "normal".to_string(),
+            Self::Italic => "italic".to_string(),
+            Self::Oblique => "oblique".to_string(),
+        }
+    }
+}
+

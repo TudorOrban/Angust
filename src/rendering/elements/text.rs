@@ -97,7 +97,7 @@ impl Element for Text {
     // Traverse the DOM from leaves to root and estimate the size of each container.
     fn estimate_sizes(&mut self) {
         self.set_natural_size(Size {
-            width: 20.0 * self.content.len() as f32,
+            width: 7.0 * self.content.len() as f32,
             height: 80.0,
         });
     }

@@ -97,7 +97,6 @@ impl ElementRenderer {
         text_color: Color,
         text_content: String,
     ) {
-        println!("Rendering text: {}", text_content);
         let font_mgr = FontMgr::default();
         let typeface = font_mgr.match_family_style("Arial", FontStyle::normal())
             .expect("Unable to create typeface");
