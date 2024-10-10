@@ -25,6 +25,11 @@ impl Text {
             natural_size: Size::default(),
         }
     }
+    
+    pub fn set_styles(&mut self, styles: Styles) -> &mut Self {
+        self.styles = styles;
+        self
+    }
 }
 
 impl Element for Text {

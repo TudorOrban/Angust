@@ -1,10 +1,9 @@
 use crate::rendering::elements::styles::{FontFamily, FontStyle, FontWeight, Styles};
 
-use super::{appearance_parser::parse_color, dimension_parser::parse_dimension};
+use super::dimension_parser::parse_dimension;
 
 pub fn update_text_style(styles: &mut Styles, key: &str, value: &str) {
     match key {
-        "color" => styles.text_color = parse_color(value),
         "font-size" => styles.font_size = parse_dimension(value),
         "font-weight" => styles.font_weight = parse_font_weight(value),
         "font-family" => styles.font_family = parse_font_family(value),

@@ -12,7 +12,7 @@ pub fn fetch_ui_body() -> Box<dyn Element> {
 
     let dom = parse_html_content(html_content.as_str());
 
-    map_dom_to_elements(&dom)
+    map_dom_to_elements(&dom, None)
         .expect("Failed to map DOM to elements")
 }
 
