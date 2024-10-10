@@ -1,8 +1,8 @@
 use skia_safe::{Canvas, Color, Point};
 
-use crate::rendering::rendering_interface::element_renderer::ElementRenderer;
+use crate::rendering::{layout::space_allocation_system::text::size_estimator::estimate_text_element_size, rendering_interface::element_renderer::ElementRenderer};
 
-use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, styles::{Dimension, Styles, Unit}};
+use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, styles::Styles};
 
 
 pub struct Text {
@@ -29,6 +29,15 @@ impl Text {
     pub fn set_styles(&mut self, styles: Styles) -> &mut Self {
         self.styles = styles;
         self
+    }
+
+    pub fn set_content(&mut self, content: String) -> &mut Self {
+        self.content = content;
+        self
+    }
+
+    pub fn get_content(&self) -> String {
+        self.content.clone()
     }
 }
 
@@ -102,19 +111,15 @@ impl Element for Text {
 
     fn get_effective_size(&self) -> Size { self.get_natural_size() }
 
-    // Traverse the DOM from leaves to root and estimate the size of each container.
     fn estimate_sizes(&mut self) {
-        self.set_natural_size(Size {
-            width: 7.0 * self.content.len() as f32,
-            height: 80.0,
-        });
+        let estimated_text_size = estimate_text_element_size(self);
+        self.set_natural_size(estimated_text_size);
     }
 
-    // Traverse the DOM from root to leaves and allocate space to each container.
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size) {
         self.position = {
             let x = allocated_position.x;
-            let y = allocated_position.y + 20.0;
+            let y = allocated_position.y + self.get_natural_size().height; // offset by the height of one line (multi-line text is not supported yet)
             Position { x, y }
         };
         self.size = allocated_size;
