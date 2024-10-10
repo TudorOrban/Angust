@@ -40,8 +40,8 @@ impl Element for Text {
             self.get_size(), 
             self.get_styles().text_color.unwrap_or(Color::BLACK),
             self.get_styles().font_size.unwrap_or_default().value,
-            self.get_styles().font_weight.unwrap_or_default().to_number(),
-            self.get_styles().font_family.unwrap_or_default().to_string(),
+            self.get_styles().font_weight.unwrap_or_default(),
+            self.get_styles().font_family.unwrap_or_default(),
             self.get_styles().font_style.unwrap_or_default(),
             self.content.clone(),
         );

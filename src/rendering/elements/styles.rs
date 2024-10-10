@@ -38,12 +38,13 @@ impl Default for Styles {
             padding: Some(Padding::default()),
             spacing: Some(Spacing::default()),
             background_color: Some(Color::TRANSPARENT),
-            text_color: Some(Color::BLACK),
             border: Some(Border::default()),
-            font_size: Some(Dimension { value: 16.0, unit: Unit::Px }),
-            font_family: Some(FontFamily::default()),
-            font_weight: Some(FontWeight::default()),
-            font_style: Some(FontStyle::default()),
+            // Cascading properties
+            text_color: None,
+            font_size: None,
+            font_family: None,
+            font_weight: None,
+            font_style: None,
         }
     }
 }
@@ -375,7 +376,7 @@ impl Default for FontWeight {
 }
 
 impl FontWeight {
-    pub fn to_number(&self) -> u16 {
+    pub fn to_number(&self) -> i32 {
         match self {
             Self::FW100 => 100,
             Self::FW200 => 200,

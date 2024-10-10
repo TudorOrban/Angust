@@ -53,6 +53,7 @@ impl Container {
 
 impl Element for Container {
     fn render(&self, canvas: &Canvas) {
+        // println!("Container styles: {:?}", self.styles);
         ElementRenderer::render_element(
             canvas,
             self.position,

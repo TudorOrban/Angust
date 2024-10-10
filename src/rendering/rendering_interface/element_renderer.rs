@@ -1,9 +1,8 @@
-use skia_safe::{Canvas, Color, Font, FontMgr, Paint, PaintStyle, Point, Rect};
+use skia_safe::{font_style::{Slant, Width}, Canvas, Color, Font, FontMgr, FontStyle, Paint, PaintStyle, Point, Rect};
 
-use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions, FontStyle}};
+use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions, FontFamily, FontStyle as CustomFontStyle, FontWeight}};
 
-use super::custom_to_skia_types_mapper::map_custom_to_skia_font_style;
-
+use super::custom_to_skia_types_mapper::{map_custom_to_skia_font_style, map_custom_to_skia_font_weight};
 
 
 pub struct ElementRenderer {
@@ -97,13 +96,17 @@ impl ElementRenderer {
         size: Size, 
         text_color: Color,
         font_size: f32,
-        font_weight: u16,
-        font_family: String,
-        font_style: FontStyle,
+        font_weight: FontWeight,
+        font_family: FontFamily,
+        font_style: CustomFontStyle,
         text_content: String,
     ) {
         let font_mgr = FontMgr::default();
-        let typeface = font_mgr.match_family_style(font_family, map_custom_to_skia_font_style(&font_style))
+        let slant: Slant = map_custom_to_skia_font_style(&font_style);
+        let weight = map_custom_to_skia_font_weight(&font_weight);
+        let font_style = FontStyle::new(weight, Width::from(20), slant);
+        
+        let typeface = font_mgr.match_family_style(font_family.to_string(), font_style)
             .expect("Unable to create typeface");
 
         let font = Font::new(typeface, font_size);
