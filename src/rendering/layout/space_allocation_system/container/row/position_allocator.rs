@@ -1,74 +1,69 @@
-use crate::rendering::elements::{common_types::{Position, Size}, container::Container, styles::{AlignItems, FlexWrap, Margin, Overflow}};
+use crate::rendering::elements::{common_types::{Position, Size}, container::Container, styles::{AlignItems, FlexWrap, Margin, Overflow, Spacing}};
 
 
 pub fn determine_allocated_position(
-    current_position: Position,
-    container_allocated_position: Position,
-    current_scroll_position_x: f32, // Between 0.0 and 1.0
     flex_wrap: FlexWrap,
     overflow: Overflow,
-    container_starting_x: f32,
-    container_ending_x: f32,
-    container_width: f32,
-    container_requested_width: f32,
     align_items: AlignItems, 
+    spacing: Spacing,
+    current_position: Position,
     child_effective_size: Size,
     children_max_height: f32, 
     max_height_child_margin: Margin,
     child_margin: Margin,
 ) -> Position {
-    let child_x_position = child_x_position(
-        current_position, container_allocated_position, current_scroll_position_x, flex_wrap, overflow, container_starting_x, container_ending_x, container_width, container_requested_width, child_margin, child_effective_size.width
+    let child_x_position = compute_child_x_position(
+        flex_wrap, overflow, spacing, current_position, child_margin
     );
-    let y_offset = get_y_offset(
-        align_items, child_effective_size, children_max_height, max_height_child_margin, child_margin
+    let child_y_position = compute_child_y_position(
+        align_items, current_position, child_effective_size, children_max_height, max_height_child_margin, child_margin
     );
 
     Position {
         x: child_x_position,
-        y: current_position.y + y_offset,
+        y: child_y_position,
     }
 }
 
-fn child_x_position(
-    current_position: Position,
-    container_allocated_position: Position,
-    current_scroll_position_x: f32, // Between 0.0 and 1.0
+// Horizontal computations
+fn compute_child_x_position(
     flex_wrap: FlexWrap,
     overflow: Overflow,
-    container_starting_x: f32,
-    container_ending_x: f32,
-    container_width: f32,
-    container_requested_width: f32,
+    spacing: Spacing,
+    current_position: Position,
     child_margin: Margin,
-    child_width: f32,
 ) -> f32 {
+    let new_child_position_x = spacing.spacing_x.value + current_position.x + child_margin.left.value;
+
     if flex_wrap != FlexWrap::NoWrap {
-        return current_position.x + child_margin.left.value; // To be implemented later
+        return new_child_position_x; // To be implemented later
     }
 
     if overflow == Overflow::Visible {
-        return current_position.x + child_margin.left.value; // No need to clip
+        return new_child_position_x; // No need to clip
     }
     
-    let new_child_x_position = current_position.x.max(container_starting_x);
-
-    new_child_x_position
+    new_child_position_x
 }
 
-fn get_y_offset(
+
+// Vertical computations
+fn compute_child_y_position(
     align_items: AlignItems,
+    current_position: Position,
     child_effective_size: Size,
     children_max_height: f32,
     max_height_child_margin: Margin,
     child_margin: Margin,
 ) -> f32 {
-    match align_items {
+    let offset = match align_items {
         AlignItems::FlexStart => child_margin.top.value,
         AlignItems::FlexEnd => children_max_height + max_height_child_margin.vertical() - child_effective_size.height - child_margin.bottom.value,
         AlignItems::Center => (children_max_height - child_effective_size.height) / 2.0 + max_height_child_margin.top.value,
         AlignItems::Stretch | AlignItems::Baseline => child_margin.top.value, // Simplified; Baseline needs additional logic
-    }
+    };
+
+    current_position.y + offset
 }
 
 pub fn find_max_child_height_index(container: &Container) -> usize {

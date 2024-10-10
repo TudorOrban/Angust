@@ -17,6 +17,10 @@ impl ElementRenderer {
         border_width: Dimension,
         border_color: Color
     ) {
+        if (size.width <= 0.0) || (size.height <= 0.0) {
+            return;
+        }
+        
         let row_rect = Rect::from_point_and_size(
             Point::new(position.x,
                        position.y),
