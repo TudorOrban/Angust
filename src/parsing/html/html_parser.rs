@@ -6,6 +6,7 @@ use kuchiki::traits::TendrilSink;
 use crate::parsing::css::css_parser;
 use crate::rendering::elements::container::Container;
 use crate::rendering::elements::element::Element;
+use crate::rendering::elements::text::Text;
 
 
 pub fn parse_html_content(html: &str) -> NodeRef {
@@ -22,8 +23,7 @@ pub fn map_dom_to_elements(dom: &NodeRef) -> Option<Box<dyn Element>> {
             Some(process_div_element(elem_data, dom))
         },
         NodeData::Text(ref text) => {
-            handle_text_node(&text.borrow());
-            None
+            handle_text_node(&text.borrow())
         },
         _ => general_traversal(dom),
     }
@@ -48,10 +48,14 @@ fn process_div_element(elem_data: &kuchiki::ElementData, node: &NodeRef) -> Box<
     Box::new(container)
 }
 
-fn handle_text_node(text: &str) {
+fn handle_text_node(text: &str) -> Option<Box<dyn Element>> {
     let trimmed_text = text.trim();
     if !trimmed_text.is_empty() {
         // println!("Text: {}", trimmed_text);
+        let text_element = Text::new(trimmed_text.to_string());
+        Some(Box::new(text_element))
+    } else {
+        None
     }
 }
 

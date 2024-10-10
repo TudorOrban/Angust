@@ -47,6 +47,6 @@ pub enum EventType {
 pub enum ElementType {
     Container,
     Button,
+    Text,
 
-    Scrollbar,
 }

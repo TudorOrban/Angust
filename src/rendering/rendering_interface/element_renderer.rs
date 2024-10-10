@@ -1,4 +1,4 @@
-use skia_safe::{Canvas, Color, Paint, PaintStyle, Point, Rect};
+use skia_safe::{Canvas, Color, Font, FontMgr, FontStyle, Paint, PaintStyle, Point, Rect, Typeface};
 
 use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions}};
 
@@ -20,7 +20,7 @@ impl ElementRenderer {
         if (size.width <= 0.0) || (size.height <= 0.0) {
             return;
         }
-        
+
         let row_rect = Rect::from_point_and_size(
             Point::new(position.x,
                        position.y),
@@ -87,5 +87,29 @@ impl ElementRenderer {
 
         paint.set_color(Color::from_argb(255, 100, 100, 100));
         canvas.draw_rect(thumb_rect, &paint);
+    }
+
+    pub fn render_text(
+        canvas: &Canvas,
+        position: Position, 
+        size: Size, 
+        text_size: f32,
+        text_color: Color,
+        text_content: String,
+    ) {
+        println!("Rendering text: {}", text_content);
+        let font_mgr = FontMgr::default();
+        let typeface = font_mgr.match_family_style("Arial", FontStyle::normal())
+            .expect("Unable to create typeface");
+
+        let font = Font::new(typeface, text_size);
+
+        let mut paint = Paint::default();
+        paint.set_anti_alias(true);
+        paint.set_color(text_color);
+
+        let position = Point::new(position.x, position.y);
+
+        canvas.draw_str(text_content, position, &font, &paint);
     }
 }
