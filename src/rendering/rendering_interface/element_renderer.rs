@@ -1,6 +1,8 @@
-use skia_safe::{Canvas, Color, Font, FontMgr, FontStyle, Paint, PaintStyle, Point, Rect, Typeface};
+use skia_safe::{Canvas, Color, Font, FontMgr, Paint, PaintStyle, Point, Rect};
 
-use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions}};
+use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions, FontStyle}};
+
+use super::custom_to_skia_types_mapper::map_custom_to_skia_font_style;
 
 
 
@@ -93,15 +95,18 @@ impl ElementRenderer {
         canvas: &Canvas,
         position: Position, 
         size: Size, 
-        text_size: f32,
         text_color: Color,
+        font_size: f32,
+        font_weight: u16,
+        font_family: String,
+        font_style: FontStyle,
         text_content: String,
     ) {
         let font_mgr = FontMgr::default();
-        let typeface = font_mgr.match_family_style("Arial", FontStyle::normal())
+        let typeface = font_mgr.match_family_style(font_family, map_custom_to_skia_font_style(&font_style))
             .expect("Unable to create typeface");
 
-        let font = Font::new(typeface, text_size);
+        let font = Font::new(typeface, font_size);
 
         let mut paint = Paint::default();
         paint.set_anti_alias(true);

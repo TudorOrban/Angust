@@ -2,7 +2,7 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::rendering_interface::element_renderer::ElementRenderer;
 
-use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, styles::Styles};
+use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, styles::{Dimension, Styles, Unit}};
 
 
 pub struct Text {
@@ -25,7 +25,7 @@ impl Text {
             natural_size: Size::default(),
         }
     }
-    
+
     pub fn set_styles(&mut self, styles: Styles) -> &mut Self {
         self.styles = styles;
         self
@@ -38,8 +38,11 @@ impl Element for Text {
             canvas, 
             self.get_position(), 
             self.get_size(), 
-            16.0, 
-            Color::BLACK,
+            self.get_styles().text_color.unwrap_or(Color::BLACK),
+            self.get_styles().font_size.unwrap_or_default().value,
+            self.get_styles().font_weight.unwrap_or_default().to_number(),
+            self.get_styles().font_family.unwrap_or_default().to_string(),
+            self.get_styles().font_style.unwrap_or_default(),
             self.content.clone(),
         );
     }
