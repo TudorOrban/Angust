@@ -30,27 +30,11 @@ pub fn determine_allocated_size(
     if overflow == Overflow::Visible {
         return child_effective_size; // No need to clip
     }
+
+    let new_child_ending_x = child_effective_size.width.min(container_ending_x);
     
-    let child_starting_x = current_position_x + child_margin.left.value;
-    let child_ending_x = child_starting_x + child_effective_size.width + child_margin.right.value;
-
-    if child_starting_x < container_starting_x {
-        let overflow_x = container_starting_x - child_starting_x;
-        let allocated_width = child_effective_size.width - overflow_x;
-        return Size {
-            width: allocated_width,
-            height: child_effective_size.height,
-        };
+    Size {
+        width: new_child_ending_x - current_position_x,
+        height: child_effective_size.height,
     }
-
-    if child_ending_x > container_ending_x {
-        let overflow_x = child_ending_x - container_ending_x;
-        let allocated_width = child_effective_size.width - overflow_x;
-        return Size {
-            width: allocated_width,
-            height: child_effective_size.height,
-        };
-    }
-
-    child_effective_size
 }
