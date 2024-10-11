@@ -1,4 +1,4 @@
-use crate::rendering::elements::{common_types::Size, container::Container, element::Element, styles::{Directions, Overflow}};
+use crate::rendering::elements::{common_types::Size, container::Container, element::Element, styles::{Directions, Overflow, WhiteSpace}};
 
 use super::size_allocator;
 
@@ -55,7 +55,7 @@ fn shrink_text_wrapper_children(
     deficit: &mut f32,
 ) {
     let text_wrapper_count: usize = container.children.iter()
-        .filter(|child| child.is_text_wrapper())
+        .filter(|child| is_text_wrapper_shrinkable(child))
         .count();
     if text_wrapper_count == 0 {
         return;
@@ -65,7 +65,7 @@ fn shrink_text_wrapper_children(
     let reduction_ratio = determine_reduction_ratio(container, deficit.clone(), min_width_per_text_wrapper);    
 
     for child in &mut container.children {
-        if !child.is_text_wrapper() {
+        if !is_text_wrapper_shrinkable(child) {
             continue;
         }
 
@@ -106,4 +106,10 @@ fn determine_reduction_ratio(
     } else {
         0.0
     }
+}
+
+fn is_text_wrapper_shrinkable(
+    child: &Box<dyn Element>,
+) -> bool {
+    child.get_styles().white_space.unwrap_or_default() == WhiteSpace::Normal
 }

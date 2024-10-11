@@ -134,6 +134,7 @@ impl Element for Text {
             self.lines = determine_text_element_lines(self);
         } else {
             self.lines = vec![self.content.clone()];
+            println!("Lines: {:?}", self.lines);
         }
     }
 }

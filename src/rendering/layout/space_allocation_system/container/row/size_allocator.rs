@@ -4,7 +4,7 @@ use crate::rendering::elements::{common_types::Size, container::Container, eleme
 
 pub fn determine_allocated_size(
     flex_wrap: FlexWrap,
-    overflow: Overflow,
+    _: Overflow,
     child_effective_size: Size,
     allocated_size: Size,
 ) -> Size {
