@@ -111,5 +111,5 @@ fn determine_reduction_ratio(
 fn is_text_wrapper_shrinkable(
     child: &Box<dyn Element>,
 ) -> bool {
-    child.get_styles().white_space.unwrap_or_default() == WhiteSpace::Normal
+    child.is_text_wrapper() && child.get_styles().white_space.unwrap_or_default() == WhiteSpace::Normal
 }

@@ -4,7 +4,7 @@ use crate::rendering::elements::{common_types::Size, container::Container, eleme
 
 pub fn determine_allocated_size(
     flex_wrap: FlexWrap,
-    _: Overflow,
+    overflow: Overflow,
     child_effective_size: Size,
     allocated_size: Size,
 ) -> Size {
@@ -12,9 +12,9 @@ pub fn determine_allocated_size(
         return child_effective_size; // To be implemented later
     }
 
-    // if overflow == Overflow::Visible {
-    //     return child_effective_size; // No need to clip
-    // }
+    if overflow == Overflow::Visible {
+        return child_effective_size; // No need to clip
+    }
 
     let clipped_width = child_effective_size.width.min(allocated_size.width);
     
