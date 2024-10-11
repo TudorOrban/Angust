@@ -2,6 +2,7 @@
 members = [
     ".",                     
     "examples/full_project_example",
+    "examples/cartan"
 ]
 
 

@@ -55,7 +55,7 @@ fn process_div_element(elem_data: &kuchiki::ElementData, node: &NodeRef, parent_
     Box::new(container)
 }
 
-fn process_image_element(elem_data: &kuchiki::ElementData, node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Option<Box<dyn Element>> {
+fn process_image_element(elem_data: &kuchiki::ElementData, _: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Option<Box<dyn Element>> {
     let attributes = elem_data.attributes.borrow();
     let src = attributes.get("src").unwrap_or_default();
     let styles = css_parser::parse_styles(&attributes, parent_styles);
@@ -66,7 +66,7 @@ fn process_image_element(elem_data: &kuchiki::ElementData, node: &NodeRef, paren
     Some(Box::new(image))
 }
 
-fn process_text_element(text: &str, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Option<Box<dyn Element>> {
+fn process_text_element(text: &str, parent_styles: Option<&Styles>, _: &AngustConfiguration) -> Option<Box<dyn Element>> {
     let trimmed_text = text.trim();
     if !trimmed_text.is_empty() {
         let mut text_element = Text::new(trimmed_text.to_string());
