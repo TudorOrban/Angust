@@ -58,9 +58,12 @@ fn process_div_element(elem_data: &kuchiki::ElementData, node: &NodeRef, parent_
 fn process_image_element(elem_data: &kuchiki::ElementData, node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Option<Box<dyn Element>> {
     let attributes = elem_data.attributes.borrow();
     let src = attributes.get("src").unwrap_or_default();
+    let styles = css_parser::parse_styles(&attributes, parent_styles);
 
-    // Create an Image element here, and populate it with the necessary data
-    Some(Box::new(Image::new(angust_config.images_dir_relative_path.clone(), src.to_string())))
+    let image = Image::new(
+        angust_config.images_dir_relative_path.clone(), src.to_string(), Some(styles)
+    );
+    Some(Box::new(image))
 }
 
 fn process_text_element(text: &str, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Option<Box<dyn Element>> {

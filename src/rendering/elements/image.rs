@@ -18,7 +18,7 @@ pub struct Image {
 }
 
 impl Image {
-    pub fn new(image_directory_relative_path: String, image_relative_path: String) -> Self {
+    pub fn new(image_directory_relative_path: String, image_relative_path: String, styles: Option<Styles>) -> Self {
         let id = IDGenerator::get();
         let image = image_loader::load_image(image_directory_relative_path, image_relative_path.clone())
             .map_or(None, |image| Some(image));
@@ -29,7 +29,7 @@ impl Image {
             image: image,
             position: Position::default(),
             size: Size::default(),
-            styles: Styles::default(),
+            styles: styles.unwrap_or_default(),
             natural_size: Size::default(),
             requested_size: OptionalSize::default(),
         }
@@ -85,7 +85,7 @@ impl Element for Image {
     }
 
     fn get_element_type(&self) -> ElementType {
-        ElementType::Text
+        ElementType::Image
     }
 
     fn get_position(&self) -> Position {
@@ -138,8 +138,15 @@ impl Element for Image {
     fn is_text_wrapper(&self) -> bool { false }
 
     fn estimate_sizes(&mut self) {
-        let estimated_image_size = Size::default();
+        let estimated_image_size = self.image.as_ref()
+            .map_or(Size::default(), |image| Size {
+                width: image.width() as f32,
+                height: image.height() as f32,
+            });
         self.set_natural_size(estimated_image_size);
+
+        let sizing_policy = self.get_styles().sizing_policy.unwrap_or_default();
+        self.set_requested_size(OptionalSize { width: sizing_policy.width, height: sizing_policy.height });
     }
 
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size) {

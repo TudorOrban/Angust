@@ -6,7 +6,7 @@ use std::{ffi::CString, num::NonZeroU32};
 
 use crate::{rendering::{elements::element::EventType, renderer::Renderer}, window::WindowingSystem};
 
-use super::{angust_configuration::AngustConfiguration, resource_loader::{configuration_loader::load_angust_configuration, image_loader::load_image}, ui_initializer::initialize_ui};
+use super::{angust_configuration::AngustConfiguration, resource_loader::configuration_loader::load_angust_configuration, ui_initializer::initialize_ui};
 
 
 pub struct Application<State> {

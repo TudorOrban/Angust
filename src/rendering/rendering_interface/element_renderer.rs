@@ -130,11 +130,10 @@ impl ElementRenderer {
             let dst_rect = skia_safe::Rect::from_xywh(
                 position.x, 
                 position.y, 
-                120.0, 
-                80.0
+                size.width, 
+                size.height
             );
 
-            println!("Drawing image at position: {:?}, size: {:?}", position, size);
             // Draw the image
             canvas.draw_image_rect(
                 &skia_image, 

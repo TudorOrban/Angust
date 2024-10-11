@@ -50,5 +50,6 @@ pub enum ElementType {
     Container,
     Button,
     Text,
+    Image,
 
 }
