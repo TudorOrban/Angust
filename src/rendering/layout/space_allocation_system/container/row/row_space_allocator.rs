@@ -49,7 +49,7 @@ pub fn allocate_space_to_children_row_flex(
         
         let child_allocated_size = size_allocator::determine_allocated_size(
             flex_wrap, overflow,
-            child_effective_size,
+            child_effective_size, allocated_size,
         );
 
         child.allocate_space(child_allocated_position, child_allocated_size);

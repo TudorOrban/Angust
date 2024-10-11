@@ -20,14 +20,14 @@ pub fn handle_scrollbar_movement(
         (container.get_size().width, container.get_size().height)
     );
     let scrollbar_rect = Rect::from_point_and_size(
-        Point::new(container.get_position().x, container.get_position().y + container.get_size().height - 10.0),
-        (container.get_size().width, 10.0)
+        Point::new(container.get_position().x, container.get_position().y + container.get_size().height - container.scrollbar_state.scrollbar_thickness),
+        (container.get_size().width, container.scrollbar_state.scrollbar_thickness)
     );
     
     let thumb_position_x = container.get_position().x + container.scrollbar_state.current_scroll_position.x * (track_width - thumb_width);
     let thumb_rect = Rect::from_point_and_size(
-        Point::new(thumb_position_x, container.get_position().y + container.get_size().height - 10.0),
-        (thumb_width, 10.0)
+        Point::new(thumb_position_x, container.get_position().y + container.get_size().height - container.scrollbar_state.scrollbar_thickness),
+        (thumb_width, container.scrollbar_state.scrollbar_thickness)
     );
 
     match event_type {

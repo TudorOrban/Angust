@@ -15,8 +15,9 @@ pub fn allocate_space_to_children_row_column(container: &mut Container, allocate
         let margin = child.get_styles().margin.unwrap_or_default();
 
         let child_position = compute_child_position_column(
-            child_effective_size, margin, align_items, max_width, current_position
+            child_effective_size, margin, align_items, max_width, current_position, allocated_size
         );
+
         child.allocate_space(child_position, child_effective_size);
 
         current_position.y += margin.top.value + child_effective_size.height + margin.bottom.value;
@@ -28,12 +29,13 @@ fn compute_child_position_column(
     margin: Margin,
     align_items: AlignItems, 
     max_width: f32, 
-    current_position: Position
+    current_position: Position,
+    parent_allocated_size: Size
 ) -> Position {
     let x_offset = get_x_offset_based_on_align_items(align_items, max_width, child_effective_size, margin);
     Position {
-        x: current_position.x + x_offset,
-        y: current_position.y + margin.top.value,
+        x: (current_position.x + x_offset).min(parent_allocated_size.width),
+        y: (current_position.y + margin.top.value).min(parent_allocated_size.height),
     }
 }
 

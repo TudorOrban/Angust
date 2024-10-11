@@ -70,6 +70,7 @@ impl Default for OptionalSize {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct ScrollbarState {
     pub thumb_scrollbar_width_ratio: f32,
     pub is_overflowing: Directions,
@@ -77,6 +78,7 @@ pub struct ScrollbarState {
     pub is_dragging: bool,
     pub drag_start_position: Position,
     pub drag_start_scroll_position: Position,
+    pub scrollbar_thickness: f32,
 }
 
 impl Default for ScrollbarState {
@@ -91,6 +93,7 @@ impl Default for ScrollbarState {
             is_dragging: false,
             drag_start_position: Position::default(),
             drag_start_scroll_position: Position::default(),
+            scrollbar_thickness: 10.0,
         }
     }
 }

@@ -35,7 +35,7 @@ impl ElementRenderer {
         canvas.draw_rect(row_rect, &paint);
          
         if border_width.value == 0.0 {
-            // return; // Draw all borders for now
+            // return; // Draw all borders for now for debugging
         }
         paint.set_anti_alias(true);
         paint.set_style(PaintStyle::Stroke);
@@ -76,7 +76,7 @@ impl ElementRenderer {
 
         let thumb_position = Position {
             x: max_left_position + (current_position * (max_right_position - max_left_position)),
-            y: position.y,
+            y: position.y + size.height * 0.1,
         };
 
         let thumb_rect = Rect::from_point_and_size(

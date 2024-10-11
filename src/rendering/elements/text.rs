@@ -2,13 +2,13 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{layout::space_allocation_system::text::size_estimator::{determine_text_element_lines, estimate_text_element_size}, rendering_interface::element_renderer::ElementRenderer};
 
-use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, styles::{Dimension, Styles, Unit, WhiteSpace}};
+use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::{Dimension, Styles, Unit, WhiteSpace}};
 
 
 pub struct Text {
     _id: String,
     content: String,
-    lines: Option<Vec<String>>,
+    lines: Vec<String>,
     position: Position,
     size: Size,
     styles: Styles,
@@ -17,10 +17,11 @@ pub struct Text {
 
 impl Text {
     pub fn new(content: String) -> Self {
+        let id = IDGenerator::get();
         Self {
-            _id: String::new(),
-            content,
-            lines: None,
+            _id: id,
+            content: content.clone(),
+            lines: vec![content],
             position: Position::default(),
             size: Size::default(),
             styles: Styles::default(),
@@ -48,7 +49,7 @@ impl Element for Text {
         ElementRenderer::render_multi_line_text(
             canvas, 
             self.get_position(), 
-            self.lines.clone().unwrap_or(vec![]),
+            self.lines.clone(),
             self.get_styles().text_color.unwrap_or(Color::BLACK),
             self.get_styles().font_size.unwrap_or(Dimension { value: 16.0, unit: Unit::Px }).value,
             self.get_styles().font_weight.unwrap_or_default(),
@@ -120,18 +121,19 @@ impl Element for Text {
     }
 
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size) {
+        let line_height = self.get_styles().font_size.unwrap_or(Dimension { value: 16.0, unit: Unit::Px }).value;
+        
         self.position = {
             let x = allocated_position.x;
-            let y = allocated_position.y + self.get_natural_size().height; // offset by the height of one line (multi-line text is not supported yet)
+            let y = allocated_position.y + line_height;
             Position { x, y }
         };
         self.size = allocated_size;
-
+        
         if self.get_styles().white_space.unwrap_or_default() == WhiteSpace::Normal {
-            let lines = determine_text_element_lines(self);
-            self.lines = Some(lines);
+            self.lines = determine_text_element_lines(self);
         } else {
-            self.lines = Some(vec![self.content.clone()]);
+            self.lines = vec![self.content.clone()];
         }
     }
 }
