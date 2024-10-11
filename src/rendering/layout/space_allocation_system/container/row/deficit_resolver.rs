@@ -8,6 +8,8 @@ pub fn attempt_deficit_resolution(
     container: &mut Container,
     allocated_size: Size,
 ) -> f32 {
+    // let container_starting_x = allocated_position.x + padding.left.value;
+    // let container_ending_x = allocated_position.x + allocated_size.width - padding.right.value;
     let overflow = container.get_styles().overflow.unwrap_or_default();
     
     let effective_horizontal_space = allocated_size.width - container.get_styles().padding.unwrap_or_default().horizontal();
@@ -83,6 +85,7 @@ fn shrink_text_wrapper_children(
         let reduction = reducible_amount * reduction_ratio;
         let new_width = current_size.width - reduction;
 
+        println!("Reducing text wrapper width from {} to {}", current_size.width, new_width);
         child.set_natural_size(Size {
             width: new_width,
             height: current_size.height

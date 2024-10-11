@@ -38,7 +38,7 @@ pub fn determine_text_lines(
 
     let lines = calculate_text_lines(text_content, &font, &paint, max_width);
 
-    println!("Lines: {:?}", lines);
+    // println!("Lines: {:?}", lines);
     lines
 }
 

@@ -199,6 +199,11 @@ impl Element for Container {
         self.position = allocated_position;
         self.size = allocated_size;
 
+        if self.is_text_wrapper() {
+            self.children[0].allocate_space(allocated_position, allocated_size);
+            return;
+        }
+
         container_space_allocator::allocate_space_to_children(self, allocated_position, allocated_size);
     }
 }

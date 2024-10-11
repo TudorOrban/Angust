@@ -45,6 +45,7 @@ impl Text {
 
 impl Element for Text {
     fn render(&self, canvas: &Canvas) {
+        println!("Size: {:?}", self.get_size());
         ElementRenderer::render_multi_line_text(
             canvas, 
             self.get_position(), 
@@ -128,6 +129,7 @@ impl Element for Text {
             let y = allocated_position.y + self.get_natural_size().height; // offset by the height of one line (multi-line text is not supported yet)
             Position { x, y }
         };
+        println!("Allocated size in text: {:?}", allocated_size);
         self.size = allocated_size;
 
         if self.get_styles().white_space.unwrap_or_default() == WhiteSpace::Normal {

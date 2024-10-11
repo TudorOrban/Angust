@@ -3,9 +3,9 @@ use crate::rendering::elements::{common_types::Size, container::Container, eleme
 
 
 pub fn determine_allocated_size(
-    child_effective_size: Size,
     flex_wrap: FlexWrap,
     overflow: Overflow,
+    child_effective_size: Size,
 ) -> Size {
     if flex_wrap != FlexWrap::NoWrap {
         return child_effective_size; // To be implemented later

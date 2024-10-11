@@ -19,9 +19,7 @@ pub fn allocate_space_to_children_row_flex(
     let flex_wrap = container.get_styles().flex_wrap.unwrap_or_default();
     let overflow = container.get_styles().overflow.unwrap_or_default();
 
-    // Prepare Overflow x computations
-    // let container_starting_x = allocated_position.x + padding.left.value;
-    // let container_ending_x = allocated_position.x + allocated_size.width - padding.right.value;
+    // Resolve horizontal space deficits
     let scrollbar_offset = deficit_resolver::attempt_deficit_resolution(container, allocated_size);
 
     // Prepare AlignItems y computations
@@ -44,22 +42,18 @@ pub fn allocate_space_to_children_row_flex(
         let child_margin = child.get_styles().margin.unwrap_or_default();
 
         let child_allocated_position = position_allocator::determine_allocated_position(
-            flex_wrap,
-            overflow,
-            align_items,
-            spacing,
-            current_position,
-            child_effective_size,
-            children_max_height,
-            max_height_child_margin,
-            child_margin,
+            flex_wrap, overflow, align_items, spacing,
+            current_position, child_effective_size,
+            children_max_height, max_height_child_margin, child_margin,
         );
         
         let child_allocated_size = size_allocator::determine_allocated_size(
+            flex_wrap, overflow,
             child_effective_size,
-            flex_wrap,
-            overflow,
         );
+        if child.is_text_wrapper() {
+            println!("Child allocated size: {:?}", child_allocated_size);
+        }
 
         child.allocate_space(child_allocated_position, child_allocated_size);
 
