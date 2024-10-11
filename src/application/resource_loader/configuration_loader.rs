@@ -1,4 +1,4 @@
-use crate::application::app_configuration::AngustConfiguration;
+use crate::application::angust_configuration::AngustConfiguration;
 
 use super::path_navigator::identify_project_root_path;
 

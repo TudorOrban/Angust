@@ -1,6 +1,6 @@
 use skia_safe::{Canvas, Color, Point};
 
-use crate::{event_handling::scrollbar_movement_handler::handle_scrollbar_movement, rendering::{
+use crate::{application::event_handling::scrollbar_movement_handler::handle_scrollbar_movement, rendering::{
     layout::{
         size_estimator, space_allocation_system::container::container_space_allocator,
     },

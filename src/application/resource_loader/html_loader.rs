@@ -10,7 +10,7 @@ pub fn load_html(html_directory_relative_path: String, html_file_relative_path: 
     let path = 
         path_navigator::get_html_directory_path(html_directory_relative_path) + "/" +
         html_file_relative_path.as_str();
-    println!("Loading HTML file: {}", path);
+
     fs::read_to_string(PathBuf::from(path))
         .map_or(None, |content| Some(content))
 }

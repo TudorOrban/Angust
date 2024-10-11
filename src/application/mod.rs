@@ -1,4 +1,5 @@
 pub mod application;
-pub mod app_configuration;
-pub mod ui_loader;
+pub mod angust_configuration;
+pub mod ui_initializer;
 pub mod resource_loader;
+pub mod event_handling;

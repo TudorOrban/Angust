@@ -1,18 +1,20 @@
 use skia_safe::{gpu::gl::FramebufferInfo, Point};
-use winit::{application::ApplicationHandler, event::{ElementState, KeyEvent, Modifiers, MouseButton, MouseScrollDelta, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}};
+use winit::{application::ApplicationHandler, dpi::PhysicalSize, event::{ElementState, KeyEvent, Modifiers, MouseButton, MouseScrollDelta, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}};
 use gl_rs as gl;
 use glutin::{config::GlConfig, display::GetGlDisplay, prelude::GlDisplay, surface::GlSurface};
 use std::{ffi::CString, num::NonZeroU32};
 
 use crate::{rendering::{elements::element::EventType, renderer::Renderer}, window::WindowingSystem};
 
-use super::{app_configuration::AngustConfiguration, resource_loader::configuration_loader::load_angust_configuration, ui_loader::load_ui};
+use super::{angust_configuration::AngustConfiguration, resource_loader::{configuration_loader::load_angust_configuration, image_loader::load_image}, ui_initializer::initialize_ui};
 
 
 pub struct Application<State> {
     pub state: State,
 
     pub angust_config: AngustConfiguration,
+    
+    pub renderer: Renderer,
 
     windowing_system: WindowingSystem,
     fb_info: FramebufferInfo,
@@ -21,37 +23,24 @@ pub struct Application<State> {
 
     mouse_position: Option<Point>,
     is_mouse_pressed: bool,
-    renderer: Renderer,
 }
 
 impl<State> Application<State> {
+    // Initialization
     pub fn new(initial_state: State, app_title: String) -> Self {
         let event_loop = EventLoop::new()
             .expect("Failed to create event loop");
-        let mut windowing_system = WindowingSystem::new(&event_loop, app_title);
-
-        gl::load_with(|s| {
-            windowing_system
-                .gl_config
-                .display()
-                .get_proc_address(CString::new(s).unwrap().as_c_str())
-        });
-    
-        let fb_info = {
-            let mut fboid: i32 = 0;
-            unsafe { gl::GetIntegerv(gl::FRAMEBUFFER_BINDING, &mut fboid) };
-    
-            skia_safe::gpu::gl::FramebufferInfo {
-                fboid: fboid.try_into().expect("Failed to get framebuffer ID"),
-                format: skia_safe::gpu::gl::Format::RGBA8.into(),
-                ..Default::default()
-            }
-        };
-
         
+        let mut windowing_system = Self::init_windowing_system(&event_loop, app_title);
+    
+        let fb_info = Self::init_framebuffer_info();
+        
+        // Load UI
         let angust_config = load_angust_configuration();
-        let ui_body = load_ui(&angust_config);
+        let image = load_image(angust_config.images_dir_relative_path.clone(), "arrow-left-solid.png".to_string()).expect("Failed to load image");
+        let ui_body = initialize_ui(&angust_config);
 
+        // Initialize renderer and layout UI
         let mut renderer = Renderer::new(
             &windowing_system.window, 
             &mut windowing_system.gr_context, 
@@ -61,7 +50,6 @@ impl<State> Application<State> {
             ui_body
         );
         renderer.layout();
-
 
         Self {
             state: initial_state,
@@ -75,13 +63,64 @@ impl<State> Application<State> {
             renderer,
         }
     }
+    
+    fn init_windowing_system(event_loop: &EventLoop<()>, app_title: String) -> WindowingSystem {
+        let windowing_system = WindowingSystem::new(event_loop, app_title);
+    
+        gl::load_with(|s| windowing_system
+            .gl_config
+            .display()
+            .get_proc_address(CString::new(s).unwrap().as_c_str())
+        );
+    
+        windowing_system
+    }
 
+    fn init_framebuffer_info() -> FramebufferInfo {
+        let framebuffer_info = {
+            let mut fboid: i32 = 0;
+            unsafe { gl::GetIntegerv(gl::FRAMEBUFFER_BINDING, &mut fboid) };
+    
+            skia_safe::gpu::gl::FramebufferInfo {
+                fboid: fboid.try_into().expect("Failed to get framebuffer ID"),
+                format: skia_safe::gpu::gl::Format::RGBA8.into(),
+                ..Default::default()
+            }
+        };
+
+        framebuffer_info
+    }
+    
+    // Run
     pub fn run(&mut self) {
         if let Some(event_loop) = self.event_loop.take() {  // Take the event loop, leaving None
             event_loop.run_app(self).expect("Failed to run the application");
         } else {
             panic!("Event loop already consumed or not initialized");
         }
+    }
+
+    // Event handling
+    fn handle_window_resize(&mut self, physical_size: PhysicalSize<u32>) {
+        let (width, height): (u32, u32) = physical_size.into();
+        self.windowing_system.gl_surface.resize(
+            &self.windowing_system.gl_context,
+            NonZeroU32::new(width.max(1)).unwrap(),
+            NonZeroU32::new(height.max(1)).unwrap(),
+        );
+    
+        self.renderer.resize_surface(&self.windowing_system.window, &mut self.windowing_system.gr_context, self.fb_info, self.windowing_system.gl_config.num_samples() as usize, self.windowing_system.gl_config.stencil_size() as usize);
+        self.windowing_system.window.request_redraw();
+    }
+
+    fn handle_redraw_requested(&mut self) {
+        self.renderer.render_frame(&mut self.windowing_system.gr_context);
+        self.windowing_system.gr_context.flush_and_submit();
+    
+        self.windowing_system
+            .gl_surface
+            .swap_buffers(&self.windowing_system.gl_context)
+            .expect("Failed to swap buffers");
     }
 }
 
@@ -103,29 +142,13 @@ impl<State> ApplicationHandler for Application<State> {
                 return;
             },
             WindowEvent::Resized(physical_size) => {
-                let (width, height): (u32, u32) = physical_size.into();
-                self.windowing_system.gl_surface.resize(
-                    &self.windowing_system.gl_context,
-                    NonZeroU32::new(width.max(1)).unwrap(),
-                    NonZeroU32::new(height.max(1)).unwrap(),
-                );
-            
-                self.renderer.resize_surface(&self.windowing_system.window, &mut self.windowing_system.gr_context, self.fb_info, self.windowing_system.gl_config.num_samples() as usize, self.windowing_system.gl_config.stencil_size() as usize);
-                self.windowing_system.window.request_redraw();
+                self.handle_window_resize(physical_size);
             },
             WindowEvent::ModifiersChanged(new_modifiers) => {
                 self.modifiers = new_modifiers;
             },
             WindowEvent::RedrawRequested => {
-                // Render and flush the Skia context
-                self.renderer.render_frame(&mut self.windowing_system.gr_context);
-                self.windowing_system.gr_context.flush_and_submit();
-
-                // Swap buffers to show the rendered content
-                self.windowing_system
-                    .gl_surface
-                    .swap_buffers(&self.windowing_system.gl_context)
-                    .expect("Failed to swap buffers");
+                self.handle_redraw_requested();
             }
 
             // Mouse and keyboard events

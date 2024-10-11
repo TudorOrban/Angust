@@ -2,10 +2,10 @@ use std::{fs, path::PathBuf};
 
 use crate::{application::resource_loader::path_navigator::get_html_directory_path, parsing::html::html_parser::{map_dom_to_elements, parse_html_content}, rendering::elements::element::Element};
 
-use super::{app_configuration::AngustConfiguration, resource_loader::html_loader::{self, load_html}};
+use super::{angust_configuration::AngustConfiguration, resource_loader::html_loader::{self, load_html}};
 
 
-pub fn load_ui(angust_config: &AngustConfiguration) -> Box<dyn Element> {
+pub fn initialize_ui(angust_config: &AngustConfiguration) -> Box<dyn Element> {
     let html_content = html_loader::load_index_html(
         angust_config.html_dir_relative_path.clone()
     ).unwrap_or_else(|| {
