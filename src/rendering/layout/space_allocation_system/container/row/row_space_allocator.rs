@@ -51,9 +51,6 @@ pub fn allocate_space_to_children_row_flex(
             flex_wrap, overflow,
             child_effective_size,
         );
-        if child.is_text_wrapper() {
-            println!("Child allocated size: {:?}", child_allocated_size);
-        }
 
         child.allocate_space(child_allocated_position, child_allocated_size);
 

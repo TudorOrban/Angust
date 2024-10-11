@@ -45,19 +45,15 @@ impl Text {
 
 impl Element for Text {
     fn render(&self, canvas: &Canvas) {
-        println!("Size: {:?}", self.get_size());
         ElementRenderer::render_multi_line_text(
             canvas, 
             self.get_position(), 
-            self.get_size(), 
             self.lines.clone().unwrap_or(vec![]),
             self.get_styles().text_color.unwrap_or(Color::BLACK),
-            self.get_styles().white_space.unwrap_or_default(),
             self.get_styles().font_size.unwrap_or(Dimension { value: 16.0, unit: Unit::Px }).value,
             self.get_styles().font_weight.unwrap_or_default(),
             self.get_styles().font_family.unwrap_or_default(),
             self.get_styles().font_style.unwrap_or_default(),
-            self.content.clone(),
         );
     }
 
@@ -129,7 +125,6 @@ impl Element for Text {
             let y = allocated_position.y + self.get_natural_size().height; // offset by the height of one line (multi-line text is not supported yet)
             Position { x, y }
         };
-        println!("Allocated size in text: {:?}", allocated_size);
         self.size = allocated_size;
 
         if self.get_styles().white_space.unwrap_or_default() == WhiteSpace::Normal {

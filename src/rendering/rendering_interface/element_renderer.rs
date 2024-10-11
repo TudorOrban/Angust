@@ -1,8 +1,8 @@
-use skia_safe::{font_style::{Slant, Width}, Canvas, Color, Font, FontMgr, FontStyle, Paint, PaintStyle, Point, Rect, TextBlob};
+use skia_safe::{Canvas, Color, Paint, PaintStyle, Point, Rect, TextBlob};
 
-use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions, FontFamily, FontStyle as CustomFontStyle, FontWeight, WhiteSpace}};
+use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions, FontFamily, FontStyle as CustomFontStyle, FontWeight}};
 
-use super::skia_boundary::{get_skia_font_by_styles, map_custom_to_skia_font_style, map_custom_to_skia_font_weight};
+use super::skia_boundary::get_skia_font_by_styles;
 
 
 pub struct ElementRenderer {
@@ -48,7 +48,7 @@ impl ElementRenderer {
         canvas: &Canvas,
         position: Position,
         size: Size,
-        directions: Directions,
+        _: Directions,
         current_position: f32, // Between 0.0 and 1.0
         thumb_scrollbar_width_ratio: f32,
     ) {
@@ -93,15 +93,12 @@ impl ElementRenderer {
     pub fn render_multi_line_text(
         canvas: &Canvas,
         position: Position, 
-        size: Size, 
         lines: Vec<String>,
         text_color: Color,
-        white_space: WhiteSpace,
         font_size: f32,
         font_weight: FontWeight,
         font_family: FontFamily,
         font_style: CustomFontStyle,
-        text_content: String,
     ) {
         let font = get_skia_font_by_styles(font_size, font_weight, font_family, font_style);
         let mut y_offset = position.y;

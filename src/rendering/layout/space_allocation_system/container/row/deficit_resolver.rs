@@ -85,7 +85,6 @@ fn shrink_text_wrapper_children(
         let reduction = reducible_amount * reduction_ratio;
         let new_width = current_size.width - reduction;
 
-        println!("Reducing text wrapper width from {} to {}", current_size.width, new_width);
         child.set_natural_size(Size {
             width: new_width,
             height: current_size.height

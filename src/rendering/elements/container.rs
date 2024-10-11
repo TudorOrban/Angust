@@ -11,7 +11,7 @@ use super::{
     common_types::{OptionalSize, Position, ScrollbarState, Size},
     element::{Element, ElementType, EventType},
     element_id_generator::IDGenerator,
-    styles::{Directions, Styles}, text::Text,
+    styles::{Directions, Styles},
 };
 
 pub struct Container {
@@ -53,7 +53,6 @@ impl Container {
 
 impl Element for Container {
     fn render(&self, canvas: &Canvas) {
-        // println!("Container styles: {:?}", self.styles);
         ElementRenderer::render_element(
             canvas,
             self.position,

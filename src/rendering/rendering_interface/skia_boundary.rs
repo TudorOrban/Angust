@@ -31,14 +31,12 @@ pub fn determine_text_lines(
     font_style: CustomFontStyle,
     max_width: f32,
 ) -> Vec<String> {
-    println!("Max width: {}", max_width);
     let font = get_skia_font_by_styles(font_size, font_weight, font_family, font_style);
     let mut paint = Paint::default();
     paint.set_anti_alias(true);
 
     let lines = calculate_text_lines(text_content, &font, &paint, max_width);
 
-    // println!("Lines: {:?}", lines);
     lines
 }
 
