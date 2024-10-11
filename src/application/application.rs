@@ -37,7 +37,6 @@ impl<State> Application<State> {
         
         // Load UI
         let angust_config = load_angust_configuration();
-        let image = load_image(angust_config.images_dir_relative_path.clone(), "arrow-left-solid.png".to_string()).expect("Failed to load image");
         let ui_body = initialize_ui(&angust_config);
 
         // Initialize renderer and layout UI

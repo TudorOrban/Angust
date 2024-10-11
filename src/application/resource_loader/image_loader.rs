@@ -1,4 +1,4 @@
-use image::{io::Reader as ImageReader, DynamicImage, ImageError};
+use image::{ImageReader, DynamicImage, ImageError};
 
 use crate::application::resource_loader::path_navigator;
 
