@@ -30,6 +30,7 @@ pub trait Element {
     fn is_text_wrapper(&self) -> bool;
     fn estimate_sizes(&mut self);
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size);
+    fn layout(&mut self, allocated_position: Position, allocated_size: Size);
 }
 
 

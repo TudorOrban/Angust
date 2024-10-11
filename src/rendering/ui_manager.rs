@@ -1,4 +1,4 @@
-use super::elements::element::{Element, EventType};
+use super::elements::{common_types::{Position, Size}, element::{Element, EventType}};
 
 pub struct UIManager {
     root_element: Box<dyn Element>,
@@ -20,5 +20,9 @@ impl UIManager {
 
     pub fn handle_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) {
         self.root_element.handle_event(cursor_position, event_type);
+    }
+
+    pub fn layout(&mut self, allocated_position: Position, allocated_size: Size) {
+        self.root_element.layout(allocated_position, allocated_size);
     }
 }

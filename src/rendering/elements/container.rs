@@ -205,4 +205,9 @@ impl Element for Container {
 
         container_space_allocator::allocate_space_to_children(self, allocated_position, allocated_size);
     }
+    
+    fn layout(&mut self, allocated_position: Position, allocated_size: Size) {
+        self.estimate_sizes();
+        self.allocate_space(allocated_position, allocated_size);
+    }
 }

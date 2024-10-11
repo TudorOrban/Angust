@@ -6,7 +6,7 @@ use std::{ffi::CString, num::NonZeroU32};
 
 use crate::{rendering::{elements::element::EventType, renderer::Renderer}, window::WindowingSystem};
 
-use super::{app_configuration::AngustConfiguration, resource_loader::configuration_loader::load_angust_configuration};
+use super::{app_configuration::AngustConfiguration, resource_loader::configuration_loader::load_angust_configuration, ui_loader::load_ui};
 
 
 pub struct Application<State> {
@@ -48,15 +48,20 @@ impl<State> Application<State> {
             }
         };
 
-        let renderer = Renderer::new(
+        
+        let angust_config = load_angust_configuration();
+        let ui_body = load_ui(&angust_config);
+
+        let mut renderer = Renderer::new(
             &windowing_system.window, 
             &mut windowing_system.gr_context, 
             fb_info, 
             windowing_system.gl_config.num_samples() as usize, 
-            windowing_system.gl_config.stencil_size() as usize
+            windowing_system.gl_config.stencil_size() as usize,
+            ui_body
         );
+        renderer.layout();
 
-        let angust_config = load_angust_configuration();
 
         Self {
             state: initial_state,

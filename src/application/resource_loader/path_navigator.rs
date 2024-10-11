@@ -5,11 +5,11 @@ pub fn get_angust_config_path(relative_pathname: String) -> String {
 }
 
 pub fn get_image_directory_path(relative_pathname: String) -> String {
-    identify_project_root_path() + relative_pathname.as_str()
+    identify_project_root_path() + "/" + relative_pathname.as_str()
 }
 
 pub fn get_html_directory_path(relative_pathname: String) -> String {
-    identify_project_root_path() + relative_pathname.as_str()
+    identify_project_root_path() + "/" + relative_pathname.as_str()
 }
 
 pub fn identify_project_root_path() -> String {

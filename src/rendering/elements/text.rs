@@ -136,4 +136,9 @@ impl Element for Text {
             self.lines = vec![self.content.clone()];
         }
     }
+    
+    fn layout(&mut self, allocated_position: Position, allocated_size: Size) {
+        self.estimate_sizes();
+        self.allocate_space(allocated_position, allocated_size);
+    }
 }

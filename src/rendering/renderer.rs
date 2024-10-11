@@ -8,13 +8,13 @@ use skia_safe::gpu::DirectContext;
 use super::{elements::{common_types::{Position, Size}, element::{Element, EventType}}, ui_manager::UIManager};
 
 pub struct Renderer {
-    pub ui_body: Box<dyn Element>,
     pub surface: Surface,
+    pub screen_size: Size,
     ui_manager: UIManager,
 }
 
 impl Renderer {
-    pub fn new(window: &Window, gr_context: &mut DirectContext, fb_info: FramebufferInfo, sample_count: usize, stencil_bits: usize) -> Self {
+    pub fn new(window: &Window, gr_context: &mut DirectContext, fb_info: FramebufferInfo, sample_count: usize, stencil_bits: usize, ui_body: Box<dyn Element>) -> Self {
         let surface = Self::create_surface(
             window,
             fb_info,
@@ -22,19 +22,20 @@ impl Renderer {
             sample_count,
             stencil_bits,
         );
-
         let screen_size = window.inner_size();
-        ui_body.estimate_sizes(); // Start backwards recursion to estimate element sizes
-        ui_body.allocate_space( // Start forwards recursion to allocate space
-            Position { x: 0.0, y: 0.0 },
-            Size { width: screen_size.width as f32, height: screen_size.height as f32 
-        });
 
         Self { 
-            ui_body,
             surface,
+            screen_size: Size { width: screen_size.width as f32, height: screen_size.height as f32 },
             ui_manager: UIManager::new(ui_body),
         }
+    }
+
+    pub fn layout(self: &mut Self) {
+        self.ui_manager.layout(
+            Position { x: 0.0, y: 0.0 },
+            self.screen_size
+        );
     }
 
     pub fn render_frame(&mut self, _gr_context: &mut DirectContext) {
