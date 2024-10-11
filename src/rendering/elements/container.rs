@@ -11,7 +11,7 @@ use super::{
     common_types::{OptionalSize, Position, ScrollbarState, Size},
     element::{Element, ElementType, EventType},
     element_id_generator::IDGenerator,
-    styles::{Directions, Styles},
+    styles::{Directions, Styles}, text::Text,
 };
 
 pub struct Container {
@@ -177,7 +177,11 @@ impl Element for Container {
         }
     }
 
-    // Traverse the DOM from leaves to root and estimate the size of each container.
+    fn is_text_wrapper(&self) -> bool {
+        self.children.len() == 1 && self.children[0].get_element_type() == ElementType::Text
+    }
+
+    // First pass: Traverse the DOM from leaves to root and estimate the size of each container.
     fn estimate_sizes(&mut self) {
         if !self.children.is_empty() {
             for child in &mut self.children {
@@ -190,7 +194,7 @@ impl Element for Container {
         }
     }
 
-    // Traverse the DOM from root to leaves and allocate space to each container.
+    // Second pass: Traverse the DOM from root to leaves and allocate space to each container.
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size) {
         self.position = allocated_position;
         self.size = allocated_size;

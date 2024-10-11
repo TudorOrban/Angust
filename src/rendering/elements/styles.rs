@@ -147,7 +147,7 @@ pub enum Overflow {
 
 impl Default for Overflow {
     fn default() -> Self {
-        Self::Auto
+        Self::Visible
     }
 }
 

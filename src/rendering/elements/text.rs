@@ -79,7 +79,7 @@ impl Element for Text {
     }
 
     fn get_element_type(&self) -> ElementType {
-        ElementType::Container
+        ElementType::Text
     }
 
     fn get_position(&self) -> Position {
@@ -110,6 +110,8 @@ impl Element for Text {
     fn get_requested_size(&self) -> OptionalSize { OptionalSize::default() }
 
     fn get_effective_size(&self) -> Size { self.get_natural_size() }
+
+    fn is_text_wrapper(&self) -> bool { false }
 
     fn estimate_sizes(&mut self) {
         let estimated_text_size = estimate_text_element_size(self);

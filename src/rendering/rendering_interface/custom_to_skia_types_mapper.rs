@@ -1,9 +1,16 @@
 use skia_safe::{font_style::{Slant, Weight, Width}, Font, FontMgr, FontStyle, Paint};
 
-use crate::rendering::elements::{common_types::Size, styles::{FontFamily, FontStyle as CustomFontStyle, FontWeight as CustomFontWeight}};
+use crate::rendering::elements::{common_types::Size, styles::{FontFamily, FontStyle as CustomFontStyle, FontWeight as CustomFontWeight, WhiteSpace}};
 
 
-pub fn estimate_text_size(text: &str, font_size: f32, font_weight: CustomFontWeight, font_family: FontFamily, font_style: CustomFontStyle) -> Size {
+pub fn estimate_text_size(
+    text: &str, 
+    white_space: WhiteSpace,
+    font_size: f32, 
+    font_weight: CustomFontWeight, 
+    font_family: FontFamily, 
+    font_style: CustomFontStyle
+) -> Size {
     let font_mgr = FontMgr::default();
     let slant: Slant = map_custom_to_skia_font_style(&font_style);
     let weight = map_custom_to_skia_font_weight(&font_weight);

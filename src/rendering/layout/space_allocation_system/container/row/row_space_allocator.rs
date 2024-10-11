@@ -5,7 +5,7 @@ use crate::rendering::elements::{
     styles::{Directions, Overflow},
 };
 
-use super::{position_allocator, size_allocator};
+use super::{deficit_resolver, position_allocator, size_allocator};
 
 pub fn allocate_space_to_children_row_flex(
     container: &mut Container,
@@ -19,30 +19,17 @@ pub fn allocate_space_to_children_row_flex(
     let flex_wrap = container.get_styles().flex_wrap.unwrap_or_default();
     let overflow = container.get_styles().overflow.unwrap_or_default();
 
+    // Prepare Overflow x computations
+    // let container_starting_x = allocated_position.x + padding.left.value;
+    // let container_ending_x = allocated_position.x + allocated_size.width - padding.right.value;
+    let scrollbar_offset = deficit_resolver::attempt_deficit_resolution(container, allocated_size);
+
     // Prepare AlignItems y computations
     let children_max_height_index = position_allocator::find_max_child_height_index(container);
     let max_height_child = &container.children[children_max_height_index];
     let children_max_height = max_height_child.get_effective_size().height;
     let max_height_child_margin = max_height_child.get_styles().margin.unwrap_or_default();
 
-    // Prepare Overflow x computations
-    // let container_starting_x = allocated_position.x + padding.left.value;
-    // let container_ending_x = allocated_position.x + allocated_size.width - padding.right.value;
-    let effective_horizontal_space = allocated_size.width - padding.horizontal();
-    let requested_width = size_allocator::precompute_requested_children_width(container);
-    if overflow == Overflow::Auto && requested_width > allocated_size.width {
-        container.scrollbar_state.thumb_scrollbar_width_ratio =
-            effective_horizontal_space / requested_width;
-        container.scrollbar_state.is_overflowing = Directions {
-            horizontal: true,
-            vertical: false,
-        };
-    }
-    let current_scroll_position_x = container.scrollbar_state.current_scroll_position.x;
-
-    let overflow_width = requested_width - allocated_size.width;
-    let scrollbar_offset = overflow_width * current_scroll_position_x;
-    
     // Start allocating space to children
     let mut current_position = allocated_position;
     current_position.x += padding.left.value;
