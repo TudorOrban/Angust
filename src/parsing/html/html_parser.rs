@@ -16,7 +16,7 @@ pub fn parse_html_content(html: &str) -> NodeRef {
 }
 
 /*
- * Map that transforms the DOM into a tree of Reast elements.
+ * Map that transforms the DOM into a tree of Angust elements.
  */
 pub fn map_dom_to_elements(dom: &NodeRef, parent_styles: Option<&Styles>) -> Option<Box<dyn Element>> {
     match dom.data() {

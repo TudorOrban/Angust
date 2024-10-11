@@ -6,12 +6,12 @@ members = [
 
 
 [package]
-name = "reast"
+name = "angust"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "reast"
+name = "angust"
 path = "src/lib.rs"
 
 [dependencies]

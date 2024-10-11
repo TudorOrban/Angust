@@ -74,6 +74,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc7eb209b1518d6bb87b283c20095f5228ecda460da70b44f0802523dea6da04"
 
 [[package]]
+name = "angust"
+version = "0.1.0"
+dependencies = [
+ "gl",
+ "glutin",
+ "glutin-winit",
+ "kuchiki",
+ "lazy_static",
+ "raw-window-handle",
+ "skia-safe",
+ "winit",
+]
+
+[[package]]
 name = "arrayref"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -498,7 +512,7 @@ checksum = "aa9a19cbb55df58761df49b23516a86d432839add4af60fc256da840f66ed35b"
 name = "full_project_example"
 version = "0.1.0"
 dependencies = [
- "reast",
+ "angust",
 ]
 
 [[package]]
@@ -1513,20 +1527,6 @@ name = "raw-window-handle"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "20675572f6f24e9e76ef639bc5552774ed45f1c30e2951e1e99c59888861c539"
-
-[[package]]
-name = "reast"
-version = "0.1.0"
-dependencies = [
- "gl",
- "glutin",
- "glutin-winit",
- "kuchiki",
- "lazy_static",
- "raw-window-handle",
- "skia-safe",
- "winit",
-]
 
 [[package]]
 name = "redox_syscall"

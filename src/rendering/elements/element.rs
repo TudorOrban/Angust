@@ -2,7 +2,7 @@ use skia_safe::{Canvas, Point};
 
 use super::{common_types::{OptionalSize, Position, Size}, styles::Styles};
 
-// This is the trait that all Reast elements must implement.
+// This is the trait that all Angust elements must implement.
 pub trait Element {
     fn render(&self, canvas: &Canvas);
     fn update(&mut self);
