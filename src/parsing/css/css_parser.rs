@@ -2,14 +2,14 @@ use kuchiki::Attributes;
 
 use crate::rendering::elements::styles::Styles;
 
-use super::{appearance_parser::update_appearance_style, dimension_parser::update_dimension_style, layout_parser::update_layout_style, text_parser::update_text_style};
+use super::{appearance_parser::update_appearance_style, dimension_parser::update_dimension_style, layout_parser::update_layout_style, stylesheet_parser::{self, Stylesheet}, text_parser::update_text_style};
 
 
-pub fn parse_styles(attributes: &Attributes, parent_styles: Option<&Styles>) -> Styles {
+pub fn parse_styles(attributes: &Attributes, parent_styles: Option<&Styles>, stylesheet: &Stylesheet) -> Styles {
     let mut styles = Styles::default();
-
+    
     if let Some(class_name) = attributes.get("class") {
-        styles = apply_class_styles(class_name);
+        styles = parse_class_styles(class_name, stylesheet);
     }
 
     if let Some(style_attr) = attributes.get("style") {
@@ -23,8 +23,9 @@ pub fn parse_styles(attributes: &Attributes, parent_styles: Option<&Styles>) -> 
     styles
 }
 
-fn apply_class_styles(class_name: &str) -> Styles {
+fn parse_class_styles(class_name: &str, stylesheet: &Stylesheet) -> Styles {
     println!("Applying class styles for class: {}", class_name);
+    
     Styles::default()
 }
 

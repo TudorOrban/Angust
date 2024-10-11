@@ -4,15 +4,16 @@ use gl_rs as gl;
 use glutin::{config::GlConfig, display::GetGlDisplay, prelude::GlDisplay, surface::GlSurface};
 use std::{ffi::CString, num::NonZeroU32};
 
-use crate::{rendering::{elements::element::EventType, renderer::Renderer}, window::WindowingSystem};
+use crate::{parsing::{css::stylesheet_parser::{self, Stylesheet}, html::html_parser}, rendering::{elements::element::EventType, renderer::Renderer}, window::WindowingSystem};
 
-use super::{angust_configuration::AngustConfiguration, resource_loader::configuration_loader::load_angust_configuration, ui_initializer::initialize_ui};
+use super::{angust_configuration::AngustConfiguration, resource_loader::configuration_loader::load_angust_configuration, ui_initializer::load_resources};
 
 
 pub struct Application<State> {
     pub state: State,
 
     pub angust_config: AngustConfiguration,
+    pub stylesheet: Stylesheet,
     
     pub renderer: Renderer,
 
@@ -37,9 +38,13 @@ impl<State> Application<State> {
         
         // Load UI
         let angust_config = load_angust_configuration();
-        let ui_body = initialize_ui(&angust_config);
+        let (dom, stylesheets) = load_resources(&angust_config);
+        let stylesheet = stylesheet_parser::parse_stylesheet(&stylesheets);
 
-        // Initialize renderer and layout UI
+        let ui_body = html_parser::map_dom_to_elements(&dom, None, &angust_config, &stylesheet)
+            .expect("Failed to map DOM to elements");
+
+        // Initialize renderer and layout
         let mut renderer = Renderer::new(
             &windowing_system.window, 
             &mut windowing_system.gr_context, 
@@ -53,6 +58,7 @@ impl<State> Application<State> {
         Self {
             state: initial_state,
             angust_config,
+            stylesheet,
             windowing_system,
             fb_info,
             event_loop: Some(event_loop),
