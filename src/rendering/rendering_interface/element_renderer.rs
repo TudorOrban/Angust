@@ -1,8 +1,8 @@
-use skia_safe::{font_style::{Slant, Width}, Canvas, Color, Font, FontMgr, FontStyle, Paint, PaintStyle, Point, Rect};
+use skia_safe::{font_style::{Slant, Width}, Canvas, Color, Font, FontMgr, FontStyle, Paint, PaintStyle, Point, Rect, TextBlob};
 
-use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions, FontFamily, FontStyle as CustomFontStyle, FontWeight}};
+use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions, FontFamily, FontStyle as CustomFontStyle, FontWeight, WhiteSpace}};
 
-use super::custom_to_skia_types_mapper::{map_custom_to_skia_font_style, map_custom_to_skia_font_weight};
+use super::skia_boundary::{get_skia_font_by_styles, map_custom_to_skia_font_style, map_custom_to_skia_font_weight};
 
 
 pub struct ElementRenderer {
@@ -90,33 +90,32 @@ impl ElementRenderer {
         canvas.draw_rect(thumb_rect, &paint);
     }
 
-    pub fn render_text(
+    pub fn render_multi_line_text(
         canvas: &Canvas,
         position: Position, 
         size: Size, 
+        lines: Vec<String>,
         text_color: Color,
+        white_space: WhiteSpace,
         font_size: f32,
         font_weight: FontWeight,
         font_family: FontFamily,
         font_style: CustomFontStyle,
         text_content: String,
     ) {
-        let font_mgr = FontMgr::default();
-        let slant: Slant = map_custom_to_skia_font_style(&font_style);
-        let weight = map_custom_to_skia_font_weight(&font_weight);
-        let font_style = FontStyle::new(weight, Width::from(20), slant);
-        
-        let typeface = font_mgr.match_family_style(font_family.to_string(), font_style)
-            .expect("Unable to create typeface");
-
-        let font = Font::new(typeface, font_size);
+        let font = get_skia_font_by_styles(font_size, font_weight, font_family, font_style);
+        let mut y_offset = position.y;
 
         let mut paint = Paint::default();
         paint.set_anti_alias(true);
         paint.set_color(text_color);
 
-        let position = Point::new(position.x, position.y);
-
-        canvas.draw_str(text_content, position, &font, &paint);
+        for line in lines {
+            if let Some(blob) = TextBlob::from_text(line.clone(), &font) {
+                canvas.draw_text_blob(&blob, Point::new(position.x, y_offset), &paint);
+                let (_, rect) = font.measure_str(line, Some(&paint));
+                y_offset += rect.height();
+            }
+        }
     }
 }

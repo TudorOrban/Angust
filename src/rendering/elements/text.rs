@@ -1,13 +1,14 @@
 use skia_safe::{Canvas, Color, Point};
 
-use crate::rendering::{layout::space_allocation_system::text::size_estimator::estimate_text_element_size, rendering_interface::element_renderer::ElementRenderer};
+use crate::rendering::{layout::space_allocation_system::text::size_estimator::{determine_text_element_lines, estimate_text_element_size}, rendering_interface::element_renderer::ElementRenderer};
 
-use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, styles::{Dimension, Styles, Unit}};
+use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, styles::{Dimension, Styles, Unit, WhiteSpace}};
 
 
 pub struct Text {
     _id: String,
     content: String,
+    lines: Option<Vec<String>>,
     position: Position,
     size: Size,
     styles: Styles,
@@ -19,6 +20,7 @@ impl Text {
         Self {
             _id: String::new(),
             content,
+            lines: None,
             position: Position::default(),
             size: Size::default(),
             styles: Styles::default(),
@@ -43,11 +45,13 @@ impl Text {
 
 impl Element for Text {
     fn render(&self, canvas: &Canvas) {
-        ElementRenderer::render_text(
+        ElementRenderer::render_multi_line_text(
             canvas, 
             self.get_position(), 
             self.get_size(), 
+            self.lines.clone().unwrap_or(vec![]),
             self.get_styles().text_color.unwrap_or(Color::BLACK),
+            self.get_styles().white_space.unwrap_or_default(),
             self.get_styles().font_size.unwrap_or(Dimension { value: 16.0, unit: Unit::Px }).value,
             self.get_styles().font_weight.unwrap_or_default(),
             self.get_styles().font_family.unwrap_or_default(),
@@ -125,5 +129,12 @@ impl Element for Text {
             Position { x, y }
         };
         self.size = allocated_size;
+
+        if self.get_styles().white_space.unwrap_or_default() == WhiteSpace::Normal {
+            let lines = determine_text_element_lines(self);
+            self.lines = Some(lines);
+        } else {
+            self.lines = Some(vec![self.content.clone()]);
+        }
     }
 }

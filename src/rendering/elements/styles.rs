@@ -331,7 +331,7 @@ impl Default for Directions {
 }
 
 // Text properties
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum WhiteSpace {
     Normal,
     NoWrap,

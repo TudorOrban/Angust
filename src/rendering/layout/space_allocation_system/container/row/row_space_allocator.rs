@@ -2,7 +2,7 @@ use crate::rendering::elements::{
     common_types::{Position, Size},
     container::Container,
     element::Element,
-    styles::{Directions, Overflow},
+    styles::Overflow,
 };
 
 use super::{deficit_resolver, position_allocator, size_allocator};
