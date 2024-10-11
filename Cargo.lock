@@ -96,6 +96,7 @@ dependencies = [
  "kuchiki",
  "lazy_static",
  "raw-window-handle",
+ "regex",
  "serde",
  "serde_json",
  "skia-safe",

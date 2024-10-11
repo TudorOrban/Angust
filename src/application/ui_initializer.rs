@@ -14,10 +14,11 @@ pub fn initialize_ui(angust_config: &AngustConfiguration) -> Box<dyn Element> {
     let dom = parse_html_content(html_content.as_str());
     
     let stylesheets = stylesheet_loader::load_stylesheet(
-        angust_config.styles_relative_path.clone(),
+        &angust_config.styles_dir_relative_path, &String::from("styles.css")
     ).unwrap_or_else(|| {
         panic!("Failed to load stylesheet")
     });
+    println!("{}", stylesheets);
 
     map_dom_to_elements(&dom, None, angust_config)
         .expect("Failed to map DOM to elements")
