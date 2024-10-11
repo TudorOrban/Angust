@@ -13,6 +13,6 @@ pub fn initialize_ui(angust_config: &AngustConfiguration) -> Box<dyn Element> {
 
     let dom = parse_html_content(html_content.as_str());
 
-    map_dom_to_elements(&dom, None)
+    map_dom_to_elements(&dom, None, angust_config)
         .expect("Failed to map DOM to elements")
 }

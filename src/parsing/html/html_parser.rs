@@ -3,10 +3,12 @@ use kuchiki::NodeData;
 use kuchiki::NodeRef;
 use kuchiki::traits::TendrilSink;
 
+use crate::application::angust_configuration::AngustConfiguration;
 use crate::parsing::css::css_parser;
 use crate::parsing::css::css_parser::merge_styles;
 use crate::rendering::elements::container::Container;
 use crate::rendering::elements::element::Element;
+use crate::rendering::elements::image::Image;
 use crate::rendering::elements::styles::Styles;
 use crate::rendering::elements::text::Text;
 
@@ -18,39 +20,50 @@ pub fn parse_html_content(html: &str) -> NodeRef {
 /*
  * Map that transforms the DOM into a tree of Angust elements.
  */
-pub fn map_dom_to_elements(dom: &NodeRef, parent_styles: Option<&Styles>) -> Option<Box<dyn Element>> {
+pub fn map_dom_to_elements(dom: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Option<Box<dyn Element>> {
     match dom.data() {
-        NodeData::Document(_) | NodeData::Doctype(_) => process_document_nodes(dom, parent_styles),
+        NodeData::Document(_) | NodeData::Doctype(_) => process_document_nodes(dom, parent_styles, angust_config),
         NodeData::Element(ref elem_data) if elem_data.name.local.as_ref() == "div" => {
-            Some(process_div_element(elem_data, dom, parent_styles))
+            Some(process_div_element(elem_data, dom, parent_styles, angust_config))
+        },
+        NodeData::Element(ref elem_data) if elem_data.name.local.as_ref() == "img" => {
+            process_image_element(elem_data, dom, parent_styles, angust_config)
         },
         NodeData::Text(ref text) => {
-            handle_text_node(&text.borrow(), parent_styles)
+            process_text_element(&text.borrow(), parent_styles, angust_config)
         },
-        _ => general_traversal(dom, parent_styles),
+        _ => general_traversal(dom, parent_styles, angust_config),
     }
 }
 
-fn process_document_nodes(node: &NodeRef, parent_styles: Option<&Styles>) -> Option<Box<dyn Element>> {
+fn process_document_nodes(node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Option<Box<dyn Element>> {
     node.children()
-        .filter_map(|child| map_dom_to_elements(&child, parent_styles))
+        .filter_map(|child| map_dom_to_elements(&child, parent_styles, angust_config))
         .next()
 }
 
-fn process_div_element(elem_data: &kuchiki::ElementData, node: &NodeRef, parent_styles: Option<&Styles>) -> Box<dyn Element> {
+fn process_div_element(elem_data: &kuchiki::ElementData, node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Box<dyn Element> {
     let mut container = Container::new();
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles);
     container.set_styles(styles);
 
     node.children()
-        .filter_map(|child| map_dom_to_elements(&child, Some(&styles)))
+        .filter_map(|child| map_dom_to_elements(&child, Some(&styles), angust_config))
         .for_each(|child_element| container.add_child(child_element));
 
     Box::new(container)
 }
 
-fn handle_text_node(text: &str, parent_styles: Option<&Styles>) -> Option<Box<dyn Element>> {
+fn process_image_element(elem_data: &kuchiki::ElementData, node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Option<Box<dyn Element>> {
+    let attributes = elem_data.attributes.borrow();
+    let src = attributes.get("src").unwrap_or_default();
+
+    // Create an Image element here, and populate it with the necessary data
+    Some(Box::new(Image::new(angust_config.images_dir_relative_path.clone(), src.to_string())))
+}
+
+fn process_text_element(text: &str, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Option<Box<dyn Element>> {
     let trimmed_text = text.trim();
     if !trimmed_text.is_empty() {
         let mut text_element = Text::new(trimmed_text.to_string());
@@ -65,11 +78,11 @@ fn handle_text_node(text: &str, parent_styles: Option<&Styles>) -> Option<Box<dy
     }
 }
 
-fn general_traversal(node: &NodeRef, parent_styles: Option<&Styles>) -> Option<Box<dyn Element>> {
+fn general_traversal(node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration) -> Option<Box<dyn Element>> {
     let mut root_element: Option<Box<dyn Element>> = None;
 
     for child in node.children() {
-        if let Some(element) = map_dom_to_elements(&child, parent_styles) {
+        if let Some(element) = map_dom_to_elements(&child, parent_styles, angust_config) {
             if root_element.is_none() {
                 root_element = Some(element);
             } else {

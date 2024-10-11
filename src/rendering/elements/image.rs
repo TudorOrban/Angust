@@ -23,6 +23,12 @@ impl Image {
         let image = image_loader::load_image(image_directory_relative_path, image_relative_path.clone())
             .map_or(None, |image| Some(image));
 
+        if image.is_none() {
+            println!("Failed to load image: {}", image_relative_path);
+        } else {
+            println!("Successfully loaded image: {}", image_relative_path);
+        }
+        
         Self {
             _id: id,
             image_path: image_relative_path,
