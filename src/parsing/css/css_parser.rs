@@ -9,7 +9,7 @@ pub fn parse_styles(attributes: &Attributes, parent_styles: Option<&Styles>) -> 
     let mut styles = Styles::default();
 
     if let Some(class_name) = attributes.get("class") {
-        styles = apply_class_styles(class_name); // Ensure this merges styles too
+        styles = apply_class_styles(class_name);
     }
 
     if let Some(style_attr) = attributes.get("style") {

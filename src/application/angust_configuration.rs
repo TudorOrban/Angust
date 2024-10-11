@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct AngustConfiguration {
     pub angust_config_path: String,
     pub html_dir_relative_path: String,
-    pub stylesheet_relative_path: String,
+    pub styles_relative_path: String,
     pub images_dir_relative_path: String,
 }
 
@@ -14,7 +14,7 @@ impl Default for AngustConfiguration {
         AngustConfiguration {
             angust_config_path: String::from("angust.configuration.json"),
             html_dir_relative_path: String::from("resources/html"),
-            stylesheet_relative_path: String::from("resources/styles/styles.css"),
+            styles_relative_path: String::from("resources/styles/styles.css"),
             images_dir_relative_path: String::from("resources/images"),
         }
     }

@@ -12,7 +12,7 @@ pub fn get_html_directory_path(relative_pathname: String) -> String {
     identify_project_root_path() + "/" + relative_pathname.as_str()
 }
 
-pub fn get_stylesheet_directory_path(relative_pathname: String) -> String {
+pub fn get_styles_path(relative_pathname: String) -> String {
     identify_project_root_path() + "/" + relative_pathname.as_str()
 }
 
