@@ -49,7 +49,7 @@ fn parse_inline_styles(style_str: &str) -> Styles {
 static LAYOUT_PROPERTIES: [&str; 9] = ["display", "flex-direction", "flex-wrap", "justify-content", "align-items", "margin", "padding", "spacing", "overflow"];
 static DIMENSION_PROPERTIES: [&str; 6] = ["width", "height", "min-width", "max-width", "min-height", "max-height"];
 static APPEARANCE_PROPERTIES: [&str; 5] = ["background-color", "color", "border-width", "border-color", "border-radius"];
-static TEXT_PROPERTIES: [&str; 5] = ["font-size", "font-weight", "font-family", "font-style", "text-align"];
+static TEXT_PROPERTIES: [&str; 6] = ["white-space", "font-size", "font-weight", "font-family", "font-style", "text-align"];
 
 fn dispatch_by_key_and_update_style(styles: &mut Styles, key: &str, value: &str) {
     if LAYOUT_PROPERTIES.contains(&key) {
@@ -67,6 +67,9 @@ fn dispatch_by_key_and_update_style(styles: &mut Styles, key: &str, value: &str)
 
 // Function to merge parent styles with current element styles
 pub fn merge_styles(parent_styles: &Styles, child_styles: &mut Styles) {
+    if child_styles.white_space.is_none() {
+        child_styles.white_space = parent_styles.white_space;
+    }
     if child_styles.font_size.is_none() {
         child_styles.font_size = parent_styles.font_size;
     }

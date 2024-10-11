@@ -2,7 +2,7 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{layout::space_allocation_system::text::size_estimator::estimate_text_element_size, rendering_interface::element_renderer::ElementRenderer};
 
-use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, styles::Styles};
+use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, styles::{Dimension, Styles, Unit}};
 
 
 pub struct Text {
@@ -48,7 +48,7 @@ impl Element for Text {
             self.get_position(), 
             self.get_size(), 
             self.get_styles().text_color.unwrap_or(Color::BLACK),
-            self.get_styles().font_size.unwrap_or_default().value,
+            self.get_styles().font_size.unwrap_or(Dimension { value: 16.0, unit: Unit::Px }).value,
             self.get_styles().font_weight.unwrap_or_default(),
             self.get_styles().font_family.unwrap_or_default(),
             self.get_styles().font_style.unwrap_or_default(),

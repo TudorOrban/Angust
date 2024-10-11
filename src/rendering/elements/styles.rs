@@ -17,6 +17,7 @@ pub struct Styles {
     pub border: Option<Border>,
     pub background_color: Option<Color>,
     pub text_color: Option<Color>,
+    pub white_space: Option<WhiteSpace>,
     pub font_size: Option<Dimension>,
     pub font_family: Option<FontFamily>,
     pub font_weight: Option<FontWeight>,
@@ -41,6 +42,7 @@ impl Default for Styles {
             border: Some(Border::default()),
             // Cascading properties
             text_color: None,
+            white_space: None,
             font_size: None,
             font_family: None,
             font_weight: None,
@@ -329,6 +331,21 @@ impl Default for Directions {
 }
 
 // Text properties
+#[derive(Clone, Copy, Debug)]
+pub enum WhiteSpace {
+    Normal,
+    NoWrap,
+    Pre,
+    PreLine,
+    PreWrap,
+}
+
+impl Default for WhiteSpace {
+    fn default() -> Self {
+        Self::Normal
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub enum FontFamily {
     Arial,
