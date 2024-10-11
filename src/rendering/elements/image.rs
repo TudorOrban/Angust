@@ -1,7 +1,7 @@
 use image::DynamicImage;
 use skia_safe::{Canvas, Point};
 
-use crate::application::resource_loader::image_loader;
+use crate::{application::resource_loader::image_loader, rendering::rendering_interface::element_renderer::ElementRenderer};
 
 use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
 
@@ -23,12 +23,6 @@ impl Image {
         let image = image_loader::load_image(image_directory_relative_path, image_relative_path.clone())
             .map_or(None, |image| Some(image));
 
-        if image.is_none() {
-            println!("Failed to load image: {}", image_relative_path);
-        } else {
-            println!("Successfully loaded image: {}", image_relative_path);
-        }
-        
         Self {
             _id: id,
             image_path: image_relative_path,
@@ -59,12 +53,12 @@ impl Image {
 impl Element for Image {
     fn render(&self, canvas: &Canvas) {
         if let Some(image) = &self.image {
-            // ElementRenderer::render_image(
-            //     canvas, 
-            //     self.get_position(), 
-            //     self.get_size(), 
-            //     image,
-            // );
+            ElementRenderer::render_image(
+                image,
+                canvas, 
+                self.get_position(), 
+                self.get_size(), 
+            );
         }
     }
 
@@ -121,9 +115,25 @@ impl Element for Image {
         self.natural_size
     }
 
-    fn get_requested_size(&self) -> OptionalSize { OptionalSize::default() }
+    fn get_requested_size(&self) -> OptionalSize { self.requested_size }
 
-    fn get_effective_size(&self) -> Size { self.get_natural_size() }
+    fn get_effective_size(&self) -> Size {
+        let effective_width = if let Some(width) = self.get_requested_size().width {
+            width.value
+        } else {
+            self.get_natural_size().width
+        };
+        let effective_height = if let Some(height) = self.get_requested_size().height {
+            height.value
+        } else {
+            self.get_natural_size().height
+        };
+
+        Size {
+            width: effective_width,
+            height: effective_height,
+        }   
+    }
 
     fn is_text_wrapper(&self) -> bool { false }
 
@@ -142,3 +152,4 @@ impl Element for Image {
         self.allocate_space(allocated_position, allocated_size);
     }
 }
+

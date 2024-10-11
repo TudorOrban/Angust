@@ -1,8 +1,9 @@
+use image::DynamicImage;
 use skia_safe::{Canvas, Color, Paint, PaintStyle, Point, Rect, TextBlob};
 
 use crate::rendering::elements::{common_types::{Position, Size}, styles::{Dimension, Directions, FontFamily, FontStyle as CustomFontStyle, FontWeight}};
 
-use super::skia_boundary::get_skia_font_by_styles;
+use super::skia_boundary::{self, get_skia_font_by_styles};
 
 
 pub struct ElementRenderer {
@@ -113,6 +114,34 @@ impl ElementRenderer {
                 let (_, rect) = font.measure_str(line, Some(&paint));
                 y_offset += rect.height();
             }
+        }
+    }
+
+    pub fn render_image(
+        image: &DynamicImage,
+        canvas: &Canvas,
+        position: Position,
+        size: Size,
+    ) {
+        let skia_image = skia_boundary::dynamic_image_to_skia_image(&image);
+        if let Some(skia_image) = skia_image {
+            // Calculate the drawing destination based on position and size
+            let src_rect = skia_safe::Rect::from_wh(skia_image.width() as f32, skia_image.height() as f32);
+            let dst_rect = skia_safe::Rect::from_xywh(
+                position.x, 
+                position.y, 
+                120.0, 
+                80.0
+            );
+
+            println!("Drawing image at position: {:?}, size: {:?}", position, size);
+            // Draw the image
+            canvas.draw_image_rect(
+                &skia_image, 
+                Some((&src_rect, skia_safe::canvas::SrcRectConstraint::Fast)), 
+                dst_rect, 
+                &skia_safe::Paint::default()
+            );
         }
     }
 }
