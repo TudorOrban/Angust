@@ -66,7 +66,7 @@ impl Element for Container {
             child.render(canvas);
         }
 
-        if self.scrollbar_state.is_overflowing.horizontal {
+        if self.scrollbar_state.is_overflowing.horizontal && self.scrollbar_state.thumb_scrollbar_width_ratio < 1.0 {
             ElementRenderer::render_scrollbar(
                 canvas,
                 Position {

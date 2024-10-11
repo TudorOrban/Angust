@@ -10,18 +10,16 @@ pub fn attempt_deficit_resolution(
 ) -> f32 {
     let effective_horizontal_space = allocated_size.width - container.get_styles().padding.unwrap_or_default().horizontal();
     let requested_width = size_allocator::precompute_requested_children_width(container);
-    let mut deficit = requested_width - allocated_size.width;
-
-    shrink_text_wrapper_children(container, &mut deficit);
-    // Recompute requested width after shrinking text wrappers
-    let new_requested_width = size_allocator::precompute_requested_children_width(container);
     
+    let mut deficit = requested_width - allocated_size.width;
+    let mut new_requested_width = requested_width;
+
     if deficit > 0.0 {
-        handle_overflow(container, effective_horizontal_space, new_requested_width);
+        handle_overflow(container, effective_horizontal_space, &mut deficit, &mut new_requested_width);
     }
 
     let current_scroll_position_x = container.scrollbar_state.current_scroll_position.x;
-    let overflow_width = requested_width - allocated_size.width;
+    let overflow_width = new_requested_width - allocated_size.width;
     let scrollbar_offset = overflow_width * current_scroll_position_x;
 
     scrollbar_offset
@@ -30,14 +28,19 @@ pub fn attempt_deficit_resolution(
 fn handle_overflow(
     container: &mut Container,
     effective_horizontal_space: f32,
-    new_requested_width: f32,
+    deficit: &mut f32,
+    new_requested_width: &mut f32,
 ) {
     let overflow = container.get_styles().overflow.unwrap_or_default();
-    
+
     match overflow {
         Overflow::Auto | Overflow::Scroll => {
+            shrink_text_wrapper_children(container, deficit);
+            // Recompute requested width after shrinking text wrappers
+            *new_requested_width = size_allocator::precompute_requested_children_width(container);
+            
             container.scrollbar_state.thumb_scrollbar_width_ratio =
-                effective_horizontal_space / new_requested_width;
+                effective_horizontal_space / new_requested_width.clone();
             container.scrollbar_state.is_overflowing = Directions {
                 horizontal: true,
                 vertical: false,
