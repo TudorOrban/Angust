@@ -5,9 +5,10 @@ use skia_safe::{
 use winit::window::Window;
 use skia_safe::gpu::DirectContext;
 
-use super::{body_fetcher::fetch_ui_body, elements::{common_types::{Position, Size}, element::{Element, EventType}}, ui_manager::UIManager};
+use super::{elements::{common_types::{Position, Size}, element::{Element, EventType}}, ui_manager::UIManager};
 
 pub struct Renderer {
+    pub ui_body: Box<dyn Element>,
     pub surface: Surface,
     ui_manager: UIManager,
 }
@@ -22,8 +23,6 @@ impl Renderer {
             stencil_bits,
         );
 
-        let mut ui_body: Box<dyn Element> = fetch_ui_body();
-
         let screen_size = window.inner_size();
         ui_body.estimate_sizes(); // Start backwards recursion to estimate element sizes
         ui_body.allocate_space( // Start forwards recursion to allocate space
@@ -32,6 +31,7 @@ impl Renderer {
         });
 
         Self { 
+            ui_body,
             surface,
             ui_manager: UIManager::new(ui_body),
         }

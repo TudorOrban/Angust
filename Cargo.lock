@@ -83,6 +83,8 @@ dependencies = [
  "kuchiki",
  "lazy_static",
  "raw-window-handle",
+ "serde",
+ "serde_json",
  "skia-safe",
  "winit",
 ]

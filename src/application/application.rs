@@ -6,13 +6,19 @@ use std::{ffi::CString, num::NonZeroU32};
 
 use crate::{rendering::{elements::element::EventType, renderer::Renderer}, window::WindowingSystem};
 
+use super::{app_configuration::AngustConfiguration, resource_loader::configuration_loader::load_angust_configuration};
+
 
 pub struct Application<State> {
     pub state: State,
+
+    pub angust_config: AngustConfiguration,
+
     windowing_system: WindowingSystem,
     fb_info: FramebufferInfo,
     event_loop: Option<EventLoop<()>>,
     modifiers: Modifiers,
+
     mouse_position: Option<Point>,
     is_mouse_pressed: bool,
     renderer: Renderer,
@@ -50,8 +56,11 @@ impl<State> Application<State> {
             windowing_system.gl_config.stencil_size() as usize
         );
 
+        let angust_config = load_angust_configuration();
+
         Self {
             state: initial_state,
+            angust_config,
             windowing_system,
             fb_info,
             event_loop: Some(event_loop),
