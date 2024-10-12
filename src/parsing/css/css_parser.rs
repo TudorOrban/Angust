@@ -2,14 +2,14 @@ use kuchiki::Attributes;
 
 use crate::rendering::elements::styles::Styles;
 
-use super::{appearance_parser::update_appearance_style, dimension_parser::update_dimension_style, layout_parser::update_layout_style, stylesheet_parser::{self, Stylesheet}, text_parser::update_text_style};
+use super::{appearance_parser::update_appearance_style, dimension_parser::update_dimension_style, layout_parser::update_layout_style, stylesheet_parser::Stylesheet, text_parser::update_text_style};
 
 
 pub fn parse_styles(attributes: &Attributes, parent_styles: Option<&Styles>, stylesheet: &Stylesheet) -> Styles {
     let mut styles = Styles::default();
     
-    if let Some(class_name) = attributes.get("class") {
-        styles = parse_class_styles(class_name, stylesheet);
+    if let Some(class_names) = attributes.get("class") {
+        styles = parse_class_styles(class_names, stylesheet);
     }
 
     if let Some(style_attr) = attributes.get("style") {
@@ -23,10 +23,20 @@ pub fn parse_styles(attributes: &Attributes, parent_styles: Option<&Styles>, sty
     styles
 }
 
-fn parse_class_styles(class_name: &str, stylesheet: &Stylesheet) -> Styles {
-    println!("Applying class styles for class: {}", class_name);
+fn parse_class_styles(class_names: &str, stylesheet: &Stylesheet) -> Styles {
+    let mut styles = Styles::default();
+
+    class_names.split_whitespace().for_each(|class_name| {
+        if let Some(class_styles) = stylesheet.classes.iter()
+            .find(|class| class.name == class_name) {
+            
+            class_styles.properties.iter().for_each(|property| {
+                dispatch_by_key_and_update_style(&mut styles, &property.name, &property.value);
+            });
+        }
+    });
     
-    Styles::default()
+    styles
 }
 
 fn parse_inline_styles(style_str: &str) -> Styles {
@@ -53,6 +63,7 @@ static APPEARANCE_PROPERTIES: [&str; 5] = ["background-color", "color", "border-
 static TEXT_PROPERTIES: [&str; 6] = ["white-space", "font-size", "font-weight", "font-family", "font-style", "text-align"];
 
 fn dispatch_by_key_and_update_style(styles: &mut Styles, key: &str, value: &str) {
+    println!("Key: {}, Value: {}", key, value);
     if LAYOUT_PROPERTIES.contains(&key) {
         update_layout_style(styles, key, value);
     } else if DIMENSION_PROPERTIES.contains(&key) {
