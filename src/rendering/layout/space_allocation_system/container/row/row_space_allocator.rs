@@ -2,7 +2,7 @@ use crate::rendering::elements::{
     common_types::{Position, Size},
     container::Container,
     element::Element,
-    styles::Overflow,
+    styles::{Margin, Overflow},
 };
 
 use super::{deficit_resolver, position_allocator, size_allocator};
@@ -23,10 +23,7 @@ pub fn allocate_space_to_children_row_flex(
     let scrollbar_offset = deficit_resolver::attempt_deficit_resolution(container, allocated_size);
 
     // Prepare AlignItems y computations
-    let children_max_height_index = position_allocator::find_max_child_height_index(container);
-    let max_height_child = &container.children[children_max_height_index];
-    let children_max_height = max_height_child.get_effective_size().height;
-    let max_height_child_margin = max_height_child.get_styles().margin.unwrap_or_default();
+    let (children_max_height, max_height_child_margin) = get_max_height_child_properties(container);
 
     // Start allocating space to children
     let mut current_position = allocated_position;
@@ -56,4 +53,23 @@ pub fn allocate_space_to_children_row_flex(
 
         current_position.x = child_allocated_position.x + child_allocated_size.width + child_margin.right.value;
     }
+}
+
+
+fn get_max_height_child_properties(container: &mut Container) -> (f32, Margin) {
+    let children_max_height_index = position_allocator::find_max_child_height_index(container);
+    let max_height_child = if children_max_height_index.is_some() {
+        Some(&container.children[children_max_height_index.unwrap()])
+    } else {
+        None
+    };
+    let mut children_max_height = 0.0;
+    let mut max_height_child_margin = Default::default();
+
+    if max_height_child.is_some() {
+        children_max_height = max_height_child.unwrap().get_effective_size().height;
+        max_height_child_margin = max_height_child.unwrap().get_styles().margin.unwrap_or_default();
+    }
+
+    (children_max_height, max_height_child_margin)
 }

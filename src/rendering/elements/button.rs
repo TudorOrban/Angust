@@ -10,7 +10,7 @@ pub struct Button {
     _id: String,
 
     container: Option<Vec<Box<dyn Element>>>, // Only one container is allowed
-    pub on_click: Box<dyn FnMut()>,
+    pub on_click: Option<Box<dyn FnMut()>>,
 
     position: Position,
     size: Size,
@@ -20,10 +20,14 @@ pub struct Button {
 }
 
 impl Button {
-    pub fn new(on_click: Box<dyn FnMut()>, container: Option<Container>, styles: Option<Styles>) -> Self {
+    pub fn new(on_click: Option<Box<dyn FnMut()>>, container: Option<Container>, styles: Option<Styles>) -> Self {
         let id = IDGenerator::get();
 
-        let container_vec = Some(container.map_or(Vec::new(), |container| vec![Box::new(container) as Box<dyn Element>]));
+        let container_vec = if let Some(container_child) = container {
+            Some(vec![Box::new(container_child) as Box<dyn Element>])
+        } else {
+            None
+        };
 
         Self {
             _id: id,
@@ -73,7 +77,9 @@ impl Element for Button {
     fn update(&mut self) {}
 
     fn handle_event(&mut self, _: Point, _: &EventType) {
-        (self.on_click)();
+        if let Some(on_click) = &mut self.on_click {
+            on_click();
+        }
     }
 
     fn set_id(&mut self, id: String) {
@@ -88,7 +94,16 @@ impl Element for Button {
         self.size = size;
     }
 
-    fn add_child(&mut self, _: Box<dyn Element>) {}
+    fn add_child(&mut self, container: Box<dyn Element>) {
+        // Only one container is allowed
+        if self.container.is_some() {
+            println!("Button already has a container");
+            return;
+        }
+
+        self.container = Some(vec![container]);
+        println!("Container ID: {:?}", self.container.as_ref().unwrap().get(0).unwrap().get_id());
+    }
 
     fn get_id(&self) -> String {
         self._id.clone()
@@ -167,6 +182,8 @@ impl Element for Button {
             }
         } 
 
+        println!("Button natural size: {:?}", natural_size);
+
         if let Some(size) = natural_size {
             self.set_natural_size(size);
         }
@@ -185,6 +202,7 @@ impl Element for Button {
                 return;
             }
             if let Some(child_element) = child_container.get_mut(0) {
+                println!("Button allocating space for child element: {:?}", child_element.get_id());
                 child_element.allocate_space(allocated_position, allocated_size);
             }
         } 

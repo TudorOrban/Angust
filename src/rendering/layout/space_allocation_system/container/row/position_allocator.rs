@@ -66,9 +66,9 @@ fn compute_child_y_position(
     current_position.y + offset
 }
 
-pub fn find_max_child_height_index(container: &Container) -> usize {
+pub fn find_max_child_height_index(container: &Container) -> Option<usize> {
     let mut max_child_height: f32 = 0.0;
-    let mut max_child_height_index: usize = 0;
+    let mut max_child_height_index: Option<usize> = None;
 
     for (index, child) in container.children.iter().enumerate() {
         let child_effective_size = child.get_effective_size();
@@ -77,7 +77,7 @@ pub fn find_max_child_height_index(container: &Container) -> usize {
 
         if total_child_height > max_child_height {
             max_child_height = total_child_height;
-            max_child_height_index = index;
+            max_child_height_index = Some(index);
         }
     }
 
