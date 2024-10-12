@@ -86,7 +86,7 @@ fn process_image_element(elem_data: &kuchiki::ElementData, _: &NodeRef, parent_s
     let styles = css_parser::parse_styles(&attributes, parent_styles, stylesheet);
 
     let image = Image::new(
-        angust_config.images_dir_relative_path.clone(), src.to_string(), Some(styles)
+        angust_config.pathing_config.assets_dir_path.clone() + "/img", src.to_string(), Some(styles)
     );
     Some(Box::new(image))
 }
