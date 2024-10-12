@@ -1,0 +1,1 @@
+This project provides a CLI tool for faster development with Angust.

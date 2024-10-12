@@ -1,0 +1,27 @@
+[package]
+name = "angust"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "angust"
+path = "src/lib.rs"
+
+[dependencies]
+winit = "0.30.2"
+glutin = "0.32.0"
+glutin-winit = "0.5.0"
+raw-window-handle = "0.6.0"
+
+gl-rs = { version = "0.14.0", package = "gl" }
+skia-safe = { version = "0.78.2", features = ["gl"] }
+
+lazy_static = "1.4"
+
+kuchiki = "0.8"
+
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
+image = "0.25"
+
+regex = "1.11.0"

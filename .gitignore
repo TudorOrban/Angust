@@ -1,1 +1,4 @@
-/target
+target/
+angust-core/target/
+examples/full_project_example/target/
+cartan/target/
