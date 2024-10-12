@@ -35,7 +35,7 @@ fn parse_class_styles(class_names: &str, stylesheet: &Stylesheet) -> Styles {
             });
         }
     });
-    
+
     styles
 }
 
@@ -63,7 +63,6 @@ static APPEARANCE_PROPERTIES: [&str; 5] = ["background-color", "color", "border-
 static TEXT_PROPERTIES: [&str; 6] = ["white-space", "font-size", "font-weight", "font-family", "font-style", "text-align"];
 
 fn dispatch_by_key_and_update_style(styles: &mut Styles, key: &str, value: &str) {
-    println!("Key: {}, Value: {}", key, value);
     if LAYOUT_PROPERTIES.contains(&key) {
         update_layout_style(styles, key, value);
     } else if DIMENSION_PROPERTIES.contains(&key) {
