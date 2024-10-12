@@ -1,6 +1,6 @@
 use clap::ArgMatches;
 
-use crate::{object_generator::{component_generator, service_generator}, project_creator::angust_project_creator::create_project};
+use crate::{object_generator::{component_generator, service_generator}, project_creator::project_creation_manager::create_project};
 
 
 pub fn dispatch_command(command_name: &str, arg_matches: &ArgMatches) {
