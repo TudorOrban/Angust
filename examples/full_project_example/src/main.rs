@@ -1,8 +1,7 @@
 extern crate angust;
 
-use std::collections::HashMap;
-
 use angust::{application::application::Application, rendering::elements::component::component::Component};
+
 
 pub struct AppState {
     pub message: String,

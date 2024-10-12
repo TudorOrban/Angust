@@ -20,10 +20,16 @@ pub fn create_project(name: &str) {
     }
 
     create_git_ignore_file(&project_root_path);
+
     initialize_cargo_project(&project_root_path);
+
     adjust_cargo_toml(&project_root_path, &snake_case_name);
+
     let angust_config = create_angust_configuration_file(&project_root_path);
+
     create_src_directory(&project_root_path, &angust_config);
+
+    update_main_rs_file(&project_root_path, &angust_config.pathing_config.main_rs_path);
 }
 
 fn create_root_directory(project_root_path: &PathBuf, name: &String) -> bool {
@@ -119,19 +125,17 @@ fn create_angust_configuration_file(project_root_path: &PathBuf) -> AngustConfig
 }
 
 fn create_src_directory(project_root_path: &PathBuf, angust_config: &AngustConfiguration) {
-    create_app_directory(project_root_path, &angust_config.app_dir_path);
-    create_assets_directory(project_root_path, &angust_config.assets_dir_path);
-    create_styles_directory(project_root_path, &angust_config.styles_dir_path);
-    create_index_html_file(project_root_path, &angust_config.index_html_path);
+    create_app_directory(project_root_path, &angust_config.pathing_config.app_dir_path);
+    create_assets_directory(project_root_path, &angust_config.pathing_config.assets_dir_path);
+    create_styles_directory(project_root_path, &angust_config.pathing_config.styles_dir_path);
+    create_index_html_file(project_root_path, &angust_config.pathing_config.index_html_path);
 }
 
 fn create_app_directory(project_root_path: &PathBuf, app_folder_path: &String) {
     let app_dir_path = project_root_path.join(app_folder_path);
 
     match fs::create_dir_all(&app_dir_path) {
-        Ok(_) => {
-            println!("App directory created at: {}", app_dir_path.display());
-        }
+        Ok(_) => {}
         Err(e) => {
             eprintln!("Failed to create app directory: {}", e);
         }
@@ -142,11 +146,27 @@ fn create_assets_directory(project_root_path: &PathBuf, assets_folder_path: &Str
     let assets_dir_path = project_root_path.join(assets_folder_path);
 
     match fs::create_dir_all(&assets_dir_path) {
-        Ok(_) => {
-            println!("Assets directory created at: {}", assets_dir_path.display());
-        }
+        Ok(_) => {}
         Err(e) => {
             eprintln!("Failed to create assets directory: {}", e);
+        }
+    }
+
+    let assets_images_dir_path = assets_dir_path.join("img");
+
+    match fs::create_dir_all(&assets_images_dir_path) {
+        Ok(_) => {}
+        Err(e) => {
+            eprintln!("Failed to create assets/images directory: {}", e);
+        }
+    }
+
+    let assets_fonts_dir_path = assets_dir_path.join("fonts");
+
+    match fs::create_dir_all(&assets_fonts_dir_path) {
+        Ok(_) => {}
+        Err(e) => {
+            eprintln!("Failed to create assets/fonts directory: {}", e);
         }
     }
 }
@@ -155,13 +175,27 @@ fn create_styles_directory(project_root_path: &PathBuf, styles_folder_path: &Str
     let styles_dir_path = project_root_path.join(styles_folder_path);
 
     match fs::create_dir_all(&styles_dir_path) {
-        Ok(_) => {
-            println!("Styles directory created at: {}", styles_dir_path.display());
-        }
+        Ok(_) => {}
         Err(e) => {
             eprintln!("Failed to create styles directory: {}", e);
         }
     }
+
+    create_styles_file(&styles_dir_path);
+}
+
+fn create_styles_file(styles_dir_path: &PathBuf) {
+    let styles_css_path = styles_dir_path.join("styles.css");
+
+    let styles_css_contents = r#"
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+    "#;
+
+    fs::write(&styles_css_path, styles_css_contents)
+        .expect("Failed to write styles.css file");
 }
 
 fn create_index_html_file(project_root_path: &PathBuf, index_html_path: &String) {
@@ -185,4 +219,32 @@ fn create_index_html_file(project_root_path: &PathBuf, index_html_path: &String)
 
     fs::write(&index_html_path, index_html_contents)
         .expect("Failed to write index.html file");
+}
+
+fn update_main_rs_file(project_root_path: &PathBuf, main_rs_path: &String) {
+    let main_rs_path = project_root_path.join(main_rs_path);
+
+    let main_rs_contents = r#"
+extern crate angust;
+
+use angust::application::application::Application;
+
+
+pub struct AppGlobalState {
+    pub message: String,
+}
+
+fn main() {
+    let initial_state = AppGlobalState {
+        message: "Hello, Angust user!".to_string(),
+    };
+
+    let mut app = Application::new(initial_state, String::from("New Angust App"));
+    
+    app.run();
+}
+    "#;
+
+    fs::write(&main_rs_path, main_rs_contents)
+        .expect("Failed to write main.rs file");
 }

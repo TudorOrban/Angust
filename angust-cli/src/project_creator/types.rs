@@ -3,6 +3,19 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AngustConfiguration {
+    pub pathing_config: PathingConfiguration,
+}
+
+impl Default for AngustConfiguration {
+    fn default() -> Self {
+        AngustConfiguration {
+            pathing_config: PathingConfiguration::default(),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PathingConfiguration {
     pub angust_config_path: String,
     pub app_dir_path: String,
     pub assets_dir_path: String,
@@ -11,9 +24,9 @@ pub struct AngustConfiguration {
     pub index_html_path: String,
 }
 
-impl Default for AngustConfiguration {
+impl Default for PathingConfiguration {
     fn default() -> Self {
-        AngustConfiguration {
+        PathingConfiguration {
             angust_config_path: String::from("angust.configuration.json"),
             app_dir_path: String::from("src/app"),
             assets_dir_path: String::from("src/assets"),
