@@ -11,28 +11,28 @@ pub enum Message {
     UpdateMessage(String),
 }
 
-pub struct CustomComponent {
-    component: Component<CustomComponentState>,    
+pub struct AppComponent {
+    component: Component<AppComponentState>,    
 }
 
-pub struct CustomComponentState {
+pub struct AppComponentState {
     content: String,
 }
 
-impl CustomComponent {
+impl AppComponent {
     pub fn new() -> Self {
-        let state = CustomComponentState { content: String::from("Initial Content") };
+        let state = AppComponentState { content: String::from("Hello, App Component!") };
 
         let mut component = Component::new(
-            "CustomComponent".to_string(),
-            "resources/html/custom_component.html".to_string(),
+            "AppComponent".to_string(),
+            "src/app/app.component.html".to_string(),
             state,
         );
 
-        component.add_event_handler("toggle".to_string(), Box::new(|state: &mut CustomComponentState| {
+        component.add_event_handler("toggle".to_string(), Box::new(|state: &mut AppComponentState| {
             Self::toggle_content(state);
         }));
-        component.add_event_handler("delete".to_string(), Box::new(|state: &mut CustomComponentState| {
+        component.add_event_handler("delete".to_string(), Box::new(|state: &mut AppComponentState| {
             Self::delete_content(state);
         }));
 
@@ -40,7 +40,7 @@ impl CustomComponent {
     }
 
     
-    pub fn toggle_content(state: &mut CustomComponentState) {
+    pub fn toggle_content(state: &mut AppComponentState) {
         if state.content == "Initial Content" {
             state.content = String::from("Updated Content");
             println!("Content updated: {}", state.content);
@@ -49,7 +49,7 @@ impl CustomComponent {
         }
     }
 
-    pub fn delete_content(state: &mut CustomComponentState) {
+    pub fn delete_content(state: &mut AppComponentState) {
         state.content = String::from("");
     }
 

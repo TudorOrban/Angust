@@ -27,7 +27,7 @@ pub fn create_project(name: &str) {
 
     let angust_config = create_angust_configuration_file(&project_root_path);
 
-    create_src_directory(&project_root_path, &angust_config);
+    create_src_directories(&project_root_path, &angust_config);
 
     update_main_rs_file(&project_root_path, &angust_config.pathing_config.main_rs_path);
 }
@@ -124,11 +124,34 @@ fn create_angust_configuration_file(project_root_path: &PathBuf) -> AngustConfig
     default_config
 }
 
-fn create_src_directory(project_root_path: &PathBuf, angust_config: &AngustConfiguration) {
+fn create_src_directories(project_root_path: &PathBuf, angust_config: &AngustConfiguration) {
+    create_index_html_file(project_root_path, &angust_config.pathing_config.index_html_path);
     create_app_directory(project_root_path, &angust_config.pathing_config.app_dir_path);
     create_assets_directory(project_root_path, &angust_config.pathing_config.assets_dir_path);
     create_styles_directory(project_root_path, &angust_config.pathing_config.styles_dir_path);
-    create_index_html_file(project_root_path, &angust_config.pathing_config.index_html_path);
+}
+
+fn create_index_html_file(project_root_path: &PathBuf, index_html_path: &String) {
+    let index_html_path = project_root_path.join(index_html_path);
+
+    let index_html_contents = r#"<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angust App</title>
+</head>
+<body>
+    <div>
+        <app-component></app-component>
+    </div>
+</body>
+</html>
+"#;
+
+    fs::write(&index_html_path, index_html_contents)
+        .expect("Failed to write index.html file");
 }
 
 fn create_app_directory(project_root_path: &PathBuf, app_folder_path: &String) {
@@ -140,6 +163,82 @@ fn create_app_directory(project_root_path: &PathBuf, app_folder_path: &String) {
             eprintln!("Failed to create app directory: {}", e);
         }
     }
+
+    create_app_component(&app_dir_path);
+    create_app_template(&app_dir_path);
+}
+
+fn create_app_component(app_dir_path: &PathBuf) {
+    let app_component_path = app_dir_path.join("app.component.rs");
+
+    let app_component_contents = r#"
+    
+use angust::rendering::elements::component::component::Component;
+
+pub struct AppComponent {
+    component: Component<AppComponentState>,    
+}
+
+pub struct AppComponentState {
+    content: String,
+}
+
+impl AppComponent {
+    pub fn new() -> Self {
+        let state = AppComponentState { content: String::from("Hello, App Component!") };
+
+        let mut component = Component::new(
+            "app-component".to_string(),
+            "src/app/app.component.html".to_string(),
+            state,
+        );
+
+        component.add_event_handler("toggle".to_string(), Box::new(|state: &mut AppComponentState| {
+            Self::toggle_content(state);
+        }));
+        component.add_event_handler("delete".to_string(), Box::new(|state: &mut AppComponentState| {
+            Self::delete_content(state);
+        }));
+
+        Self { component }
+    }
+
+    
+    pub fn toggle_content(state: &mut AppComponentState) {
+        if state.content == "Initial Content" {
+            state.content = String::from("Updated Content");
+            println!("Content updated: {}", state.content);
+        } else {
+            state.content = String::from("Initial Content");
+        }
+    }
+
+    pub fn delete_content(state: &mut AppComponentState) {
+        state.content = String::from("");
+    }
+
+}
+
+    "#;
+
+    fs::write(&app_component_path, app_component_contents)
+        .expect("Failed to write app_component.rs file");
+}
+
+fn create_app_template(app_dir_path: &PathBuf) {
+    let app_template_path = app_dir_path.join("app.component.html");
+
+    let app_template_contents = r#"
+<div style="background-color: rgb(255, 0, 0)">
+
+    <h1>{{ content }}</h1>
+
+    <button @onclick="toggle">Toggle Content</button>
+</div>
+    "#;
+
+    fs::write(&app_template_path, app_template_contents)
+        .expect("Failed to write app.component.html file");
 }
 
 fn create_assets_directory(project_root_path: &PathBuf, assets_folder_path: &String) {
@@ -190,35 +289,12 @@ fn create_styles_file(styles_dir_path: &PathBuf) {
     let styles_css_contents = r#"
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: rgb(0, 0, 0);
 }
     "#;
 
     fs::write(&styles_css_path, styles_css_contents)
         .expect("Failed to write styles.css file");
-}
-
-fn create_index_html_file(project_root_path: &PathBuf, index_html_path: &String) {
-    let index_html_path = project_root_path.join(index_html_path);
-
-    let index_html_contents = r#"<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Angust App</title>
-</head>
-<body>
-    <div>
-        <h1>Welcome to Angust!</h1>
-    </div>
-</body>
-</html>
-"#;
-
-    fs::write(&index_html_path, index_html_contents)
-        .expect("Failed to write index.html file");
 }
 
 fn update_main_rs_file(project_root_path: &PathBuf, main_rs_path: &String) {
