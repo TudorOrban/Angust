@@ -1,33 +1,18 @@
-use clap::{Arg, Command};
+use commands::command_dispatcher::dispatch_command;
+
+pub mod project_creator;
+pub mod commands;
+pub mod object_generator;
 
 fn main() {
-    let matches = Command::new("angust-cli")
-        .version("0.1.0")
-        .author("Tudor Andrei Orban <tudororban2@gmail.com>")
-        .about("A CLI tool for managing Angust projects")
-        .subcommand(
-            Command::new("new")
-                .about("Creates a new Angust project")
-                .arg(
-                    Arg::new("name")
-                        .help("The name of the project")
-                        .required(true)
-                        .index(1),
-                ),   
-        )
-        .get_matches();
-
+    let matches = 
+        commands::command_configuration::get_command_configuration()
+            .get_matches();
+        
     match matches.subcommand() {
-        Some(("new", sub_m)) => {
-            let name = sub_m.get_one::<String>("name").unwrap();
-            println!("Creating a new Angust project with name: {}", name);
-            create_project(&name);
+        Some((command_name, arg_matches)) => {
+            dispatch_command(command_name, arg_matches);
         },
         _ => {}
     }
-}
-
-
-fn create_project(name: &str) {
-
 }
