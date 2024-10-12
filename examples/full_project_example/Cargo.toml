@@ -8,4 +8,4 @@ angust = { path = "../../" }
 
 [[bin]]
 name = "full_project_example"
-path = "main.rs"
+path = "src/main.rs"

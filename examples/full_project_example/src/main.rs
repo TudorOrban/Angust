@@ -1,5 +1,7 @@
 extern crate angust;
 
+use std::collections::HashMap;
+
 use angust::{application::application::Application, rendering::elements::component::component::Component};
 
 pub struct AppState {
@@ -21,20 +23,35 @@ pub struct CustomComponentState {
 impl CustomComponent {
     pub fn new() -> Self {
         let state = CustomComponentState { content: String::from("Initial Content") };
-        let component = Component::new(
+
+        let mut component = Component::new(
             "CustomComponent".to_string(),
             "resources/html/custom_component.html".to_string(),
             state,
         );
+
+        component.add_event_handler("toggle".to_string(), Box::new(|state: &mut CustomComponentState| {
+            Self::toggle_content(state);
+        }));
+        component.add_event_handler("delete".to_string(), Box::new(|state: &mut CustomComponentState| {
+            Self::delete_content(state);
+        }));
+
         Self { component }
     }
 
-    fn toggle_content(&mut self) {
-        if self.component.state.content == "Initial Content" {
-            self.component.state.content = String::from("Updated Content");
+    
+    pub fn toggle_content(state: &mut CustomComponentState) {
+        if state.content == "Initial Content" {
+            state.content = String::from("Updated Content");
+            println!("Content updated: {}", state.content);
         } else {
-            self.component.state.content = String::from("Initial Content");
+            state.content = String::from("Initial Content");
         }
+    }
+
+    pub fn delete_content(state: &mut CustomComponentState) {
+        state.content = String::from("");
     }
 
 }
