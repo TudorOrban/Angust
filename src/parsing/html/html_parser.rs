@@ -70,7 +70,10 @@ fn process_button_element(elem_data: &kuchiki::ElementData, node: &NodeRef, pare
     let mut child_container = Container::new();
     node.children()
         .filter_map(|child| map_dom_to_elements(&child, Some(&styles), angust_config, stylesheet))
-        .for_each(|child_element| child_container.add_child(child_element));
+        .for_each(|child_element| {
+            child_container.add_child(child_element);
+            child_container.set_styles(styles.clone());
+        });
         
     button.add_child(Box::new(child_container));
 

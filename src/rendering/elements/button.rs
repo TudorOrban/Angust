@@ -72,6 +72,12 @@ impl Element for Button {
             self.styles.border.unwrap_or_default().width,
             self.styles.border.unwrap_or_default().color,
         );
+
+        if let Some(child_container) = self.get_children() {
+            if let Some(child_element) = child_container.get(0) {
+                child_element.render(canvas);
+            }
+        }
     }
 
     fn update(&mut self) {}
@@ -97,12 +103,10 @@ impl Element for Button {
     fn add_child(&mut self, container: Box<dyn Element>) {
         // Only one container is allowed
         if self.container.is_some() {
-            println!("Button already has a container");
             return;
         }
 
         self.container = Some(vec![container]);
-        println!("Container ID: {:?}", self.container.as_ref().unwrap().get(0).unwrap().get_id());
     }
 
     fn get_id(&self) -> String {
@@ -182,8 +186,6 @@ impl Element for Button {
             }
         } 
 
-        println!("Button natural size: {:?}", natural_size);
-
         if let Some(size) = natural_size {
             self.set_natural_size(size);
         }
@@ -202,7 +204,6 @@ impl Element for Button {
                 return;
             }
             if let Some(child_element) = child_container.get_mut(0) {
-                println!("Button allocating space for child element: {:?}", child_element.get_id());
                 child_element.allocate_space(allocated_position, allocated_size);
             }
         } 
