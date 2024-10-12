@@ -4,3 +4,7 @@ members = [
     "examples/full_project_example",
     "cartan"
 ]
+resolver = "2"
+exclude = [
+    "angust-cli"
+]
