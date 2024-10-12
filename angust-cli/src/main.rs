@@ -3,6 +3,7 @@ use commands::command_dispatcher::dispatch_command;
 pub mod project_creator;
 pub mod commands;
 pub mod object_generator;
+pub mod shared;
 
 fn main() {
     let matches = 

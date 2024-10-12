@@ -5,6 +5,3 @@ mod core_file_creator;
 mod app_directory_creator;
 mod assets_directory_creator;
 mod styles_directory_creator;
-
-pub mod types;
-mod utils;

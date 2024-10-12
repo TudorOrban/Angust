@@ -2,7 +2,7 @@ use std::{fs, path::PathBuf, process::Command};
 
 use toml_edit::{value, DocumentMut};
 
-use super::types::AngustConfiguration;
+use crate::shared::types::AngustConfiguration;
 
 pub fn create_configuration_files(project_root_path: &PathBuf, project_name: String) -> AngustConfiguration {
     create_git_ignore_file(&project_root_path);
