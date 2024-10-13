@@ -19,53 +19,37 @@ fn create_app_component(app_dir_path: &PathBuf) {
     let app_component_path = app_dir_path.join("app.component.rs");
 
     let app_component_contents = r#"
-    
-use angust::rendering::elements::component::component::Component;
+ use angust::rendering::elements::component::{component::Component, component_factory::register_component};
+
 
 pub struct AppComponent {
     component: Component<AppComponentState>,    
 }
 
+#[derive(Clone)]
 pub struct AppComponentState {
     content: String,
 }
 
-impl AppComponent {
-    pub fn new() -> Self {
-        let state = AppComponentState { content: String::from("Hello, App Component!") };
-
-        let mut component = Component::new(
-            "app-component".to_string(),
-            "src/app/app.component.html".to_string(),
-            state,
-        );
-
-        component.add_event_handler("toggle".to_string(), Box::new(|state: &mut AppComponentState| {
-            Self::toggle_content(state);
-        }));
-        component.add_event_handler("delete".to_string(), Box::new(|state: &mut AppComponentState| {
-            Self::delete_content(state);
-        }));
-
-        Self { component }
+impl AppComponentState {
+    fn new() -> Self {
+        Self { content: String::from("Hello, App Component!") }
     }
-
-    
-    pub fn toggle_content(state: &mut AppComponentState) {
-        if state.content == "Initial Content" {
-            state.content = String::from("Updated Content");
-            println!("Content updated: {}", state.content);
-        } else {
-            state.content = String::from("Initial Content");
-        }
-    }
-
-    pub fn delete_content(state: &mut AppComponentState) {
-        state.content = String::from("");
-    }
-
 }
 
+impl AppComponent {
+    pub fn register() {
+        let state_factory = || AppComponentState::new();
+
+        register_component("app-component".to_string(), Box::new(move || {
+            Component::new(
+                "app-component".to_string(),
+                "src/app/app_component.html".to_string(),
+                state_factory() 
+            )
+        }));
+    }
+}
     "#;
 
     fs::write(&app_component_path, app_component_contents)
