@@ -1,5 +1,7 @@
 
-use angust::rendering::elements::component::{component::Component, component_factory::register_component};
+use std::collections::HashMap;
+
+use angust::rendering::elements::component::{component::Component, component_factory::ComponentFactory};
 
 pub struct HeaderComponent {
     component: Component<HeaderComponentState>,    
@@ -18,14 +20,16 @@ impl HeaderComponentState {
 }
 
 impl HeaderComponent {
-    pub fn register() {
+    pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
         let state_factory = || HeaderComponentState::new();
 
-        register_component("header-component".to_string(), Box::new(move || {
-            Component::new(
-                "header-component".to_string(),
-                "src/app/core/header_component.html".to_string(),
-                state_factory() 
+        registry.insert("header-component".to_string(), Box::new(move || {
+            Box::new(
+                Component::new(
+                    "header-component".to_string(),
+                    "src/app/core/header_component/header_component.html".to_string(),
+                    state_factory() 
+                )
             )
         }));
 

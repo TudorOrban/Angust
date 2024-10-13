@@ -50,6 +50,7 @@ impl<State> Component<State> {
         let project_root = PathBuf::from(identify_project_root_path());
         let template_path = project_root.join(&self.template_relative_path);
 
+        println!("Template path: {:?}", template_path);
         let template_content = std::fs::read_to_string(template_path)
             .expect("Failed to read template file");
 

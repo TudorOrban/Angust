@@ -1,29 +1,18 @@
-use std::{collections::HashMap, sync::Mutex};
-
-use lazy_static::lazy_static;
-
+use std::collections::HashMap;
+use std::sync::Arc;
+use once_cell::sync::OnceCell;
 use crate::rendering::elements::element::Element;
 
-use super::component::Component;
+pub type ComponentFactory = Box<dyn Fn() -> Box<dyn Element> + Send + Sync>;
+static COMPONENT_REGISTRY: OnceCell<Arc<HashMap<String, ComponentFactory>>> = OnceCell::new();
 
-
-lazy_static! {
-    static ref COMPONENT_REGISTRY: Mutex<HashMap<String, Box<dyn Fn() -> Box<dyn Element> + Send>>> = Mutex::new(HashMap::new());
+pub fn initialize_registry(registry: HashMap<String, ComponentFactory>) {
+    let immutable_registry = Arc::new(registry);
+    let _ = COMPONENT_REGISTRY.set(immutable_registry);
 }
 
-pub fn register_component<State>(name: String, factory: Box<dyn Fn() -> Component<State> + Send>)
-where 
-    State: 'static {
-        let wrapped_factory = Box::new(move || {
-            let component = factory();
-            println!("Creating component");
-            Box::new(component) as Box<dyn Element>
-        });
-
-        COMPONENT_REGISTRY.lock().unwrap().insert(name, wrapped_factory);
-    }
-
 pub fn create_component(name: &str) -> Option<Box<dyn Element>> {
-    let registry = COMPONENT_REGISTRY.lock().unwrap();
-    registry.get(name).and_then(|factory| Some(factory()))
+    COMPONENT_REGISTRY.get().and_then(|registry| {
+        registry.get(name).and_then(|factory| Some(factory()))
+    })
 }
