@@ -40,6 +40,7 @@ impl<State> Component<State> {
 
     fn initialize(&mut self, template_relative_path: String) {
         // Load template
+        println!("Loading template from {}", template_relative_path);
     }
 
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
