@@ -1,5 +1,5 @@
 
-pub fn string_pascal_to_snake_case(input: &str) -> String {
+pub fn string_pascal_to_snake_case(input: &String) -> String {
     let mut result = String::new();
     for (i, c) in input.chars().enumerate() {
         if c.is_uppercase() {
@@ -14,7 +14,7 @@ pub fn string_pascal_to_snake_case(input: &str) -> String {
     result
 }
 
-pub fn string_pascal_to_kebab_case(input: &str) -> String {
+pub fn string_pascal_to_kebab_case(input: &String) -> String {
     let mut result = String::new();
     for (i, c) in input.chars().enumerate() {
         if c.is_uppercase() {

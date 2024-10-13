@@ -9,7 +9,7 @@ pub fn create_project(name: &str) {
     println!("Creating a new Angust project with name: {}", name);
 
     let current_dir = env::current_dir().expect("Failed to get current directory");
-    let snake_case_name = utils::string_pascal_to_snake_case(name);
+    let snake_case_name = utils::string_pascal_to_snake_case(&name.to_owned());
     let project_root_path = current_dir.join(snake_case_name.clone());
 
     create_root_directory(&project_root_path, &snake_case_name);
