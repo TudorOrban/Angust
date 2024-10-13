@@ -1,17 +1,17 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
-use crate::rendering::elements::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType}, element_id_generator::IDGenerator, styles::Styles};
+use crate::{application::{angust_configuration::AngustConfiguration, resource_loader::path_navigator::identify_project_root_path}, parsing::{css::stylesheet_parser::Stylesheet, html::html_parser}, rendering::elements::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles}};
 
 pub struct Component<State> {
     _id: String,
     pub name: String,
     pub template_relative_path: String,
-    pub content: Option<Box<dyn Element>>,
-    pub position: Position,
-    pub size: Size,
-    pub natural_size: Size,
-    pub requested_size: OptionalSize,
-    pub styles: Styles,
+    content: Option<Box<dyn Element>>,
+    position: Position,
+    size: Size,
+    natural_size: Size,
+    requested_size: OptionalSize,
+    styles: Styles,
 
     // User-defined state
     pub state: State,
@@ -20,11 +20,12 @@ pub struct Component<State> {
 
 impl<State> Component<State> {
     pub fn new(name: String, template_relative_path: String, state: State) -> Self {
+        println!("Creating component {}", name);
         let id = IDGenerator::get();
         let mut component = Self {
             _id: id,
             name,
-            template_relative_path: template_relative_path.clone(),
+            template_relative_path: template_relative_path,
             content: None,
             position: Position::default(),
             size: Size::default(),
@@ -34,13 +35,28 @@ impl<State> Component<State> {
             state,
             event_handlers: HashMap::new(),
         };
-        component.initialize(template_relative_path);
+        component.initialize();
         component
     }
 
-    fn initialize(&mut self, template_relative_path: String) {
+    fn initialize(&mut self) {
+        self.load_template();
+    }
+
+    fn load_template(&mut self) {
         // Load template
-        println!("Loading template from {}", template_relative_path);
+        println!("Loading template from {}", self.template_relative_path);
+
+        let project_root = PathBuf::from(identify_project_root_path());
+        let template_path = project_root.join(&self.template_relative_path);
+
+        let template_content = std::fs::read_to_string(template_path)
+            .expect("Failed to read template file");
+
+        // Parse template
+        let dom = html_parser::parse_html_content(&template_content);
+        println!("Parsed template");
+        self.content = html_parser::map_dom_to_elements(&dom, None, &AngustConfiguration::default(), &Stylesheet::default());
     }
 
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
@@ -60,15 +76,21 @@ impl<State> Component<State> {
 impl<State> Element for Component<State> {
     
     fn render(&self, canvas: &skia_safe::Canvas) {
-        
+        if let Some(content) = &self.content {
+            content.render(canvas);
+        }
     }
 
     fn update(&mut self) {
-        
+        if let Some(content) = &mut self.content {
+            content.update();
+        }
     }
     
-    fn handle_event(&mut self, cursor_position: skia_safe::Point, event_type: &crate::rendering::elements::element::EventType) {
-        
+    fn handle_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) {
+        if let Some(content) = &mut self.content {
+            content.handle_event(cursor_position, event_type);
+        }
     }
 
     fn add_child(&mut self, child: Box<dyn Element>) {
@@ -136,11 +158,18 @@ impl<State> Element for Component<State> {
     }
 
     fn estimate_sizes(&mut self) {
-        
+        if let Some(content) = &mut self.content {
+            content.estimate_sizes();
+        }
     }
 
-    fn allocate_space(&mut self, allocated_position: crate::rendering::elements::common_types::Position, allocated_size: crate::rendering::elements::common_types::Size) {
-        
+    fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size) {
+        if let Some(content) = &mut self.content {
+            content.set_position(allocated_position);
+            content.set_size(allocated_size);
+
+            content.allocate_space(allocated_position, allocated_size);
+        }
     }
 
     fn layout(&mut self, allocated_position: Position, allocated_size: Size) {

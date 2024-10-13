@@ -17,8 +17,7 @@ pub fn dispatch_element_processing(elem_data: &kuchiki::ElementData, node: &Node
         "div" => Some(process_div_element(elem_data, node, parent_styles, angust_config, stylesheet)),
         "button" => Some(process_button_element(elem_data, node, parent_styles, angust_config, stylesheet)),
         "img" => process_image_element(elem_data, node, parent_styles, angust_config, stylesheet),
-        "app-component" => process_custom_component("app-component", elem_data, node, parent_styles, angust_config, stylesheet),
-        _ => html_parser::general_traversal(node, parent_styles, angust_config, stylesheet),
+        component_name => process_custom_component(component_name, elem_data, node, parent_styles, angust_config, stylesheet),
     }
 }
 
@@ -67,13 +66,26 @@ fn process_image_element(elem_data: &kuchiki::ElementData, _: &NodeRef, parent_s
 }
 
 fn process_custom_component(component_name: &str, elem_data: &kuchiki::ElementData, node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration, stylesheet: &Stylesheet) -> Option<Box<dyn Element>> {
+    let skippable_components = vec!["!DOCTYPE", "html", "head", "meta", "body", "title", "h1"];
+    if skippable_components.contains(&component_name) {
+        return html_parser::general_traversal(node, parent_styles, angust_config, stylesheet)
+    }
+    
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, stylesheet);
-    println!("Component encountered: {}", component_name);
+
+    println!("Processing custom component: {}", component_name);
+
     if let Some(component_box) = create_component(component_name) {
         println!("Component found: {}", component_name);
         Some(component_box)
     } else {
+        println!("Component not found: {}", component_name);
+        // // Continue processing children
+        // // To be reported as an error in the future
+        if node.children().count() > 0 {
+            return html_parser::general_traversal(node, Some(&styles), angust_config, stylesheet)
+        }
         None
     }
 }

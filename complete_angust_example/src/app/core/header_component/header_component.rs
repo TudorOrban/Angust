@@ -28,6 +28,8 @@ impl HeaderComponent {
                 state_factory() 
             )
         }));
+
+        println!("Registered header-component");
     }
 }
     

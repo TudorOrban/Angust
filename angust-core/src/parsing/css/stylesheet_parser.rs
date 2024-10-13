@@ -4,6 +4,14 @@ pub struct Stylesheet {
     pub classes: Vec<StyleClass>,
 }
 
+impl Default for Stylesheet {
+    fn default() -> Self {
+        Stylesheet {
+            classes: Vec::new(),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct StyleClass {
     pub name: String,
