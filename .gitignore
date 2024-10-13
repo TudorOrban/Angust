@@ -3,3 +3,4 @@ angust-core/target/
 angust-cli/target/
 examples/full_project_example/target/
 cartan/target/
+test_angust_project/

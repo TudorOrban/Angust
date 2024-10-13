@@ -4,6 +4,7 @@ use crate::application::angust_configuration::AngustConfiguration;
 use crate::parsing::css::css_parser;
 use crate::parsing::css::stylesheet_parser::Stylesheet;
 use crate::rendering::elements::button::Button;
+use crate::rendering::elements::component::component_factory::create_component;
 use crate::rendering::elements::container::Container;
 use crate::rendering::elements::element::Element;
 use crate::rendering::elements::image::Image;
@@ -16,6 +17,7 @@ pub fn dispatch_element_processing(elem_data: &kuchiki::ElementData, node: &Node
         "div" => Some(process_div_element(elem_data, node, parent_styles, angust_config, stylesheet)),
         "button" => Some(process_button_element(elem_data, node, parent_styles, angust_config, stylesheet)),
         "img" => process_image_element(elem_data, node, parent_styles, angust_config, stylesheet),
+        "app-component" => process_custom_component("app-component", elem_data, node, parent_styles, angust_config, stylesheet),
         _ => html_parser::general_traversal(node, parent_styles, angust_config, stylesheet),
     }
 }
@@ -62,4 +64,16 @@ fn process_image_element(elem_data: &kuchiki::ElementData, _: &NodeRef, parent_s
         angust_config.pathing_config.assets_dir_path.clone() + "/img", src.to_string(), Some(styles)
     );
     Some(Box::new(image))
+}
+
+fn process_custom_component(component_name: &str, elem_data: &kuchiki::ElementData, node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration, stylesheet: &Stylesheet) -> Option<Box<dyn Element>> {
+    let attributes = elem_data.attributes.borrow();
+    let styles = css_parser::parse_styles(&attributes, parent_styles, stylesheet);
+    println!("Component encountered: {}", component_name);
+    if let Some(component_box) = create_component(component_name) {
+        println!("Component found: {}", component_name);
+        Some(component_box)
+    } else {
+        None
+    }
 }

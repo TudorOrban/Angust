@@ -16,6 +16,7 @@ where
     State: 'static {
         let wrapped_factory = Box::new(move || {
             let component = factory();
+            println!("Creating component");
             Box::new(component) as Box<dyn Element>
         });
 
