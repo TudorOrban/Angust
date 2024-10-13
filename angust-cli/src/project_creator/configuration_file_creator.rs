@@ -60,7 +60,7 @@ fn adjust_cargo_toml(project_root_path: &PathBuf, name: &String) {
     doc["package"]["edition"] = value("2021");
 
     // Specify dependency to be a local path for development purposes
-    doc["dependencies"]["angust"] = value("../../../angust-core/");
+    doc["dependencies"]["angust"] = value("../angust-core/");
 
     // Define a binary target
     let bin_table = doc["bin"].or_insert(toml_edit::table());

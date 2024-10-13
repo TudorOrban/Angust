@@ -53,7 +53,7 @@ fn create_component_module(component_dir_path: &PathBuf, current_dir_path: &Path
     let relative_path = component_dir_path.strip_prefix(&base_path).unwrap();
 
     let mut current_path = base_path.clone();
-    let mut previous_mod_path = Some(base_path.join("mod.rs"));
+    let mut previous_mod_path = Some(base_path.join("mod.rs"));  // mod.rs in app directory
 
     for component in relative_path.iter() {
         current_path.push(component);
@@ -68,6 +68,12 @@ fn create_component_module(component_dir_path: &PathBuf, current_dir_path: &Path
         }
 
         previous_mod_path = Some(current_path.join("mod.rs"));
+    }
+
+    // Ensure the last component's mod.rs is updated to include the component file
+    if let Some(ref final_mod_path) = previous_mod_path {
+        let file_stem = component_dir_path.file_stem().unwrap().to_str().unwrap();
+        update_mod_file(final_mod_path, file_stem);
     }
 }
 
@@ -96,7 +102,7 @@ fn create_component_rs_file(
         .replace("\\", "/");
 
     let component_component_contents = format!(r#"
-use angust::rendering::elements::component::component::Component;
+use angust::rendering::elements::component::{{component::Component, component_factory::register_component}};
 
 pub struct {pascal_case_component_name} {{
     component: Component<{pascal_case_component_name}State>,    
@@ -104,6 +110,14 @@ pub struct {pascal_case_component_name} {{
 
 pub struct {pascal_case_component_name}State {{
     content: String,
+}}
+
+impl {pascal_case_component_name}State {{
+    pub fn new() -> {pascal_case_component_name}State {{
+        {pascal_case_component_name}State {{
+            content: "Hello from {kebab_case_component_name}".to_string(),
+        }}
+    }}
 }}
 
 impl {pascal_case_component_name} {{
@@ -136,7 +150,7 @@ fn create_component_template(
 <div style="background-color: rgb(255, 0, 0)">
 
     <div>{kebab_case_component_name} works!</div>
-    <span>{{ content }}</span>
+    <span>{{{{ content }}}}</span>
 
     <button @onclick="toggle">Toggle Content</button>
 </div>
@@ -145,8 +159,6 @@ fn create_component_template(
     fs::write(&component_template_path, component_template_contents)
         .expect("Failed to write component.component.html file");
 }
-
-
 
 fn update_component_registration_module(
     component_rs_path: &PathBuf, 

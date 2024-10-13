@@ -389,6 +389,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "complete_angust_example"
+version = "0.1.0"
+dependencies = [
+ "angust",
+]
+
+[[package]]
 name = "concurrent-queue"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2399,13 +2406,6 @@ dependencies = [
  "futf",
  "mac",
  "utf-8",
-]
-
-[[package]]
-name = "test_angust_project"
-version = "0.1.0"
-dependencies = [
- "angust",
 ]
 
 [[package]]

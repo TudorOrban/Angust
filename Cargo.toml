@@ -3,7 +3,7 @@ members = [
     "angust-core",                     
     "examples/full_project_example",
     "cartan",
-    "test_angust_project"
+    "complete_angust_example"
 ]
 resolver = "2"
 exclude = [

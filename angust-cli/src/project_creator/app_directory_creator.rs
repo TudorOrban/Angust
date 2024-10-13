@@ -11,12 +11,24 @@ pub fn create_app_directory(project_root_path: &PathBuf, app_folder_path: &Strin
         }
     }
 
+    create_app_mod_file(&app_dir_path);
     create_app_component(&app_dir_path);
     create_app_template(&app_dir_path);
 }
 
+fn create_app_mod_file(app_dir_path: &PathBuf) {
+    let app_mod_path = app_dir_path.join("mod.rs");
+
+    let app_mod_contents = r#"
+pub mod app_component;
+    "#;
+
+    fs::write(&app_mod_path, app_mod_contents)
+        .expect("Failed to write app mod.rs file");
+}
+
 fn create_app_component(app_dir_path: &PathBuf) {
-    let app_component_path = app_dir_path.join("app.component.rs");
+    let app_component_path = app_dir_path.join("app_component.rs");
 
     let app_component_contents = r#"
  use angust::rendering::elements::component::{component::Component, component_factory::register_component};
@@ -57,7 +69,7 @@ impl AppComponent {
 }
 
 fn create_app_template(app_dir_path: &PathBuf) {
-    let app_template_path = app_dir_path.join("app.component.html");
+    let app_template_path = app_dir_path.join("app_component.html");
 
     let app_template_contents = r#"
 <div style="background-color: rgb(255, 0, 0)">
@@ -69,5 +81,5 @@ fn create_app_template(app_dir_path: &PathBuf) {
     "#;
 
     fs::write(&app_template_path, app_template_contents)
-        .expect("Failed to write app.component.html file");
+        .expect("Failed to write app_component.html file");
 }

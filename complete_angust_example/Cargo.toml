@@ -1,0 +1,11 @@
+[package]
+name = "complete_angust_example"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+angust = { path = "../angust-core/" } 
+
+[[bin]]
+name = "complete_angust_example"
+path = "src/main.rs"
