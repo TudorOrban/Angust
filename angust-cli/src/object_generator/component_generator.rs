@@ -102,7 +102,10 @@ fn create_component_rs_file(
         .replace("\\", "/");
 
     let component_component_contents = format!(r#"
-use angust::rendering::elements::component::{{component::Component, component_factory::register_component}};
+use std::collections::HashMap;
+
+use angust::rendering::elements::component::{{component::Component, component_factory::ComponentFactory}};
+
 
 pub struct {pascal_case_component_name} {{
     component: Component<{pascal_case_component_name}State>,    
@@ -121,14 +124,16 @@ impl {pascal_case_component_name}State {{
 }}
 
 impl {pascal_case_component_name} {{
-    pub fn register() {{
+    pub fn register(registry: &mut HashMap<String, ComponentFactory>) {{
         let state_factory = || {pascal_case_component_name}State::new();
 
-        register_component("{kebab_case_component_name}".to_string(), Box::new(move || {{
-            Component::new(
-                "{kebab_case_component_name}".to_string(),
-                "{path_to_html_from_root}".to_string(),
-                state_factory() 
+        registry.insert("{kebab_case_component_name}".to_string(), Box::new(move || {{
+            Box::new(
+                Component::new(
+                    "{kebab_case_component_name}".to_string(),
+                    "{path_to_html_from_root}".to_string(),
+                    state_factory() 
+                )
             )
         }}));
     }}
@@ -147,12 +152,8 @@ fn create_component_template(
     let component_template_path = component_dir_path.join(format!("{}.html", snake_case_component_name));
 
     let component_template_contents = format!(r#"
-<div style="background-color: rgb(255, 0, 0)">
-
+<div>
     <div>{kebab_case_component_name} works!</div>
-    <span>{{{{ content }}}}</span>
-
-    <button @onclick="toggle">Toggle Content</button>
 </div>
     "#);
 
@@ -172,7 +173,7 @@ fn update_component_registration_module(
     let module_path = import_path.replace("/", "::");
 
     let import_statement = format!("use crate::{}::{};", module_path, pascal_case_component_name);
-    let register_call = format!("    {}::register();", pascal_case_component_name);
+    let register_call = format!("    {}::register(&mut registry);", pascal_case_component_name);
 
     let component_registration_file_path = current_dir_path.join("src").join("component_registration.rs");
 
@@ -197,6 +198,7 @@ fn update_component_registration_module(
     let function_body_start = new_contents[function_start_index..].find('{').unwrap() + function_start_index + 1;
     let function_body_end = new_contents[function_start_index..].rfind('}').unwrap() + function_start_index;
 
+    // TODO: Make sure to add BEFORE initialize_registry(registry)
     let before_register_block = new_contents[..function_body_start].to_string();
     let register_block = new_contents[function_body_start..function_body_end].to_string();
     let after_register_block = new_contents[function_body_end..].to_string();

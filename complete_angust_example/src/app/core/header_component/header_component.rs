@@ -3,6 +3,7 @@ use std::collections::HashMap;
 
 use angust::rendering::elements::component::{component::Component, component_factory::ComponentFactory};
 
+
 pub struct HeaderComponent {
     component: Component<HeaderComponentState>,    
 }
@@ -27,7 +28,7 @@ impl HeaderComponent {
             Box::new(
                 Component::new(
                     "header-component".to_string(),
-                    "src/app/core/header_component/header_component.html".to_string(),
+                    "src/app/core/header_component.html".to_string(),
                     state_factory() 
                 )
             )

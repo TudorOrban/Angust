@@ -1,5 +1,5 @@
 
- use std::collections::HashMap;
+use std::collections::HashMap;
 
 use angust::rendering::elements::component::{component::Component, component_factory::ComponentFactory};
 

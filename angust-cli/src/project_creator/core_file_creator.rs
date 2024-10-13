@@ -46,13 +46,21 @@ fn create_component_registration_file(project_root_path: &PathBuf, component_reg
     let component_registration_path = project_root_path.join(component_registration_path);
 
     let component_registration_contents = r#"
+use std::collections::HashMap;
+
+use angust::rendering::elements::component::component_factory::initialize_registry;
+
 use crate::app::app_component::AppComponent;
 
 /*
  * Function for registering all user-defined components. Should be called before Application::new()
  */
 pub fn register_components() {
-    AppComponent::register();    
+    let mut registry = HashMap::new();
+
+    AppComponent::register(&mut registry);
+
+    initialize_registry(registry);
 }
 "#;
 
@@ -70,7 +78,6 @@ fn create_index_html_file(project_root_path: &PathBuf, index_html_path: &String)
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Angust App</title>
 </head>
 <body>
     <div>

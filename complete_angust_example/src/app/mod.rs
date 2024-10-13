@@ -1,3 +1,3 @@
 
 pub mod app_component;
-pub mod core;
+    pub mod core;

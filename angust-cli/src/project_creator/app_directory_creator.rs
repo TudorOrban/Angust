@@ -31,7 +31,9 @@ fn create_app_component(app_dir_path: &PathBuf) {
     let app_component_path = app_dir_path.join("app_component.rs");
 
     let app_component_contents = r#"
- use angust::rendering::elements::component::{component::Component, component_factory::register_component};
+use std::collections::HashMap;
+
+use angust::rendering::elements::component::{component::Component, component_factory::ComponentFactory};
 
 
 pub struct AppComponent {
@@ -50,14 +52,16 @@ impl AppComponentState {
 }
 
 impl AppComponent {
-    pub fn register() {
+    pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
         let state_factory = || AppComponentState::new();
 
-        register_component("app-component".to_string(), Box::new(move || {
-            Component::new(
-                "app-component".to_string(),
-                "src/app/app_component.html".to_string(),
-                state_factory() 
+        registry.insert("app-component".to_string(), Box::new(move || {
+            Box::new(
+                Component::new(
+                    "app-component".to_string(),
+                    "src/app/app_component.html".to_string(),
+                    state_factory() 
+                )
             )
         }));
     }
@@ -72,7 +76,7 @@ fn create_app_template(app_dir_path: &PathBuf) {
     let app_template_path = app_dir_path.join("app_component.html");
 
     let app_template_contents = r#"
-<div style="background-color: rgb(255, 0, 0)">
+<div style="background-color: rgb(50, 50, 220)">
 
     <h1>{{ content }}</h1>
 
