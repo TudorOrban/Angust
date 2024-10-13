@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::{application::{angust_configuration::AngustConfiguration, resource_loader::path_navigator::identify_project_root_path}, parsing::{css::stylesheet_parser::Stylesheet, html::html_parser}};
+use crate::{application::{angust_configuration::AngustConfiguration, resource_loader::path_navigator::identify_project_root_path}, parsing::{css::stylesheet_parser::Stylesheet, html::html_parser}, rendering::elements::{container::Container, element::Element}};
 
 use super::component::Component;
 
@@ -15,5 +15,10 @@ pub fn load_template<State>(component: &mut Component<State>) {
 
     // Parse template
     let dom = html_parser::parse_html_content(&template_content);
-    component.content = html_parser::map_dom_to_elements(&dom, None, &AngustConfiguration::default(), &Stylesheet::default());
+
+    let mut container = Box::new(Container::new());
+    if let Some(element) = html_parser::map_dom_to_elements(&dom, None, &AngustConfiguration::default(), &Stylesheet::default()) {
+        container.add_child(element);
+    }
+    component.content = container;
 }

@@ -28,7 +28,7 @@ impl HeaderComponent {
             Box::new(
                 Component::new(
                     "header-component".to_string(),
-                    "src/app/core/header_component.html".to_string(),
+                    "src/app/core/header_component/header_component.html".to_string(),
                     state_factory() 
                 )
             )

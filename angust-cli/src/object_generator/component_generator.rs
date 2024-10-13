@@ -97,7 +97,7 @@ fn create_component_rs_file(
     pascal_case_component_name: &String, 
     kebab_case_component_name: &String,
 ) {
-    let path_to_html_from_root = path_to_html_from_root
+    let path_to_html_from_root = path_to_html_from_root // TODO: This is missing an extra kebab_case_component_name from directory
         .to_str().unwrap()
         .replace("\\", "/");
 

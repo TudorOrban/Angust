@@ -1,6 +1,6 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::collections::HashMap;
 
-use crate::{application::{angust_configuration::AngustConfiguration, resource_loader::path_navigator::identify_project_root_path}, parsing::{css::stylesheet_parser::Stylesheet, html::html_parser}, rendering::elements::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles}};
+use crate::rendering::elements::{common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
 
 use super::template_loader;
 
@@ -8,14 +8,14 @@ pub struct Component<State> {
     _id: String,
     pub name: String,
     pub template_relative_path: String,
-    pub content: Option<Box<dyn Element>>,
+    pub content: Box<dyn Element>,
     position: Position,
     size: Size,
     natural_size: Size,
     requested_size: OptionalSize,
     styles: Styles,
 
-    // User-defined state
+    // User-defined properties
     pub state: State,
     event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
 }
@@ -27,7 +27,7 @@ impl<State> Component<State> {
             _id: id,
             name,
             template_relative_path: template_relative_path,
-            content: None,
+            content: Box::new(Container::new()),
             position: Position::default(),
             size: Size::default(),
             natural_size: Size::default(),
@@ -61,27 +61,19 @@ impl<State> Component<State> {
 impl<State> Element for Component<State> {
     
     fn render(&self, canvas: &skia_safe::Canvas) {
-        if let Some(content) = &self.content {
-            content.render(canvas);
-        }
+        self.content.render(canvas);
     }
 
     fn update(&mut self) {
-        if let Some(content) = &mut self.content {
-            content.update();
-        }
+        self.content.update();
     }
     
     fn handle_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) {
-        if let Some(content) = &mut self.content {
-            content.handle_event(cursor_position, event_type);
-        }
+        self.content.handle_event(cursor_position, event_type);
     }
 
     fn add_child(&mut self, child: Box<dyn Element>) {
-        if let Some(content) = &mut self.content {
-            content.add_child(child);
-        }
+        self.content.add_child(child);
     }
 
     fn set_id(&mut self, id: String) {
@@ -159,32 +151,22 @@ impl<State> Element for Component<State> {
     }
     
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>> {
-        if let Some(content) = &mut self.content {
-            println!("Getting children for component: {}", self.name);
-            return content.get_children_mut();
-        }
-        None
+        return self.content.get_children_mut();
     }
 
     fn estimate_sizes(&mut self) {
-        let mut content_natural_size = Size::default();
-        if let Some(content) = &mut self.content {
-            content.estimate_sizes();
-            content_natural_size = content.get_natural_size();
-        }
-        self.set_natural_size(content_natural_size);
+        self.content.estimate_sizes();
+        self.set_natural_size(self.content.get_natural_size());
 
         let sizing_policy = self.get_styles().sizing_policy.unwrap_or_default();
         self.set_requested_size(OptionalSize { width: sizing_policy.width, height: sizing_policy.height }); 
     }
 
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size) {
-        if let Some(content) = &mut self.content {
-            content.set_position(allocated_position);
-            content.set_size(allocated_size);
+        self.content.set_position(allocated_position);
+        self.content.set_size(allocated_size);
 
-            content.allocate_space(allocated_position, allocated_size);
-        }
+        self.content.allocate_space(allocated_position, allocated_size);
     }
 
     fn layout(&mut self, allocated_position: Position, allocated_size: Size) {
