@@ -20,7 +20,6 @@ pub struct Component<State> {
 
 impl<State> Component<State> {
     pub fn new(name: String, template_relative_path: String, state: State) -> Self {
-        println!("Creating component {}", name);
         let id = IDGenerator::get();
         let mut component = Self {
             _id: id,
@@ -45,18 +44,14 @@ impl<State> Component<State> {
 
     fn load_template(&mut self) {
         // Load template
-        println!("Loading template from {}", self.template_relative_path);
-
         let project_root = PathBuf::from(identify_project_root_path());
         let template_path = project_root.join(&self.template_relative_path);
 
-        println!("Template path: {:?}", template_path);
         let template_content = std::fs::read_to_string(template_path)
             .expect("Failed to read template file");
 
         // Parse template
         let dom = html_parser::parse_html_content(&template_content);
-        println!("Parsed template");
         self.content = html_parser::map_dom_to_elements(&dom, None, &AngustConfiguration::default(), &Stylesheet::default());
     }
 
@@ -109,13 +104,17 @@ impl<State> Element for Component<State> {
     fn set_size(&mut self, size: Size) {
         self.size = size;
     }
-
+    
     fn set_natural_size(&mut self, size: Size) {
         self.natural_size = size;
     }
 
     fn set_requested_size(&mut self, optional_size: OptionalSize) {
         self.requested_size = optional_size;
+    }
+
+    fn set_styles(&mut self, styles: Styles) {
+        self.styles = styles;
     }
 
     fn is_text_wrapper(&self) -> bool {

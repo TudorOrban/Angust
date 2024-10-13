@@ -35,11 +35,6 @@ impl Image {
         }
     }
 
-    pub fn set_styles(&mut self, styles: Styles) -> &mut Self {
-        self.styles = styles;
-        self
-    }
-
     pub fn set_image_path(&mut self, image_path: String) -> &mut Self {
         self.image_path = image_path;
         self
@@ -76,6 +71,10 @@ impl Element for Image {
 
     fn set_size(&mut self, size: Size) {
         self.size = size;
+    }
+
+    fn set_styles(&mut self, styles: Styles) {
+        self.styles = styles;
     }
 
     fn add_child(&mut self, _: Box<dyn Element>) {}

@@ -76,8 +76,9 @@ fn process_custom_component(component_name: &str, elem_data: &kuchiki::ElementDa
 
     println!("Processing custom component: {}", component_name);
 
-    if let Some(component_box) = create_component(component_name) {
+    if let Some(mut component_box) = create_component(component_name) {
         println!("Component found: {}", component_name);
+        component_box.set_styles(styles);
         Some(component_box)
     } else {
         println!("Component not found: {}", component_name);

@@ -32,14 +32,6 @@ impl AppComponent {
                 )
             )
         }));
-
-        // register_component("app-component".to_string(), Box::new(move || {
-        //     Component::new(
-        //         "app-component".to_string(),
-        //         "src/app/app_component.html".to_string(),
-        //         state_factory() 
-        //     )
-        // }));
     }
 }
     

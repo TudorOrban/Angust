@@ -44,15 +44,11 @@ impl Container {
         self.children.extend(children);
         self
     }
-
-    pub fn set_styles(&mut self, styles: Styles) -> &mut Self {
-        self.styles = styles;
-        self
-    }
 }
 
 impl Element for Container {
     fn render(&self, canvas: &Canvas) {
+        let component_children = self.children.iter().filter(|child| child.get_element_type() == ElementType::CustomComponent).collect::<Vec<_>>();
         ElementRenderer::render_element(
             canvas,
             self.position,
@@ -111,6 +107,10 @@ impl Element for Container {
 
     fn set_size(&mut self, size: Size) {
         self.size = size;
+    }
+
+    fn set_styles(&mut self, styles: Styles) {
+        self.styles = styles;
     }
 
     fn add_child(&mut self, child: Box<dyn Element>) {

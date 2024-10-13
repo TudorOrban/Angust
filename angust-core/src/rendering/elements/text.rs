@@ -74,6 +74,10 @@ impl Element for Text {
         self.size = size;
     }
 
+    fn set_styles(&mut self, styles: Styles) {
+        self.styles = styles;
+    }
+    
     fn add_child(&mut self, _: Box<dyn Element>) {}
 
     fn get_id(&self) -> String {

@@ -40,11 +40,6 @@ impl Button {
             requested_size: OptionalSize::default(),
         }
     }
-
-    pub fn set_styles(&mut self, styles: Styles) -> &mut Self {
-        self.styles = styles;
-        self
-    }
     
     fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
         self.container.as_ref()
@@ -98,6 +93,10 @@ impl Element for Button {
 
     fn set_size(&mut self, size: Size) {
         self.size = size;
+    }
+
+    fn set_styles(&mut self, styles: Styles) {
+        self.styles = styles;
     }
 
     fn add_child(&mut self, container: Box<dyn Element>) {
