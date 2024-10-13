@@ -51,5 +51,5 @@ pub enum ElementType {
     Button,
     Text,
     Image,
-
+    CustomComponent
 }
