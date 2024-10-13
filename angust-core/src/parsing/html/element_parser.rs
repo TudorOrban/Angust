@@ -66,24 +66,20 @@ fn process_image_element(elem_data: &kuchiki::ElementData, _: &NodeRef, parent_s
 }
 
 fn process_custom_component(component_name: &str, elem_data: &kuchiki::ElementData, node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration, stylesheet: &Stylesheet) -> Option<Box<dyn Element>> {
-    let skippable_components = vec!["!DOCTYPE", "html", "head", "meta", "body", "title", "h1"]; // To be implemented in the future
-    if skippable_components.contains(&component_name) {
+    let skippable_elements = vec!["!DOCTYPE", "html", "head", "meta", "body", "title", "h1"]; // To be implemented in the future
+    if skippable_elements.contains(&component_name) {
         return html_parser::general_traversal(node, parent_styles, angust_config, stylesheet)
     }
     
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, stylesheet);
 
-    println!("Processing custom component: {}", component_name);
-
     if let Some(mut component_box) = create_component(component_name) {
-        println!("Component found: {}", component_name);
         component_box.set_styles(styles);
         Some(component_box)
     } else {
+        // Continue processing children (To be reported as an error in the future)
         println!("Component not found: {}", component_name);
-        // // Continue processing children
-        // // To be reported as an error in the future
         return html_parser::general_traversal(node, Some(&styles), angust_config, stylesheet)
     }
 }

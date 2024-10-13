@@ -2,11 +2,13 @@ use std::{collections::HashMap, path::PathBuf};
 
 use crate::{application::{angust_configuration::AngustConfiguration, resource_loader::path_navigator::identify_project_root_path}, parsing::{css::stylesheet_parser::Stylesheet, html::html_parser}, rendering::elements::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles}};
 
+use super::template_loader;
+
 pub struct Component<State> {
     _id: String,
     pub name: String,
     pub template_relative_path: String,
-    content: Option<Box<dyn Element>>,
+    pub content: Option<Box<dyn Element>>,
     position: Position,
     size: Size,
     natural_size: Size,
@@ -39,20 +41,7 @@ impl<State> Component<State> {
     }
 
     fn initialize(&mut self) {
-        self.load_template();
-    }
-
-    fn load_template(&mut self) {
-        // Load template
-        let project_root = PathBuf::from(identify_project_root_path());
-        let template_path = project_root.join(&self.template_relative_path);
-
-        let template_content = std::fs::read_to_string(template_path)
-            .expect("Failed to read template file");
-
-        // Parse template
-        let dom = html_parser::parse_html_content(&template_content);
-        self.content = html_parser::map_dom_to_elements(&dom, None, &AngustConfiguration::default(), &Stylesheet::default());
+        template_loader::load_template(self);
     }
 
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
@@ -90,7 +79,9 @@ impl<State> Element for Component<State> {
     }
 
     fn add_child(&mut self, child: Box<dyn Element>) {
-        
+        if let Some(content) = &mut self.content {
+            content.add_child(child);
+        }
     }
 
     fn set_id(&mut self, id: String) {
@@ -146,7 +137,21 @@ impl<State> Element for Component<State> {
     }
 
     fn get_effective_size(&self) -> Size {
-        return self.size;
+        let effective_width = if let Some(width) = self.get_requested_size().width {
+            width.value
+        } else {
+            self.get_natural_size().width
+        };
+        let effective_height = if let Some(height) = self.get_requested_size().height {
+            height.value
+        } else {
+            self.get_natural_size().height
+        };
+
+        Size {
+            width: effective_width,
+            height: effective_height,
+        }
     }
 
     fn get_styles(&self) -> Styles {
@@ -154,13 +159,23 @@ impl<State> Element for Component<State> {
     }
     
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>> {
-        None // Placeholder
+        if let Some(content) = &mut self.content {
+            println!("Getting children for component: {}", self.name);
+            return content.get_children_mut();
+        }
+        None
     }
 
     fn estimate_sizes(&mut self) {
+        let mut content_natural_size = Size::default();
         if let Some(content) = &mut self.content {
             content.estimate_sizes();
+            content_natural_size = content.get_natural_size();
         }
+        self.set_natural_size(content_natural_size);
+
+        let sizing_policy = self.get_styles().sizing_policy.unwrap_or_default();
+        self.set_requested_size(OptionalSize { width: sizing_policy.width, height: sizing_policy.height }); 
     }
 
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size) {

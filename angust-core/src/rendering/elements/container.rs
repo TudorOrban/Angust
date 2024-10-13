@@ -11,7 +11,7 @@ use super::{
     common_types::{OptionalSize, Position, ScrollbarState, Size},
     element::{Element, ElementType, EventType},
     element_id_generator::IDGenerator,
-    styles::{Directions, Styles},
+    styles::{Directions, FlexDirection, Styles},
 };
 
 pub struct Container {
@@ -182,6 +182,7 @@ impl Element for Container {
 
     // First pass: Traverse the DOM from leaves to root and estimate the size of each container.
     fn estimate_sizes(&mut self) {
+
         if !self.children.is_empty() {
             for child in &mut self.children {
                 child.estimate_sizes();

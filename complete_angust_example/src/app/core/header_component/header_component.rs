@@ -32,8 +32,6 @@ impl HeaderComponent {
                 )
             )
         }));
-
-        println!("Registered header-component");
     }
 }
     
