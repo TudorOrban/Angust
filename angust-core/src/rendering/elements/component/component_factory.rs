@@ -21,3 +21,8 @@ where
 
         COMPONENT_REGISTRY.lock().unwrap().insert(name, wrapped_factory);
     }
+
+pub fn create_component(name: &str) -> Option<Box<dyn Element>> {
+    let registry = COMPONENT_REGISTRY.lock().unwrap();
+    registry.get(name).and_then(|factory| Some(factory()))
+}

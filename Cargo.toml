@@ -2,7 +2,8 @@
 members = [
     "angust-core",                     
     "examples/full_project_example",
-    "cartan"
+    "cartan",
+    "test_angust_project"
 ]
 resolver = "2"
 exclude = [
