@@ -18,7 +18,7 @@ pub fn get_command_configuration() -> Command {
         )
         .subcommand(
             Command::new("generate")
-                .about("Generate components, services, etc.")
+                .about("Generate components, services, etc. Should be run from the root of the project, with component name in PascalCase")
                 .subcommand(
                     Command::new("component")
                         .about("Generate a new component")
