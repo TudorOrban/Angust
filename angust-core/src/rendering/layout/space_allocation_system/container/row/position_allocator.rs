@@ -1,4 +1,4 @@
-use crate::rendering::elements::{common_types::{Position, Size}, container::Container, styles::{AlignItems, FlexWrap, Margin, Overflow, Spacing}};
+use crate::rendering::elements::{common_types::{Position, Size}, styles::{AlignItems, FlexWrap, Margin, Overflow, Spacing}};
 
 
 pub fn determine_allocated_position(
@@ -79,22 +79,4 @@ fn compute_child_y_position(
     };
 
     cursor_position.y + offset
-}
-
-pub fn find_max_child_height_index(container: &Container) -> Option<usize> {
-    let mut max_child_height: f32 = 0.0;
-    let mut max_child_height_index: Option<usize> = None;
-
-    for (index, child) in container.children.iter().enumerate() {
-        let child_effective_size = child.get_effective_size();
-
-        let total_child_height = child_effective_size.height;
-
-        if total_child_height > max_child_height {
-            max_child_height = total_child_height;
-            max_child_height_index = Some(index);
-        }
-    }
-
-    max_child_height_index
 }
