@@ -20,7 +20,9 @@ pub fn allocate_space_to_children_row_flex(
     let overflow = container.get_styles().overflow.unwrap_or_default();
 
     // Resolve horizontal space deficits
-    let scrollbar_offset = deficit_resolver::attempt_deficit_resolution(container, allocated_size);
+    let requested_width = size_allocator::precompute_requested_children_width(container);
+    let mut horizontal_deficit = requested_width - allocated_size.width;
+    let scrollbar_offset = deficit_resolver::attempt_deficit_resolution(container, allocated_size, requested_width, &mut horizontal_deficit);
 
     // Prepare AlignItems y computations
     let (children_max_height, max_height_child_margin) = get_max_height_child_properties(container);

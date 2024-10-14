@@ -12,6 +12,8 @@ pub fn update_layout_style(styles: &mut Styles, key: &str, value: &str) {
         "align-items" => styles.align_items = parse_align_items(value),
         "align-content" => styles.align_content = parse_align_content(value),
         "overflow" => styles.overflow = parse_overflow(value),
+        "flex-grow" => styles.flex_grow = value.parse().ok(),
+        "flex-shrink" => styles.flex_shrink = value.parse().ok(),
         "margin" => styles.margin = parse_margin(value),
         "padding" => styles.padding = parse_padding(value),
         "spacing" => styles.spacing = parse_spacing(value),

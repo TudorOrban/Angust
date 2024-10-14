@@ -1,6 +1,6 @@
 use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::Element, styles::{AlignItems, Margin}};
 
-pub fn allocate_space_to_children_row_column(container: &mut Container, allocated_position: Position, allocated_size: Size) {
+pub fn allocate_space_to_children_column_flex(container: &mut Container, allocated_position: Position, allocated_size: Size) {
     let padding = container.get_styles().padding.unwrap_or_default();
     let max_width = get_max_child_width(container) - padding.left.value - padding.right.value;
     let align_items = container.get_styles().align_items.unwrap_or_default();

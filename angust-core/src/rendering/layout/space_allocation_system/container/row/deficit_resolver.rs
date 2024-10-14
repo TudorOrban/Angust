@@ -3,19 +3,18 @@ use crate::rendering::elements::{common_types::Size, container::Container, eleme
 use super::size_allocator;
 
 
-
 pub fn attempt_deficit_resolution(
     container: &mut Container,
     allocated_size: Size,
+    requested_width: f32,
+    deficit: &mut f32,
 ) -> f32 {
     let effective_horizontal_space = allocated_size.width - container.get_styles().padding.unwrap_or_default().horizontal();
-    let requested_width = size_allocator::precompute_requested_children_width(container);
-    
-    let mut deficit = requested_width - allocated_size.width;
+
     let mut new_requested_width = requested_width;
 
-    if deficit > 0.0 {
-        handle_overflow(container, effective_horizontal_space, &mut deficit, &mut new_requested_width);
+    if *deficit > 0.0 {
+        handle_overflow(container, effective_horizontal_space, deficit, &mut new_requested_width);
     }
 
     let current_scroll_position_x = container.scrollbar_state.current_scroll_position.x;
@@ -50,6 +49,9 @@ fn handle_overflow(
     }
 }
 
+/*
+ * Function to shrink text containers from their natural one-line sizes to resolve horizontal space deficits.
+ */
 fn shrink_text_wrapper_children(
     container: &mut Container,
     deficit: &mut f32,

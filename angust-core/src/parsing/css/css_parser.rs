@@ -57,7 +57,7 @@ fn parse_inline_styles(style_str: &str) -> Styles {
     styles
 }
 
-static LAYOUT_PROPERTIES: [&str; 9] = ["display", "flex-direction", "flex-wrap", "justify-content", "align-items", "margin", "padding", "spacing", "overflow"];
+static LAYOUT_PROPERTIES: [&str; 11] = ["display", "flex-direction", "flex-wrap", "justify-content", "align-items", "flex-grow", "flex-shrink", "margin", "padding", "spacing", "overflow"];
 static DIMENSION_PROPERTIES: [&str; 6] = ["width", "height", "min-width", "max-width", "min-height", "max-height"];
 static APPEARANCE_PROPERTIES: [&str; 5] = ["background-color", "color", "border-width", "border-color", "border-radius"];
 static TEXT_PROPERTIES: [&str; 6] = ["white-space", "font-size", "font-weight", "font-family", "font-style", "text-align"];

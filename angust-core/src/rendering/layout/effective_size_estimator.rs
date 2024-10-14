@@ -24,11 +24,15 @@ pub fn estimate_requested_size(width: &Option<Dimension>, height: &Option<Dimens
     if let Some(width) = width {
         if width.unit != Unit::Percent {
             requested_size.width = Some(width.clone());
+        } else {
+            requested_size.width = Some(Dimension { value: 0.0, unit: Unit::Percent });
         }
     } 
     if let Some(height) = height {
         if height.unit != Unit::Percent {
             requested_size.height = Some(height.clone());
+        } else {
+            requested_size.height = Some(Dimension { value: 0.0, unit: Unit::Percent });
         }
     }
 

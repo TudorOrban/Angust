@@ -20,9 +20,12 @@ pub fn update_dimension_style(styles: &mut Styles, key: &str, value: &str) {
 }
 
 pub fn parse_dimension(value: &str) -> Option<Dimension> {
-    let numeric_part = value[..value.len() - 2].trim();  // Slice off the last two characters for the unit
-    if let Ok(val) = numeric_part.parse::<f32>() {
-        let unit = parse_unit(&value[numeric_part.len()..].trim())?;
+    let value = value.trim();
+    let unit_start = value.find(|c: char| !c.is_digit(10) && c != '.').unwrap_or(value.len());
+    let (numeric_part, unit_part) = value.split_at(unit_start);
+    let unit_part = unit_part.trim();
+
+    if let (Ok(val), Some(unit)) = (numeric_part.parse::<f32>(), parse_unit(unit_part)) {
         Some(Dimension { value: val, unit })
     } else {
         None
@@ -30,17 +33,12 @@ pub fn parse_dimension(value: &str) -> Option<Dimension> {
 }
 
 fn parse_unit(value: &str) -> Option<Unit> {
-    if value.ends_with("px") {
-        Some(Unit::Px)
-    } else if value.ends_with("vh") {
-        Some(Unit::Vh)
-    } else if value.ends_with("vw") {
-        Some(Unit::Vw)
-    } else if value.ends_with("rem") {
-        Some(Unit::Rem)
-    } else if value.ends_with("%") {
-        Some(Unit::Percent)
-    } else {
-        None
+    match value {
+        "px" => Some(Unit::Px),
+        "vh" => Some(Unit::Vh),
+        "vw" => Some(Unit::Vw),
+        "rem" => Some(Unit::Rem),
+        "%" => Some(Unit::Percent),
+        _ => None,
     }
 }

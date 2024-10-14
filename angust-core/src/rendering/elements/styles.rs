@@ -11,11 +11,16 @@ pub struct Styles {
     pub align_content: Option<AlignContent>,
     pub overflow: Option<Overflow>,
     pub sizing_policy: Option<SizingPolicy>,
+    pub flex_grow: Option<f32>,
+    pub flex_shrink: Option<f32>,
+
     pub margin: Option<Margin>,
     pub padding: Option<Padding>,
     pub spacing: Option<Spacing>,
+
     pub border: Option<Border>,
     pub background_color: Option<Color>,
+
     pub text_color: Option<Color>,
     pub white_space: Option<WhiteSpace>,
     pub font_size: Option<Dimension>,
@@ -35,6 +40,8 @@ impl Default for Styles {
             align_content: Some(AlignContent::default()),
             overflow: Some(Overflow::default()),
             sizing_policy: Some(SizingPolicy::default()),
+            flex_grow: Some(0.0),
+            flex_shrink: Some(1.0),
             margin: Some(Margin::default()),
             padding: Some(Padding::default()),
             spacing: Some(Spacing::default()),
