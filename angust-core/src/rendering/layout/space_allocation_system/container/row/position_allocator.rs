@@ -63,7 +63,7 @@ fn compute_child_x_position(
 
 
 // Vertical computations
-fn compute_child_y_position(
+pub fn compute_child_y_position(
     align_items: AlignItems,
     cursor_position: Position,
     child_effective_size: Size,

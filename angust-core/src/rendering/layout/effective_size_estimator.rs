@@ -103,38 +103,18 @@ pub fn precompute_requested_children_width(container: &Container) -> f32 {
 }
 
 // Height computations
-pub fn get_max_height_child_properties(container: &mut Container) -> (f32, Margin) {
-    let children_max_height_index = find_max_child_height_index(container);
-    let max_height_child = if children_max_height_index.is_some() {
-        Some(&container.children[children_max_height_index.unwrap()])
-    } else {
-        None
-    };
+pub fn get_max_height_child_properties(container: &Container, indices: &[usize]) -> (f32, Margin) {
     let mut children_max_height = 0.0;
-    let mut max_height_child_margin = Default::default();
+    let mut max_height_child_margin = Margin::default();
 
-    if max_height_child.is_some() {
-        children_max_height = max_height_child.unwrap().get_effective_size().height;
-        max_height_child_margin = max_height_child.unwrap().get_styles().margin.unwrap_or_default();
-    }
-
-    (children_max_height, max_height_child_margin)
-}
-
-fn find_max_child_height_index(container: &Container) -> Option<usize> {
-    let mut max_child_height: f32 = 0.0;
-    let mut max_child_height_index: Option<usize> = None;
-
-    for (index, child) in container.children.iter().enumerate() {
-        let child_effective_size = child.get_effective_size();
-
-        let total_child_height = child_effective_size.height;
-
-        if total_child_height > max_child_height {
-            max_child_height = total_child_height;
-            max_child_height_index = Some(index);
+    for &index in indices {
+        let child = &container.children[index];
+        let child_size = child.get_effective_size();
+        if child_size.height > children_max_height {
+            children_max_height = child_size.height;
+            max_height_child_margin = child.get_styles().margin.unwrap_or_default();
         }
     }
 
-    max_child_height_index
+    (children_max_height, max_height_child_margin)
 }
