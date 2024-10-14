@@ -3,12 +3,16 @@ use crate::rendering::elements::{common_types::{OptionalSize, Size}, container::
 use super::size_allocator;
 
 
-pub fn attempt_deficit_resolution(
+pub fn resolve_deficits(
     container: &mut Container,
     allocated_size: Size,
     requested_width: f32,
     deficit: &mut f32,
 ) -> f32 {
+    if *deficit <= 0.0 {
+        return 0.0;
+    }
+
     let effective_horizontal_space = allocated_size.width - container.get_styles().padding.unwrap_or_default().horizontal();
     
     apply_flex_shrink(container, deficit);
@@ -28,32 +32,9 @@ pub fn attempt_deficit_resolution(
     scrollbar_offset
 }
 
-fn handle_overflow(
-    container: &mut Container,
-    effective_horizontal_space: f32,
-    deficit: &mut f32,
-    new_requested_width: &mut f32,
-) {
-    let overflow = container.get_styles().overflow.unwrap_or_default();
-
-    match overflow {
-        Overflow::Auto | Overflow::Scroll => {
-            shrink_text_wrapper_children(container, deficit);
-            // Recompute requested width after shrinking text wrappers
-            *new_requested_width = size_allocator::precompute_requested_children_width(container);
-            
-            container.scrollbar_state.thumb_scrollbar_width_ratio =
-                effective_horizontal_space / new_requested_width.clone();
-            container.scrollbar_state.is_overflowing = Directions {
-                horizontal: true,
-                vertical: false,
-            };
-        },
-        Overflow::Hidden | Overflow::Visible => {},
-    }
-}
-
-
+/*
+ * Function to apply flex shrink to children to resolve horizontal space deficits.
+ */
 fn apply_flex_shrink(container: &mut Container, deficit: &mut f32) {
     let total_flex_shrink: f32 = container.children.iter()
         .map(|child| child.get_styles().flex_shrink.unwrap_or(0.0) * child.get_effective_size().width)
@@ -82,6 +63,30 @@ fn apply_flex_shrink(container: &mut Container, deficit: &mut f32) {
     }
 }
 
+fn handle_overflow(
+    container: &mut Container,
+    effective_horizontal_space: f32,
+    deficit: &mut f32,
+    new_requested_width: &mut f32,
+) {
+    let overflow = container.get_styles().overflow.unwrap_or_default();
+
+    match overflow {
+        Overflow::Auto | Overflow::Scroll => {
+            shrink_text_wrapper_children(container, deficit);
+            // Recompute requested width after shrinking text wrappers
+            *new_requested_width = size_allocator::precompute_requested_children_width(container);
+            
+            container.scrollbar_state.thumb_scrollbar_width_ratio =
+                effective_horizontal_space / new_requested_width.clone();
+            container.scrollbar_state.is_overflowing = Directions {
+                horizontal: true,
+                vertical: false,
+            };
+        },
+        Overflow::Hidden | Overflow::Visible => {},
+    }
+}
 
 /*
  * Function to shrink text containers from their natural one-line sizes to resolve horizontal space deficits.

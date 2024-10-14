@@ -6,17 +6,25 @@ pub fn determine_allocated_position(
     overflow: Overflow,
     align_items: AlignItems, 
     spacing: Spacing,
-    current_position: Position,
+    justify_content_spacing: f32,
+
+    cursor_position: Position,
     child_effective_size: Size,
+    index: usize,
+
     children_max_height: f32, 
     max_height_child_margin: Margin,
     child_margin: Margin,
 ) -> Position {
     let child_x_position = compute_child_x_position(
-        flex_wrap, overflow, spacing, current_position, child_margin
+        flex_wrap, overflow, spacing, justify_content_spacing, 
+        cursor_position, index,
+        child_margin
     );
     let child_y_position = compute_child_y_position(
-        align_items, current_position, child_effective_size, children_max_height, max_height_child_margin, child_margin
+        align_items, 
+        cursor_position, child_effective_size, 
+        children_max_height, max_height_child_margin, child_margin
     );
 
     Position {
@@ -30,10 +38,17 @@ fn compute_child_x_position(
     flex_wrap: FlexWrap,
     overflow: Overflow,
     spacing: Spacing,
-    current_position: Position,
+    justify_content_spacing: f32,
+
+    cursor_position: Position,
+    index: usize,
+
     child_margin: Margin,
 ) -> f32 {
-    let new_child_position_x = spacing.spacing_x.value + current_position.x + child_margin.left.value;
+    let mut new_child_position_x = cursor_position.x + child_margin.left.value;
+    if index > 0 {
+        new_child_position_x += spacing.spacing_x.value + justify_content_spacing;
+    }
 
     if flex_wrap != FlexWrap::NoWrap {
         return new_child_position_x; // To be implemented later
@@ -50,7 +65,7 @@ fn compute_child_x_position(
 // Vertical computations
 fn compute_child_y_position(
     align_items: AlignItems,
-    current_position: Position,
+    cursor_position: Position,
     child_effective_size: Size,
     children_max_height: f32,
     max_height_child_margin: Margin,
@@ -63,7 +78,7 @@ fn compute_child_y_position(
         AlignItems::Stretch | AlignItems::Baseline => child_margin.top.value, // Simplified; Baseline needs additional logic
     };
 
-    current_position.y + offset
+    cursor_position.y + offset
 }
 
 pub fn find_max_child_height_index(container: &Container) -> Option<usize> {
