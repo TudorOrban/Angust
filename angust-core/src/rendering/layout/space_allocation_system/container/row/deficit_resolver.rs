@@ -1,4 +1,4 @@
-use crate::rendering::elements::{common_types::Size, container::Container, element::Element, styles::{Directions, Overflow, WhiteSpace}};
+use crate::rendering::elements::{common_types::{OptionalSize, Size}, container::Container, element::Element, styles::{Dimension, Directions, Overflow, Unit, WhiteSpace}};
 
 use super::size_allocator;
 
@@ -48,6 +48,36 @@ fn handle_overflow(
         Overflow::Hidden | Overflow::Visible => {},
     }
 }
+
+
+fn apply_flex_shrink(container: &mut Container, deficit: &mut f32) {
+    let total_flex_shrink: f32 = container.children.iter()
+        .map(|child| child.get_styles().flex_shrink.unwrap_or(0.0) * child.get_effective_size().width)
+        .sum();
+
+    if total_flex_shrink <= 0.0 || *deficit <= 0.0 {
+        return;
+    }
+
+    let total_shrinkage_needed = *deficit;
+    for child in &mut container.children {
+        let initial_width = child.get_effective_size().width;
+        let flex_shrink_factor = child.get_styles().flex_shrink.unwrap_or(0.0);
+        let shrink_amount = (flex_shrink_factor * initial_width / total_flex_shrink) * total_shrinkage_needed;
+        let new_width = (initial_width - shrink_amount).max(0.0);
+        
+        if child.get_requested_size().width.is_some() {
+            child.set_requested_size(OptionalSize { width: Some(Dimension { value: new_width, unit: Unit::Px }), height: child.get_requested_size().height });
+        } else {
+            child.set_natural_size(Size { width: new_width, height: child.get_effective_size().height });
+        }
+
+        // Update the deficit by the actual amount the width was reduced
+        let actual_shrink_amount = initial_width - new_width;
+        *deficit -= actual_shrink_amount;
+    }
+}
+
 
 /*
  * Function to shrink text containers from their natural one-line sizes to resolve horizontal space deficits.

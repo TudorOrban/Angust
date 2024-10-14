@@ -1,9 +1,9 @@
-use crate::rendering::elements::{
+use crate::rendering::{elements::{
     common_types::{Position, Size},
     container::Container,
     element::Element,
-    styles::{Margin, Overflow},
-};
+    styles::{AlignItems, FlexWrap, Margin, Overflow, Padding, Spacing},
+}, layout::effective_size_estimator};
 
 use super::{deficit_resolver, position_allocator, size_allocator};
 
@@ -12,14 +12,10 @@ pub fn allocate_space_to_children_row_flex(
     allocated_position: Position,
     allocated_size: Size,
 ) {
-    // Unwrap styles
-    let padding = container.get_styles().padding.unwrap_or_default();
-    let spacing = container.get_styles().spacing.unwrap_or_default();
-    let align_items = container.get_styles().align_items.unwrap_or_default();
-    let flex_wrap = container.get_styles().flex_wrap.unwrap_or_default();
-    let overflow = container.get_styles().overflow.unwrap_or_default();
+    let (padding, spacing, align_items, flex_wrap, overflow) = unwrap_container_styles(container);
 
-    // Resolve horizontal space deficits
+    // Preadjust children sizes according to flex properties, deficit/surplus
+    effective_size_estimator::estimate_percentage_width_sizes(container, allocated_size.width);
     let requested_width = size_allocator::precompute_requested_children_width(container);
     let mut horizontal_deficit = requested_width - allocated_size.width;
     let scrollbar_offset = deficit_resolver::attempt_deficit_resolution(container, allocated_size, requested_width, &mut horizontal_deficit);
@@ -57,6 +53,15 @@ pub fn allocate_space_to_children_row_flex(
     }
 }
 
+fn unwrap_container_styles(container: &Container) -> (Padding, Spacing, AlignItems, FlexWrap, Overflow) {
+    let padding = container.get_styles().padding.unwrap_or_default();
+    let spacing = container.get_styles().spacing.unwrap_or_default();
+    let align_items = container.get_styles().align_items.unwrap_or_default();
+    let flex_wrap = container.get_styles().flex_wrap.unwrap_or_default();
+    let overflow = container.get_styles().overflow.unwrap_or_default();
+
+    (padding, spacing, align_items, flex_wrap, overflow)
+}
 
 fn get_max_height_child_properties(container: &mut Container) -> (f32, Margin) {
     let children_max_height_index = position_allocator::find_max_child_height_index(container);
