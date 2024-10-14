@@ -2,7 +2,7 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::{application::event_handling::scrollbar_movement_handler::handle_scrollbar_movement, rendering::{
     layout::{
-        size_estimator, space_allocation_system::container::container_space_allocator,
+        effective_size_estimator, size_estimator, space_allocation_system::container::container_space_allocator
     },
     rendering_interface::element_renderer::ElementRenderer,
 }};
@@ -11,7 +11,7 @@ use super::{
     common_types::{OptionalSize, Position, ScrollbarState, Size},
     element::{Element, ElementType, EventType},
     element_id_generator::IDGenerator,
-    styles::{Directions, FlexDirection, Styles},
+    styles::{Directions, Styles},
 };
 
 pub struct Container {
@@ -48,7 +48,6 @@ impl Container {
 
 impl Element for Container {
     fn render(&self, canvas: &Canvas) {
-        let component_children = self.children.iter().filter(|child| child.get_element_type() == ElementType::CustomComponent).collect::<Vec<_>>();
         ElementRenderer::render_element(
             canvas,
             self.position,
@@ -159,21 +158,7 @@ impl Element for Container {
     }
 
     fn get_effective_size(&self) -> Size {
-        let effective_width = if let Some(width) = self.get_requested_size().width {
-            width.value
-        } else {
-            self.get_natural_size().width
-        };
-        let effective_height = if let Some(height) = self.get_requested_size().height {
-            height.value
-        } else {
-            self.get_natural_size().height
-        };
-
-        Size {
-            width: effective_width,
-            height: effective_height,
-        }
+        effective_size_estimator::estimate_effective_size(&self.get_requested_size(), &self.get_natural_size())
     }
 
     fn is_text_wrapper(&self) -> bool {

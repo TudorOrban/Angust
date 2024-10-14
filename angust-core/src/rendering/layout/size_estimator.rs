@@ -1,4 +1,6 @@
-use crate::rendering::elements::{common_types::{OptionalSize, Size}, container::Container, element::Element, styles::FlexDirection};
+use crate::rendering::elements::{common_types::Size, container::Container, element::Element, styles::FlexDirection};
+
+use super::effective_size_estimator;
 
 
 /*
@@ -6,10 +8,19 @@ use crate::rendering::elements::{common_types::{OptionalSize, Size}, container::
  * based on the children's *effective* sizes (i.e. requested if specified, natural otherwise).
  */
 pub fn estimate_parent_container_sizes(container: &mut Container) {
-    let flex_direction = container.get_styles().flex_direction.unwrap_or_default();
+    let natural_size = estimate_parent_natural_size(container);
+    container.set_natural_size(natural_size);
+    
+    let sizing_policy = container.get_styles().sizing_policy.unwrap_or_default();
+    let estimated_requested_size = effective_size_estimator::estimate_requested_size(&sizing_policy.width, &sizing_policy.height);
+    container.set_requested_size(estimated_requested_size);
+}
 
+fn estimate_parent_natural_size(container: &mut Container) -> Size {
+    let flex_direction = container.get_styles().flex_direction.unwrap_or_default();
     let parent_padding = container.get_styles().padding.unwrap_or_default();
     let spacing = container.get_styles().spacing.unwrap_or_default();
+
     let mut width: f32 = parent_padding.horizontal();
     let mut height: f32 = parent_padding.vertical();
 
@@ -36,11 +47,8 @@ pub fn estimate_parent_container_sizes(container: &mut Container) {
         }
 
     }
-    
-    container.set_natural_size(Size { width, height });
-    
-    let sizing_policy = container.get_styles().sizing_policy.unwrap_or_default();
-    container.set_requested_size(OptionalSize { width: sizing_policy.width, height: sizing_policy.height });
+
+    Size { width, height }
 }
 
 pub fn estimate_leaf_container_sizes(container: &mut Container) {
@@ -50,9 +58,7 @@ pub fn estimate_leaf_container_sizes(container: &mut Container) {
     });
     
     if let Some(sizing_policy) = container.get_styles().sizing_policy {
-        container.set_requested_size(OptionalSize {
-            width: sizing_policy.width,
-            height: sizing_policy.height,
-        });
+        let estimated_requested_size = effective_size_estimator::estimate_requested_size(&sizing_policy.width, &sizing_policy.height);
+        container.set_requested_size(estimated_requested_size);
     }
 }

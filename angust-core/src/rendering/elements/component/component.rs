@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::rendering::elements::{common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
+use crate::rendering::{elements::{common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles}, layout::effective_size_estimator};
 
 use super::template_loader;
 
@@ -10,7 +10,7 @@ pub struct Component<State> {
     pub template_relative_path: String,
     pub content: Box<dyn Element>,
     position: Position,
-    size: Size,
+    size: Size, 
     natural_size: Size,
     requested_size: OptionalSize,
     styles: Styles,
@@ -98,6 +98,7 @@ impl<State> Element for Component<State> {
 
     fn set_styles(&mut self, styles: Styles) {
         self.styles = styles;
+        self.content.set_styles(styles);
     }
 
     fn is_text_wrapper(&self) -> bool {
@@ -129,21 +130,7 @@ impl<State> Element for Component<State> {
     }
 
     fn get_effective_size(&self) -> Size {
-        let effective_width = if let Some(width) = self.get_requested_size().width {
-            width.value
-        } else {
-            self.get_natural_size().width
-        };
-        let effective_height = if let Some(height) = self.get_requested_size().height {
-            height.value
-        } else {
-            self.get_natural_size().height
-        };
-
-        Size {
-            width: effective_width,
-            height: effective_height,
-        }
+        effective_size_estimator::estimate_effective_size(&self.get_requested_size(), &self.get_natural_size())
     }
 
     fn get_styles(&self) -> Styles {

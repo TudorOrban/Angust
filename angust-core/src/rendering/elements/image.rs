@@ -1,7 +1,7 @@
 use image::DynamicImage;
 use skia_safe::{Canvas, Point};
 
-use crate::{application::resource_loader::image_loader, rendering::rendering_interface::element_renderer::ElementRenderer};
+use crate::{application::resource_loader::image_loader, rendering::{layout::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer}};
 
 use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
 
@@ -117,21 +117,7 @@ impl Element for Image {
     fn get_requested_size(&self) -> OptionalSize { self.requested_size }
 
     fn get_effective_size(&self) -> Size {
-        let effective_width = if let Some(width) = self.get_requested_size().width {
-            width.value
-        } else {
-            self.get_natural_size().width
-        };
-        let effective_height = if let Some(height) = self.get_requested_size().height {
-            height.value
-        } else {
-            self.get_natural_size().height
-        };
-
-        Size {
-            width: effective_width,
-            height: effective_height,
-        }   
+        effective_size_estimator::estimate_effective_size(&self.get_requested_size(), &self.get_natural_size())
     }
 
     fn is_text_wrapper(&self) -> bool { false }

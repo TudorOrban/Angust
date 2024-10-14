@@ -190,13 +190,13 @@ impl Default for Dimension {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Unit {
-    Px,
-    Vh,
-    Vw,
-    Rem,
-    Percent,
+    Px,            // Pixels (1/96th of an inch).
+    Vh,            // Relative to 1% of the height of the viewport.
+    Vw,            // Relative to 1% of the width of the viewport.
+    Rem,           // Relative to the font-size of the root element.
+    Percent,       // Percentage of the parent container's size.
 }
 
 impl Default for Unit {
