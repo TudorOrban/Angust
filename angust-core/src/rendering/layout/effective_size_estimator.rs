@@ -46,10 +46,10 @@ pub fn estimate_percentage_width_sizes(container: &mut Container, allocated_widt
     let scale_factor = find_scale_factor(container);
 
     for child in &mut container.children {
-        if child.get_requested_size().width.is_none() {
+        if child.get_styles().sizing_policy.unwrap_or_default().width.is_none() {
             continue;
         }
-        let dimension = child.get_requested_size().width.unwrap();
+        let dimension = child.get_styles().sizing_policy.unwrap_or_default().width.unwrap();
         if dimension.unit != Unit::Percent {
             continue;
         }

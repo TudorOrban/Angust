@@ -10,8 +10,12 @@ pub fn attempt_deficit_resolution(
     deficit: &mut f32,
 ) -> f32 {
     let effective_horizontal_space = allocated_size.width - container.get_styles().padding.unwrap_or_default().horizontal();
+    
+    apply_flex_shrink(container, deficit);
 
-    let mut new_requested_width = requested_width;
+    let mut new_requested_width = size_allocator::precompute_requested_children_width(container);
+    let updated_deficit = requested_width - new_requested_width;
+    *deficit = updated_deficit.max(0.0);
 
     if *deficit > 0.0 {
         handle_overflow(container, effective_horizontal_space, deficit, &mut new_requested_width);
