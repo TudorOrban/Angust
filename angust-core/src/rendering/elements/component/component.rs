@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::rendering::{elements::{common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles}, layout::effective_size_estimator};
 
@@ -17,7 +17,7 @@ pub struct Component<State> {
 
     // User-defined properties
     pub state: State,
-    event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
+    pub event_handlers: HashMap<String, Arc<dyn FnMut(&mut State) + 'static>>,
 }
 
 impl<State> Component<State> {
@@ -41,21 +41,22 @@ impl<State> Component<State> {
     }
 
     fn initialize(&mut self) {
-        template_loader::load_template(self);
+        template_loader::load_component_template(self);
     }
 
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
     where
-        F: 'static + FnMut(&mut State),
+        F: 'static + FnMut(&mut State) + Send + Sync,  // Ensure the handler can be shared across threads if needed
     {
-        self.event_handlers.insert(event_name, Box::new(handler));
+        // Wrap the handler in an Arc before storing
+        self.event_handlers.insert(event_name, Arc::new(handler));
     }
 
-    pub fn handle_event(&mut self, event: &str) {
-        if let Some(handler) = self.event_handlers.get_mut(event) {
-            handler(&mut self.state);
-        }
-    }
+    // pub fn handle_event(&mut self, event: &str) {
+    //     if let Some(handler) = self.event_handlers.get_mut(event) {
+    //         handler(&mut self.state);
+    //     }
+    // }
 }
 
 impl<State> Element for Component<State> {

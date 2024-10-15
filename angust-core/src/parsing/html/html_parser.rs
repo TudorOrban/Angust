@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use kuchiki::parse_html;
 use kuchiki::NodeData;
@@ -88,13 +89,13 @@ pub fn general_traversal<State>(
     root_element
 }
 
-pub struct ParsingContext<State> {
+pub struct ParsingContext<'a, State> {
     pub angust_config: Option<AngustConfiguration>,
     pub stylesheet: Option<Stylesheet>,
-    pub current_component_event_handlers: Option<HashMap<String, Box<dyn FnMut(&mut State)>>>
+    pub current_component_event_handlers: Option<&'a HashMap<String, Arc<dyn FnMut(&mut State) + 'static>>>
 }
 
-impl<State> Default for ParsingContext<State> {
+impl<'a, State> Default for ParsingContext<'a, State> {
     fn default() -> Self {
         ParsingContext {
             angust_config: None,
@@ -104,11 +105,11 @@ impl<State> Default for ParsingContext<State> {
     }
 }
 
-impl<State> ParsingContext<State> {
+impl<'a, State> ParsingContext<'a, State> {
     pub fn new(
         angust_config: Option<AngustConfiguration>,
         stylesheet: Option<Stylesheet>,
-        current_component_event_handlers: Option<HashMap<String, Box<dyn FnMut(&mut State)>>>,
+        current_component_event_handlers: Option<&'a HashMap<String, Arc<dyn FnMut(&mut State) + 'static>>>,
     ) -> Self {
         ParsingContext {
             angust_config,
