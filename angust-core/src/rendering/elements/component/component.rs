@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc, sync::Arc};
 
 use crate::rendering::{elements::{common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles}, layout::effective_size_estimator};
 
@@ -17,7 +17,7 @@ pub struct Component<State> {
 
     // User-defined properties
     pub state: State,
-    pub event_handlers: HashMap<String, Arc<dyn FnMut(&mut State) + 'static>>,
+    pub event_handlers: HashMap<String, Rc<RefCell<dyn FnMut(&mut State) + 'static>>>,
 }
 
 impl<State> Component<State> {
@@ -49,7 +49,7 @@ impl<State> Component<State> {
         F: 'static + FnMut(&mut State) + Send + Sync,  // Ensure the handler can be shared across threads if needed
     {
         // Wrap the handler in an Arc before storing
-        self.event_handlers.insert(event_name, Arc::new(handler));
+        self.event_handlers.insert(event_name, Rc::new(RefCell::new(handler)));
     }
 
     // pub fn handle_event(&mut self, event: &str) {

@@ -10,7 +10,7 @@ use crate::rendering::elements::element::Element;
 use crate::rendering::elements::image::Image;
 use crate::rendering::elements::styles::Styles;
 
-use super::html_parser::{self, ParsingContext};
+use super::{directive_parser, html_parser::{self, ParsingContext}};
 
 pub fn dispatch_element_processing<State>(
     elem_data: &kuchiki::ElementData, 
@@ -51,10 +51,12 @@ fn process_button_element<State>(
     context: &ParsingContext<State>,
 ) -> Box<dyn Element> {
     let attributes = elem_data.attributes.borrow();
-    // let on_click = attributes.get("on_click").unwrap_or_default();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
 
-    let mut button = Button::new(None, None, Some(styles));
+    let event_handlers = directive_parser::parse_directives(&attributes, context);;
+    let on_click_handler = event_handlers.get("click").map(|handler| handler.clone());
+    
+    let mut button = Button::new(Some(event_handlers), None, Some(styles));
 
     let mut child_container = Container::new();
     node.children()

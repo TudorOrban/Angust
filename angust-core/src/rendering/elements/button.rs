@@ -1,3 +1,5 @@
+use std::{borrow::BorrowMut, cell::RefCell, collections::HashMap, rc::Rc, sync::Arc};
+
 use skia_safe::{Canvas, Color, Point};
 
 
@@ -6,11 +8,11 @@ use crate::rendering::{layout::effective_size_estimator, rendering_interface::el
 use super::{common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
 
 
-pub struct Button {
+pub struct Button<State> {
     _id: String,
 
     container: Option<Vec<Box<dyn Element>>>, // Only one container is allowed
-    pub on_click: Option<Box<dyn FnMut()>>,
+    pub on_click: Option<HashMap<String, Rc<RefCell<dyn FnMut(&mut State) + 'static>>>>,
 
     position: Position,
     size: Size,
@@ -19,8 +21,8 @@ pub struct Button {
     requested_size: OptionalSize,
 }
 
-impl Button {
-    pub fn new(on_click: Option<Box<dyn FnMut()>>, container: Option<Container>, styles: Option<Styles>) -> Self {
+impl<State> Button<State> {
+    pub fn new(on_click: Option<HashMap<String, Rc<RefCell<dyn FnMut(&mut State) + 'static>>>>, container: Option<Container>, styles: Option<Styles>) -> Self {
         let id = IDGenerator::get();
 
         let container_vec = if let Some(container_child) = container {
@@ -46,7 +48,7 @@ impl Button {
     }
 }
 
-impl Element for Button {
+impl<State> Element for Button<State> {
     fn render(&self, canvas: &Canvas) {
         let has_children = if let Some(child_container) = self.get_children() {
             if child_container.len() != 1 {
@@ -79,7 +81,7 @@ impl Element for Button {
 
     fn handle_event(&mut self, _: Point, _: &EventType) {
         if let Some(on_click) = &mut self.on_click {
-            on_click();
+            // (on_click.borrow_mut())(&mut self.state);
         }
     }
 
