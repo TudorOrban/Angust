@@ -1,5 +1,5 @@
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Stylesheet {
     pub classes: Vec<StyleClass>,
 }
@@ -12,13 +12,13 @@ impl Default for Stylesheet {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StyleClass {
     pub name: String,
     pub properties: Vec<Property>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Property {
     pub name: String,
     pub value: String,

@@ -24,14 +24,23 @@ impl AppComponent {
         let state_factory = || AppComponentState::new();
 
         registry.insert("app-component".to_string(), Box::new(move || {
-            Box::new(
-                Component::new(
-                    "app-component".to_string(),
-                    "src/app/app_component.html".to_string(),
-                    state_factory() 
-                )
-            )
+            let mut component = Component::new(
+                "app-component".to_string(),
+                "src/app/app_component.html".to_string(),
+                state_factory() 
+            );
+
+            component.add_event_handler(String::from("print_something"), |state| {
+                Self::print_something(state);
+            });
+
+            Box::new(component)
         }));
+    }
+
+    fn print_something(state: &mut AppComponentState) {
+        println!("Something");
+        state.content = String::from("Something");
     }
 }
     

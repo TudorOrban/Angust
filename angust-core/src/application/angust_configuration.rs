@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct AngustConfiguration {
     pub pathing_config: PathingConfiguration,
 }
@@ -14,7 +14,7 @@ impl Default for AngustConfiguration {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct PathingConfiguration {
     pub angust_config_path: String,
     pub app_dir_path: String,

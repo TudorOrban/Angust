@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use kuchiki::parse_html;
 use kuchiki::NodeData;
 use kuchiki::NodeRef;
@@ -18,29 +20,40 @@ pub fn parse_html_content(html: &str) -> NodeRef {
 }
 
 /*
- * Map that transforms the DOM into a tree of Angust elements.
+ * Function that maps the parsed DOM into a tree of Angust elements.
  */
-pub fn map_dom_to_elements(dom: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration, stylesheet: &Stylesheet) -> Option<Box<dyn Element>> {
+pub fn map_dom_to_elements<State>(
+    dom: &NodeRef, 
+    parent_styles: Option<&Styles>, 
+    context: &ParsingContext<State>,
+) -> Option<Box<dyn Element>> {
     match dom.data() {
-        NodeData::Document(_) | NodeData::Doctype(_) => process_document_nodes(dom, parent_styles, angust_config, stylesheet),
+        NodeData::Document(_) | NodeData::Doctype(_) => process_document_nodes(dom, parent_styles, context),
         NodeData::Element(ref elem_data) => {
-            element_parser::dispatch_element_processing(elem_data, dom, parent_styles, angust_config, stylesheet)
+            element_parser::dispatch_element_processing(elem_data, dom, parent_styles, context)
         },
         NodeData::Text(ref text) => {
-            process_text_element(&text.borrow(), parent_styles, angust_config)
+            process_text_element(&text.borrow(), parent_styles)
         },
-        _ => general_traversal(dom, parent_styles, angust_config, stylesheet),
+        _ => general_traversal(dom, parent_styles, context),
     }
 }
 
-fn process_document_nodes(node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration, stylesheet: &Stylesheet) -> Option<Box<dyn Element>> {
+fn process_document_nodes<State>(
+    node: &NodeRef, 
+    parent_styles: Option<&Styles>, 
+    context: &ParsingContext<State>,
+) -> Option<Box<dyn Element>> {
     node.children()
-        .filter_map(|child| map_dom_to_elements(&child, parent_styles, angust_config, stylesheet))
+        .filter_map(|child| map_dom_to_elements(&child, parent_styles, context))
         .next()
 }
 
 
-fn process_text_element(text: &str, parent_styles: Option<&Styles>, _: &AngustConfiguration) -> Option<Box<dyn Element>> {
+fn process_text_element(
+    text: &str,
+    parent_styles: Option<&Styles>,
+) -> Option<Box<dyn Element>> {
     let trimmed_text = text.trim();
     if !trimmed_text.is_empty() {
         let mut text_element = Text::new(trimmed_text.to_string());
@@ -55,11 +68,15 @@ fn process_text_element(text: &str, parent_styles: Option<&Styles>, _: &AngustCo
     }
 }
 
-pub fn general_traversal(node: &NodeRef, parent_styles: Option<&Styles>, angust_config: &AngustConfiguration, stylesheet: &Stylesheet) -> Option<Box<dyn Element>> {
+pub fn general_traversal<State>(
+    node: &NodeRef, 
+    parent_styles: Option<&Styles>, 
+    context: &ParsingContext<State>,
+) -> Option<Box<dyn Element>> {
     let mut root_element: Option<Box<dyn Element>> = None;
 
     for child in node.children() {
-        if let Some(element) = map_dom_to_elements(&child, parent_styles, angust_config, stylesheet) {
+        if let Some(element) = map_dom_to_elements(&child, parent_styles, context) {
             if root_element.is_none() {
                 root_element = Some(element);
             } else {
@@ -71,3 +88,32 @@ pub fn general_traversal(node: &NodeRef, parent_styles: Option<&Styles>, angust_
     root_element
 }
 
+pub struct ParsingContext<State> {
+    pub angust_config: Option<AngustConfiguration>,
+    pub stylesheet: Option<Stylesheet>,
+    pub current_component_event_handlers: Option<HashMap<String, Box<dyn FnMut(&mut State)>>>
+}
+
+impl<State> Default for ParsingContext<State> {
+    fn default() -> Self {
+        ParsingContext {
+            angust_config: None,
+            stylesheet: None,
+            current_component_event_handlers: None,
+        }
+    }
+}
+
+impl<State> ParsingContext<State> {
+    pub fn new(
+        angust_config: Option<AngustConfiguration>,
+        stylesheet: Option<Stylesheet>,
+        current_component_event_handlers: Option<HashMap<String, Box<dyn FnMut(&mut State)>>>,
+    ) -> Self {
+        ParsingContext {
+            angust_config,
+            stylesheet,
+            current_component_event_handlers,
+        }
+    }
+}

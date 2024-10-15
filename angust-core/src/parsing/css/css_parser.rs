@@ -5,7 +5,11 @@ use crate::rendering::elements::styles::Styles;
 use super::{appearance_parser::update_appearance_style, dimension_parser::update_dimension_style, layout_parser::update_layout_style, stylesheet_parser::Stylesheet, text_parser::update_text_style};
 
 
-pub fn parse_styles(attributes: &Attributes, parent_styles: Option<&Styles>, stylesheet: &Stylesheet) -> Styles {
+pub fn parse_styles(
+    attributes: &Attributes, 
+    parent_styles: Option<&Styles>, 
+    stylesheet: &Option<Stylesheet>
+) -> Styles {
     let mut styles = Styles::default();
     
     if let Some(class_names) = attributes.get("class") {
@@ -23,7 +27,12 @@ pub fn parse_styles(attributes: &Attributes, parent_styles: Option<&Styles>, sty
     styles
 }
 
-fn parse_class_styles(class_names: &str, stylesheet: &Stylesheet) -> Styles {
+fn parse_class_styles(class_names: &str, stylesheet_option: &Option<Stylesheet>) -> Styles {
+    if stylesheet_option.is_none() {
+        return Styles::default();
+    }
+    let stylesheet = stylesheet_option.as_ref().unwrap();
+
     let mut styles = Styles::default();
 
     class_names.split_whitespace().for_each(|class_name| {
