@@ -17,13 +17,12 @@ pub fn load_component_template<State>(component: &mut Component<State>) {
     let dom = html_parser::parse_html_content(&template_content);
 
     let mut container = Box::new(Container::new());
-    let parsing_context: ParsingContext<State> = html_parser::ParsingContext::new(
+    let parsing_context: ParsingContext = html_parser::ParsingContext::new(
         None, 
         None, 
-        Some(&component.event_handlers)
     );
     
-    if let Some(element) = html_parser::map_dom_to_elements(&dom, None, &parsing_context) {
+    if let Some(element) = html_parser::map_dom_to_elements::<State>(&dom, None, &parsing_context) {
         container.add_child(element);
     }
     component.content = container;

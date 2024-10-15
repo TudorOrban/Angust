@@ -1,18 +1,15 @@
-use std::{borrow::BorrowMut, cell::RefCell, collections::HashMap, rc::Rc, sync::Arc};
-
 use skia_safe::{Canvas, Color, Point};
-
 
 use crate::rendering::{layout::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer};
 
 use super::{common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
 
 
-pub struct Button<State> {
+pub struct Button {
     _id: String,
 
     container: Option<Vec<Box<dyn Element>>>, // Only one container is allowed
-    pub on_click: Option<HashMap<String, Rc<RefCell<dyn FnMut(&mut State) + 'static>>>>,
+    pub on_click_handler_name: Option<String>,
 
     position: Position,
     size: Size,
@@ -21,8 +18,8 @@ pub struct Button<State> {
     requested_size: OptionalSize,
 }
 
-impl<State> Button<State> {
-    pub fn new(on_click: Option<HashMap<String, Rc<RefCell<dyn FnMut(&mut State) + 'static>>>>, container: Option<Container>, styles: Option<Styles>) -> Self {
+impl Button {
+    pub fn new(on_click_handler_name: Option<String>, container: Option<Container>, styles: Option<Styles>) -> Self {
         let id = IDGenerator::get();
 
         let container_vec = if let Some(container_child) = container {
@@ -34,7 +31,7 @@ impl<State> Button<State> {
         Self {
             _id: id,
             container: container_vec,
-            on_click,
+            on_click_handler_name,
             position: Position::default(),
             size: Size::default(),
             styles: styles.unwrap_or_default(),
@@ -48,7 +45,7 @@ impl<State> Button<State> {
     }
 }
 
-impl<State> Element for Button<State> {
+impl Element for Button {
     fn render(&self, canvas: &Canvas) {
         let has_children = if let Some(child_container) = self.get_children() {
             if child_container.len() != 1 {
@@ -80,9 +77,7 @@ impl<State> Element for Button<State> {
     fn update(&mut self) {}
 
     fn handle_event(&mut self, _: Point, _: &EventType) {
-        if let Some(on_click) = &mut self.on_click {
-            // (on_click.borrow_mut())(&mut self.state);
-        }
+        
     }
 
     fn set_id(&mut self, id: String) {

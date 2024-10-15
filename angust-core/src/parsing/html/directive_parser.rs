@@ -1,18 +1,16 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
-
 use super::html_parser::ParsingContext;
 
 
 pub fn parse_directives<State>(
     attributes: &kuchiki::Attributes,
-    context: &ParsingContext<State>
-) -> HashMap<String, Rc<RefCell<dyn FnMut(&mut State) + 'static>>> {
-    let mut handlers = HashMap::new();
+    context: &ParsingContext
+) -> Option<String> {
     if let Some(on_click_value) = attributes.get("@onclick") {
-        if let Some(handler) = context.current_component_event_handlers.and_then(|h| h.get(on_click_value)) {
-            // Clone the Arc containing the handler
-            handlers.insert("click".to_string(), Rc::clone(handler));
-        }
+        let handler = on_click_value.to_string();
+        let handler = handler.trim_start_matches("handle_event('");
+        let handler = handler.trim_end_matches("')");
+        let handler = handler.to_string();
+        return Some(handler);
     }
-    handlers
+    None
 }

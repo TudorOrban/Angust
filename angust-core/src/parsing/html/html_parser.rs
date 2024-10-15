@@ -1,8 +1,3 @@
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::rc::Rc;
-use std::sync::Arc;
-
 use kuchiki::parse_html;
 use kuchiki::NodeData;
 use kuchiki::NodeRef;
@@ -28,27 +23,27 @@ pub fn parse_html_content(html: &str) -> NodeRef {
 pub fn map_dom_to_elements<State>(
     dom: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &ParsingContext,
 ) -> Option<Box<dyn Element>> {
     match dom.data() {
-        NodeData::Document(_) | NodeData::Doctype(_) => process_document_nodes(dom, parent_styles, context),
+        NodeData::Document(_) | NodeData::Doctype(_) => process_document_nodes::<State>(dom, parent_styles, context),
         NodeData::Element(ref elem_data) => {
-            element_parser::dispatch_element_processing(elem_data, dom, parent_styles, context)
+            element_parser::dispatch_element_processing::<State>(elem_data, dom, parent_styles, context)
         },
         NodeData::Text(ref text) => {
             process_text_element(&text.borrow(), parent_styles)
         },
-        _ => general_traversal(dom, parent_styles, context),
+        _ => general_traversal::<State>(dom, parent_styles, context),
     }
 }
 
 fn process_document_nodes<State>(
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &ParsingContext,
 ) -> Option<Box<dyn Element>> {
     node.children()
-        .filter_map(|child| map_dom_to_elements(&child, parent_styles, context))
+        .filter_map(|child| map_dom_to_elements::<State>(&child, parent_styles, context))
         .next()
 }
 
@@ -74,12 +69,12 @@ fn process_text_element(
 pub fn general_traversal<State>(
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &ParsingContext,
 ) -> Option<Box<dyn Element>> {
     let mut root_element: Option<Box<dyn Element>> = None;
 
     for child in node.children() {
-        if let Some(element) = map_dom_to_elements(&child, parent_styles, context) {
+        if let Some(element) = map_dom_to_elements::<State>(&child, parent_styles, context) {
             if root_element.is_none() {
                 root_element = Some(element);
             } else {
@@ -91,32 +86,28 @@ pub fn general_traversal<State>(
     root_element
 }
 
-pub struct ParsingContext<'a, State> {
+pub struct ParsingContext {
     pub angust_config: Option<AngustConfiguration>,
     pub stylesheet: Option<Stylesheet>,
-    pub current_component_event_handlers: Option<&'a HashMap<String, Rc<RefCell<dyn FnMut(&mut State) + 'static>>>>
 }
 
-impl<'a, State> Default for ParsingContext<'a, State> {
+impl Default for ParsingContext {
     fn default() -> Self {
         ParsingContext {
             angust_config: None,
             stylesheet: None,
-            current_component_event_handlers: None,
         }
     }
 }
 
-impl<'a, State> ParsingContext<'a, State> {
+impl ParsingContext {
     pub fn new(
         angust_config: Option<AngustConfiguration>,
         stylesheet: Option<Stylesheet>,
-        current_component_event_handlers: Option<&'a HashMap<String, Rc<RefCell<dyn FnMut(&mut State) + 'static>>>>,
     ) -> Self {
         ParsingContext {
             angust_config,
             stylesheet,
-            current_component_event_handlers,
         }
     }
 }

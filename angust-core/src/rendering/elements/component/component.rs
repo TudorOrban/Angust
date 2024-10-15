@@ -46,9 +46,8 @@ impl<State> Component<State> {
 
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
     where
-        F: 'static + FnMut(&mut State) + Send + Sync,  // Ensure the handler can be shared across threads if needed
+        F: 'static + FnMut(&mut State) + Send + Sync,
     {
-        // Wrap the handler in an Arc before storing
         self.event_handlers.insert(event_name, Rc::new(RefCell::new(handler)));
     }
 

@@ -40,9 +40,9 @@ impl<State> Application<State> {
         let angust_config = load_angust_configuration();
         let (dom, stylesheets) = load_resources(&angust_config);
         let stylesheet = stylesheet_parser::parse_stylesheet(&stylesheets);
-        let parsing_context: ParsingContext<i32> = ParsingContext::<i32>::new(Some(angust_config.clone()), Some(stylesheet.clone()), None);
+        let parsing_context: ParsingContext = ParsingContext::new(Some(angust_config.clone()), Some(stylesheet.clone()));
 
-        let ui_body = html_parser::map_dom_to_elements(&dom, None, &parsing_context)
+        let ui_body = html_parser::map_dom_to_elements::<usize>(&dom, None, &parsing_context)
             .expect("Failed to map DOM to elements");
 
         // Initialize renderer and layout
