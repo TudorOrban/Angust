@@ -1,9 +1,9 @@
 use super::html_parser::ParsingContext;
 
 
-pub fn parse_directives<State>(
+pub fn parse_on_click_attribute(
     attributes: &kuchiki::Attributes,
-    context: &ParsingContext
+    _: &ParsingContext
 ) -> Option<String> {
     if let Some(on_click_value) = attributes.get("@onclick") {
         let handler = on_click_value.to_string();

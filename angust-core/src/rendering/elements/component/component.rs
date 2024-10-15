@@ -1,4 +1,4 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::collections::HashMap;
 
 use crate::rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
@@ -24,7 +24,7 @@ pub struct Component<State> {
 
     // User-defined properties
     pub state: State,
-    pub event_handlers: HashMap<String, Rc<RefCell<dyn FnMut(&mut State) + 'static>>>,
+    pub event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
 }
 
 impl<State> Component<State> {
@@ -53,9 +53,9 @@ impl<State> Component<State> {
 
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
     where
-        F: 'static + FnMut(&mut State) + Send + Sync,
+        F: 'static + FnMut(&mut State),
     {
-        self.event_handlers.insert(event_name, Rc::new(RefCell::new(handler)));
+        self.event_handlers.insert(event_name, Box::new(handler));
     }
 }
 
@@ -75,8 +75,12 @@ impl<State> Element for Component<State> {
     
     fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
         let event_handler_names = event_propagator::propagate_event(self, cursor_position, event_type);
-        println!("Event handler names: {:?}", event_handler_names);
-        // TODO: Trigger gathered event handlers here
+        
+        for handler_name in event_handler_names.iter() {
+            if let Some(handler) = self.event_handlers.get_mut(handler_name) {
+                handler(&mut self.state);
+            }
+        }
 
         vec![]
     }

@@ -17,6 +17,14 @@ impl AppComponentState {
     fn new() -> Self {
         Self { content: String::from("Hello, App Component!") }
     }
+
+    pub fn toggle_content(&mut self) {
+        if self.content == "Hello, App Component!" {
+            self.content = "Hello, World!".to_string();
+        } else {
+            self.content = "Hello, App Component!".to_string();
+        }
+    }
 }
 
 impl AppComponent {
@@ -39,8 +47,8 @@ impl AppComponent {
     }
 
     fn print_something(state: &mut AppComponentState) {
-        println!("Something");
-        state.content = String::from("Something");
+        state.toggle_content();
+        println!("{}", state.content);
     }
 }
     

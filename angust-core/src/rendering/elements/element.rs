@@ -9,7 +9,7 @@ pub trait Element {
     fn update(&mut self);
     fn handle_event(&mut self, cursor_position: Point, event_type: &EventType);
 
-    // Experimental
+    // Experimental: gather all names of event handlers that should be called by a parent Custom Component
     fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String>;
 
     // Getters and setters
