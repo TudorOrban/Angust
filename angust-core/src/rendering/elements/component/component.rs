@@ -1,6 +1,13 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc, sync::Arc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
-use crate::rendering::{elements::{common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles}, layout::effective_size_estimator};
+use crate::rendering::{elements::{
+    common_types::{OptionalSize, Position, Size}, 
+    container::Container, 
+    element::{Element, ElementType, EventType}, 
+    element_id_generator::IDGenerator, 
+    event_propagator, 
+    styles::Styles
+}, layout::effective_size_estimator};
 
 use super::template_loader;
 
@@ -50,12 +57,6 @@ impl<State> Component<State> {
     {
         self.event_handlers.insert(event_name, Rc::new(RefCell::new(handler)));
     }
-
-    // pub fn handle_event(&mut self, event: &str) {
-    //     if let Some(handler) = self.event_handlers.get_mut(event) {
-    //         handler(&mut self.state);
-    //     }
-    // }
 }
 
 impl<State> Element for Component<State> {
@@ -70,6 +71,14 @@ impl<State> Element for Component<State> {
     
     fn handle_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) {
         self.content.handle_event(cursor_position, event_type);
+    }
+    
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+        let event_handler_names = event_propagator::propagate_event(self, cursor_position, event_type);
+        println!("Event handler names: {:?}", event_handler_names);
+        // TODO: Trigger gathered event handlers here
+
+        vec![]
     }
 
     fn add_child(&mut self, child: Box<dyn Element>) {

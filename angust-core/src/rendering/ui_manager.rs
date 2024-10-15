@@ -22,6 +22,10 @@ impl UIManager {
         self.root_element.handle_event(cursor_position, event_type);
     }
 
+    pub fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+        self.root_element.propagate_event(cursor_position, event_type)
+    }
+
     pub fn layout(&mut self, allocated_position: Position, allocated_size: Size) {
         self.root_element.layout(allocated_position, allocated_size);
     }

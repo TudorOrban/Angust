@@ -8,10 +8,7 @@ use crate::{application::event_handling::scrollbar_movement_handler::handle_scro
 }};
 
 use super::{
-    common_types::{OptionalSize, Position, ScrollbarState, Size},
-    element::{Element, ElementType, EventType},
-    element_id_generator::IDGenerator,
-    styles::{Directions, Styles},
+    common_types::{OptionalSize, Position, ScrollbarState, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, event_propagator, styles::{Directions, Styles}
 };
 
 pub struct Container {
@@ -94,6 +91,10 @@ impl Element for Container {
         for child in &mut self.children {
             child.handle_event(cursor_position, event_type);
         }
+    }
+
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+        event_propagator::propagate_event(self, cursor_position, event_type)
     }
 
     fn set_id(&mut self, id: String) {

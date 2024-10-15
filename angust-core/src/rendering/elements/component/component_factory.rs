@@ -3,6 +3,10 @@ use std::sync::Arc;
 use once_cell::sync::OnceCell;
 use crate::rendering::elements::element::Element;
 
+/*
+ * Registry for component factories, populated at runtime by the client application 
+ * and used by Angust to create custom components.
+ */
 pub type ComponentFactory = Box<dyn Fn() -> Box<dyn Element> + Send + Sync>;
 static COMPONENT_REGISTRY: OnceCell<Arc<HashMap<String, ComponentFactory>>> = OnceCell::new();
 

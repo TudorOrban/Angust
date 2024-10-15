@@ -10,3 +10,5 @@ pub mod component;
 
 pub mod common_types;
 pub mod styles;
+
+mod event_propagator;

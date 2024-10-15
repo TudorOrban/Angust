@@ -48,6 +48,10 @@ impl Renderer {
     pub fn handle_event(&mut self, cursor_position: skia_safe::Point, event_type: EventType) {
         self.ui_manager.handle_event(cursor_position, &event_type);
     }
+
+    pub fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+        self.ui_manager.propagate_event(cursor_position, event_type)
+    }
     
     fn create_surface(
         window: &Window,

@@ -51,9 +51,9 @@ fn process_button_element<State>(
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
 
-    let event_handlers = directive_parser::parse_directives::<State>(&attributes, context);;
+    let on_click_handler_name = directive_parser::parse_directives::<State>(&attributes, context);
     
-    let mut button = Button::new(None, None, Some(styles));
+    let mut button = Button::new(on_click_handler_name, None, Some(styles));
 
     let mut child_container = Container::new();
     node.children()

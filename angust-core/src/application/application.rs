@@ -164,6 +164,8 @@ impl<State> ApplicationHandler for Application<State> {
                         self.is_mouse_pressed = true;
                         if let Some(mouse_position) = self.mouse_position {
                             self.renderer.handle_event(mouse_position, EventType::MouseDown);
+                            self.renderer.propagate_event(mouse_position, &EventType::MouseClick);
+                            
                             self.windowing_system.window.request_redraw();
                         }
                     },

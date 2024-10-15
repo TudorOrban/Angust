@@ -2,7 +2,7 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{layout::space_allocation_system::text::size_estimator::{determine_text_element_lines, estimate_text_element_size}, rendering_interface::element_renderer::ElementRenderer};
 
-use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::{Dimension, Styles, Unit, WhiteSpace}};
+use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, event_propagator, styles::{Dimension, Styles, Unit, WhiteSpace}};
 
 
 pub struct Text {
@@ -61,6 +61,10 @@ impl Element for Text {
     fn update(&mut self) {}
 
     fn handle_event(&mut self, _: Point, _: &EventType) {}
+    
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+        event_propagator::propagate_event(self, cursor_position, event_type)
+    }
 
     fn set_id(&mut self, id: String) {
         self._id = id;

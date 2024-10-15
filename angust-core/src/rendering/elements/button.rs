@@ -43,6 +43,12 @@ impl Button {
     fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
         self.container.as_ref()
     }
+
+    // Utils    
+    fn position_within_bounds(&self, point: skia_safe::Point) -> bool {
+        point.x >= self.position.x && point.x <= self.position.x + self.size.width &&
+        point.y >= self.position.y && point.y <= self.position.y + self.size.height
+    }
 }
 
 impl Element for Button {
@@ -79,6 +85,27 @@ impl Element for Button {
     fn handle_event(&mut self, _: Point, _: &EventType) {
         
     }
+
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+        let mut event_targets = Vec::new();
+
+        // Check if the cursor_position is within the bounds of the button
+        if self.position_within_bounds(cursor_position) {
+            if let Some(handler_name) = &self.on_click_handler_name {
+                match event_type {
+                    EventType::MouseClick => {
+                        event_targets.push(handler_name.clone());
+                    },
+                    _ => {}
+                }
+            }
+        }
+
+        // TODO: Propagate to children as well
+
+        event_targets
+    }
+
 
     fn set_id(&mut self, id: String) {
         self._id = id;

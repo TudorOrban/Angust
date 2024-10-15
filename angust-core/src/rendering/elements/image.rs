@@ -3,7 +3,7 @@ use skia_safe::{Canvas, Point};
 
 use crate::{application::resource_loader::image_loader, rendering::{layout::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer}};
 
-use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
+use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, event_propagator, styles::Styles};
 
 
 pub struct Image {
@@ -60,6 +60,10 @@ impl Element for Image {
     fn update(&mut self) {}
 
     fn handle_event(&mut self, _: Point, _: &EventType) {}
+    
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+        event_propagator::propagate_event(self, cursor_position, event_type)
+    }
 
     fn set_id(&mut self, id: String) {
         self._id = id;

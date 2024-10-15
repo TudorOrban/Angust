@@ -4,10 +4,15 @@ use super::{common_types::{OptionalSize, Position, Size}, styles::Styles};
 
 // This is the trait that all Angust elements must implement.
 pub trait Element {
+    // Core
     fn render(&self, canvas: &Canvas);
     fn update(&mut self);
     fn handle_event(&mut self, cursor_position: Point, event_type: &EventType);
 
+    // Experimental
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String>;
+
+    // Getters and setters
     fn set_id(&mut self, id: String);
     fn set_position(&mut self, position: Position);
     fn set_size(&mut self, size: Size);
