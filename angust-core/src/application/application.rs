@@ -4,7 +4,7 @@ use gl_rs as gl;
 use glutin::{config::GlConfig, display::GetGlDisplay, prelude::GlDisplay, surface::GlSurface};
 use std::{ffi::CString, num::NonZeroU32};
 
-use crate::{parsing::{css::stylesheet_parser::{self, Stylesheet}, html::html_parser::{self, ParsingContext}}, rendering::{elements::element::EventType, renderer::Renderer}, window::WindowingSystem};
+use crate::{parsing::{css::stylesheet_parser::{self, Stylesheet}, html::html_parser::{self, ParsingContext}}, rendering::{elements::{component::component::NoState, element::EventType}, renderer::Renderer}, window::WindowingSystem};
 
 use super::{angust_configuration::AngustConfiguration, resource_loader::configuration_loader::load_angust_configuration, ui_initializer::load_resources};
 
@@ -40,9 +40,9 @@ impl<State> Application<State> {
         let angust_config = load_angust_configuration();
         let (dom, stylesheets) = load_resources(&angust_config);
         let stylesheet = stylesheet_parser::parse_stylesheet(&stylesheets);
-        let parsing_context: ParsingContext = ParsingContext::new(Some(angust_config.clone()), Some(stylesheet.clone()));
+        let parsing_context: ParsingContext<NoState> = ParsingContext::new(Some(angust_config.clone()), Some(stylesheet.clone()), None);
 
-        let ui_body = html_parser::map_dom_to_elements::<usize>(&dom, None, &parsing_context)
+        let ui_body = html_parser::map_dom_to_elements::<NoState>(&dom, None, &parsing_context)
             .expect("Failed to map DOM to elements");
 
         // Initialize renderer and layout

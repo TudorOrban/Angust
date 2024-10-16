@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use angust::{
     component_state, 
-    rendering::elements::component::{component::Component, component_factory::ComponentFactory
+    rendering::elements::component::{component::Component, component_factory_registry::ComponentFactory
 }};
 
 
@@ -18,10 +18,7 @@ component_state! {
 }
 
 impl AppComponentState {
-    fn new() -> Self {
-        Self { content: String::from("Hello, App Component!") }
-    }
-
+    
     pub fn toggle_content(&mut self) {
         if self.content == "Hello, App Component!" {
             self.content = "Hello, World!".to_string();
@@ -33,7 +30,9 @@ impl AppComponentState {
 
 impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
-        let state_factory = || AppComponentState::new();
+        let state_factory = || AppComponentState::new(
+            String::from("Hello, App Component!")
+        );
 
         registry.insert("app-component".to_string(), Box::new(move || {
             let mut component = Component::new(

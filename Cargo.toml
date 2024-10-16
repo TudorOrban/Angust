@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "angust-core",                     
-    "examples/full_project_example",
     "cartan",
     "complete_angust_example"
 ]

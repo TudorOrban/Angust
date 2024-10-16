@@ -1,8 +1,8 @@
 use kuchiki::NodeRef;
 
-use crate::parsing::css::css_parser;
+use crate::{parsing::css::css_parser, rendering::elements::component::component::ComponentState};
 use crate::rendering::elements::button::Button;
-use crate::rendering::elements::component::component_factory::create_component;
+use crate::rendering::elements::component::component_factory_registry::create_component;
 use crate::rendering::elements::container::Container;
 use crate::rendering::elements::element::Element;
 use crate::rendering::elements::image::Image;
@@ -10,11 +10,11 @@ use crate::rendering::elements::styles::Styles;
 
 use super::{directive_parser, html_parser::{self, ParsingContext}};
 
-pub fn dispatch_element_processing<State>(
+pub fn dispatch_element_processing<State : ComponentState>(
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext,
+    context: &ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     match elem_data.name.local.as_ref() {
         "div" => Some(process_div_element::<State>(elem_data, node, parent_styles, context)),
@@ -24,11 +24,11 @@ pub fn dispatch_element_processing<State>(
     }
 }
 
-fn process_div_element<State>(
+fn process_div_element<State : ComponentState>(
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext,
+    context: &ParsingContext<State>,
 ) -> Box<dyn Element> {
     let mut container = Container::new();
     let attributes = elem_data.attributes.borrow();
@@ -42,11 +42,11 @@ fn process_div_element<State>(
     Box::new(container)
 }
 
-fn process_button_element<State>(
+fn process_button_element<State : ComponentState>(
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext,
+    context: &ParsingContext<State>,
 ) -> Box<dyn Element> {
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
@@ -68,11 +68,11 @@ fn process_button_element<State>(
     Box::new(button)
 }
 
-fn process_image_element<State>(
+fn process_image_element<State : ComponentState>(
     elem_data: &kuchiki::ElementData, 
     _: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext,
+    context: &ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     let attributes = elem_data.attributes.borrow();
     let src = attributes.get("src").unwrap_or_default();
@@ -85,12 +85,12 @@ fn process_image_element<State>(
     Some(Box::new(image))
 }
 
-fn process_custom_component<State>(
+fn process_custom_component<State : ComponentState>(
     component_name: &str, 
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext,
+    context: &ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     let skippable_elements = vec!["!DOCTYPE", "html", "head", "meta", "body", "title", "h1"]; // To be implemented in the future
     if skippable_elements.contains(&component_name) {

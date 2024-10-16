@@ -5,9 +5,9 @@ use crate::rendering::elements::component::component::ComponentState;
 use super::html_parser::ParsingContext;
 
 
-pub fn parse_on_click_attribute(
+pub fn parse_on_click_attribute<State : ComponentState>(
     attributes: &kuchiki::Attributes,
-    _: &ParsingContext
+    _: &ParsingContext<State>
 ) -> Option<String> {
     if let Some(on_click_value) = attributes.get("@onclick") {
         let handler = on_click_value.to_string();
