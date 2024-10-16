@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 

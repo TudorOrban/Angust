@@ -10,8 +10,10 @@ use angust::{
 define_component_state! {
     AppComponentState {
         content: String,
+        count: i32,
     }
 }
+
 
 impl AppComponentState {
     
@@ -22,7 +24,12 @@ impl AppComponentState {
             *self.content = "Hello, App Component!".to_string();
         }
     }
+
+    pub fn increment_count(&mut self) {
+        *self.count += 1;
+    }
 }
+
 
 pub struct AppComponent {
     component: Component<AppComponentState>,    
@@ -30,17 +37,11 @@ pub struct AppComponent {
 
 impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
-        let state_factory = || {
-            let mut state = AppComponentState::new(String::from("Hello, App Component!"));
+        let state_factory = || AppComponentState::new(
+            String::from("Hello, App Component!"),
+            0
+        );
 
-            // Subscribe to changes on the `content` field
-            state.content.subscribe(|| {
-                println!("Content field changed!");
-            });
-
-            state
-        };
-        
         registry.insert("app-component".to_string(), Box::new(move || {
             let mut component = Component::new(
                 "app-component".to_string(),
@@ -51,6 +52,10 @@ impl AppComponent {
             component.add_event_handler(String::from("print_something"), |state| {
                 Self::print_something(state);
             });
+            component.add_event_handler(String::from("increment_count"), |state| {
+                Self::increment_count(state);
+            });
+
 
             Box::new(component)
         }));
@@ -59,6 +64,10 @@ impl AppComponent {
     fn print_something(state: &mut AppComponentState) {
         state.toggle_content();
         println!("{}", *state.content);
+    }
+
+    fn increment_count(state: &mut AppComponentState) {
+        state.increment_count();
     }
 }
     

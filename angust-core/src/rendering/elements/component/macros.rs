@@ -4,6 +4,7 @@ macro_rules! define_component_state {
         use $crate::rendering::elements::component::component_state::ComponentState;
         use $crate::rendering::elements::component::reactivity::ReactiveField;
         use std::any::Any;
+        use std::sync::Arc;
 
         #[derive(Debug)]
         pub struct $name {
@@ -37,6 +38,12 @@ macro_rules! define_component_state {
                     )*
                     _ => {},
                 }
+            }
+            
+            fn get_all_properties(&self) -> Vec<&str> {
+                vec![
+                    $( stringify!($field), )*
+                ]
             }
         }
     };
