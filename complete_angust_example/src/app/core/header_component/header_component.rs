@@ -1,15 +1,18 @@
 
 use std::collections::HashMap;
 
-use angust::rendering::elements::component::{component::Component, component_factory::ComponentFactory};
+use angust::{component_state, rendering::elements::component::{component::Component, component_factory::ComponentFactory}};
 
 
 pub struct HeaderComponent {
     component: Component<HeaderComponentState>,    
 }
 
-pub struct HeaderComponentState {
-    content: String,
+
+component_state! {
+    HeaderComponentState {
+        content: String,
+    }
 }
 
 impl HeaderComponentState {

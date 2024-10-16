@@ -1,3 +1,7 @@
+use regex::Regex;
+
+use crate::rendering::elements::component::component::ComponentState;
+
 use super::html_parser::ParsingContext;
 
 
@@ -13,4 +17,34 @@ pub fn parse_on_click_attribute(
         return Some(handler);
     }
     None
+}
+
+pub fn parse_state_placeholder<State: ComponentState>(
+    text: &str,
+    state: &State,
+) -> Result<String, String> {
+    let re = Regex::new(r"\{\{(\s*[^}]+\s*)\}\}").unwrap();
+    let mut result = text.to_string();
+
+    for cap in re.captures_iter(text) {
+        let matched_text = match cap.get(0) {
+            Some(text) => text,
+            None => continue,
+        };
+
+        let key = cap[1].trim();
+        let property = match state.get_property(key) {
+            Some(prop) => prop,
+            None => return Err(format!("Property '{}' not found in state", key)),
+        };
+
+        let value = match property.downcast_ref::<String>() {
+            Some(val) => val,
+            None => return Err(format!("Property '{}' is not a String type", key)),
+        };
+
+        result = result.replace(matched_text.as_str(), value);
+    }
+
+    Ok(result)
 }

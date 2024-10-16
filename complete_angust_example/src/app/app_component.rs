@@ -18,9 +18,9 @@ component_state! {
 }
 
 impl AppComponentState {
-    // fn new() -> Self {
-    //     Self { content: String::from("Hello, App Component!") }
-    // }
+    fn new() -> Self {
+        Self { content: String::from("Hello, App Component!") }
+    }
 
     pub fn toggle_content(&mut self) {
         if self.content == "Hello, App Component!" {
@@ -33,7 +33,7 @@ impl AppComponentState {
 
 impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
-        let state_factory = || AppComponentState::new(String::from("AS"));
+        let state_factory = || AppComponentState::new();
 
         registry.insert("app-component".to_string(), Box::new(move || {
             let mut component = Component::new(

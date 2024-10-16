@@ -17,7 +17,7 @@ pub trait ComponentState {
     fn set_property(&mut self, property_name: &str, value: Box<dyn Any>);
 }
 
-pub struct Component<State> {
+pub struct Component<State: ComponentState> {
     _id: String,
     pub name: String,
     pub template_relative_path: String,
@@ -33,7 +33,7 @@ pub struct Component<State> {
     pub event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
 }
 
-impl<State> Component<State> {
+impl<State: ComponentState> Component<State> {
     pub fn new(name: String, template_relative_path: String, state: State) -> Self {
         let id = IDGenerator::get();
         let mut component = Self {
@@ -65,7 +65,7 @@ impl<State> Component<State> {
     }
 }
 
-impl<State> Element for Component<State> {
+impl<State: ComponentState> Element for Component<State> {
     
     fn render(&self, canvas: &skia_safe::Canvas) {
         self.content.render(canvas);

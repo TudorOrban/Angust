@@ -11,11 +11,11 @@ macro_rules! component_state {
             $(pub $field: $type),*
         }
 
-        impl $name {
-            pub fn new($( $field: $type ),*) -> Self {
-                $name { $($field),* }
-            }
-        }
+        // impl $name {
+        //     pub fn new($( $field: $type ),*) -> Self {
+        //         $name { $($field),* }
+        //     }
+        // }
 
         impl ComponentState for $name {
             fn get_property(&self, property_name: &str) -> Option<&dyn Any> {
