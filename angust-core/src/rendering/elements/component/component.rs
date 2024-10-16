@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{any::Any, collections::HashMap};
 
 use crate::rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
@@ -10,6 +10,12 @@ use crate::rendering::{elements::{
 }, layout::effective_size_estimator};
 
 use super::template_loader;
+
+
+pub trait ComponentState {
+    fn get_property(&self, property_name: &str) -> Option<&dyn Any>;
+    fn set_property(&mut self, property_name: &str, value: Box<dyn Any>);
+}
 
 pub struct Component<State> {
     _id: String,
