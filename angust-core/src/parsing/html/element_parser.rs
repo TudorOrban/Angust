@@ -1,6 +1,6 @@
 use kuchiki::NodeRef;
 
-use crate::{parsing::css::css_parser, rendering::elements::component::component::ComponentState};
+use crate::{parsing::css::css_parser, rendering::elements::component::component_state::ComponentState};
 use crate::rendering::elements::button::Button;
 use crate::rendering::elements::component::component_factory_registry::create_component;
 use crate::rendering::elements::container::Container;

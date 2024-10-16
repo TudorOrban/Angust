@@ -1,31 +1,54 @@
-pub trait Signal<T> {
-    fn connect<F>(&mut self, callback: F) where F: Fn(&T) + 'static;
-    fn emit(&self, value: &T);
+use std::fmt::{Debug, Formatter};
+use std::sync::{Arc, Mutex};
+use std::ops::{Deref, DerefMut};
+
+pub struct ReactiveField<T> {
+    value: T,
+    listeners: Arc<Mutex<Vec<Box<dyn Fn() + Send + Sync>>>>,
 }
 
-pub struct SignalImpl<T> {
-    subscribers: Vec<Box<dyn Fn(&T)>>,
-}
-
-impl<T> SignalImpl<T> {
-    pub fn new() -> Self {
-        SignalImpl {
-            subscribers: Vec::new(),
-        }
+impl<T> Debug for ReactiveField<T>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.value)
     }
 }
 
-impl<T> Signal<T> for SignalImpl<T> {
-    fn connect<F>(&mut self, callback: F)
+impl<T> ReactiveField<T> {
+    pub fn new(value: T) -> Self {
+        Self {
+            value,
+            listeners: Arc::new(Mutex::new(Vec::new())),
+        }
+    }
+
+    pub fn subscribe<F>(&mut self, callback: F)
     where
-        F: Fn(&T) + 'static,
+        F: Fn() + Send + Sync + 'static,
     {
-        self.subscribers.push(Box::new(callback));
+        self.listeners.lock().unwrap().push(Box::new(callback));
     }
 
-    fn emit(&self, value: &T) {
-        for subscriber in &self.subscribers {
-            subscriber(value);
+    fn notify_listeners(&self) {
+        for callback in self.listeners.lock().unwrap().iter() {
+            callback();
         }
+    }
+}
+
+impl<T> Deref for ReactiveField<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
+impl<T> DerefMut for ReactiveField<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.notify_listeners();
+        &mut self.value
     }
 }

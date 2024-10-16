@@ -6,7 +6,7 @@ use crate::{
     rendering::elements::{container::Container, element::Element}
 };
 
-use super::component::{Component, ComponentState};
+use super::{component::Component, component_state::ComponentState};
 
 
 pub fn load_component_template<State: ComponentState>(component: &mut Component<State>) {

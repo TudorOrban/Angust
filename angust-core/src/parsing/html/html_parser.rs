@@ -6,7 +6,7 @@ use kuchiki::traits::TendrilSink;
 use crate::application::angust_configuration::AngustConfiguration;
 use crate::parsing::css::css_parser::merge_styles;
 use crate::parsing::css::stylesheet_parser::Stylesheet;
-use crate::rendering::elements::component::component::ComponentState;
+use crate::rendering::elements::component::component_state::ComponentState;
 use crate::rendering::elements::element::Element;
 use crate::rendering::elements::styles::Styles;
 use crate::rendering::elements::text::Text;

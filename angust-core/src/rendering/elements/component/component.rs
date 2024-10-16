@@ -1,25 +1,15 @@
-use std::{any::Any, collections::HashMap};
+use std::collections::HashMap;
 
-use crate::{component_state, rendering::{elements::{
+use crate::rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
     container::Container, 
     element::{Element, ElementType, EventType}, 
     element_id_generator::IDGenerator, 
     event_propagator, 
     styles::Styles
-}, layout::effective_size_estimator}};
+}, layout::effective_size_estimator};
 
-use super::template_loader;
-
-
-pub trait ComponentState {
-    fn get_property(&self, property_name: &str) -> Option<&dyn Any>;
-    fn set_property(&mut self, property_name: &str, value: Box<dyn Any>);
-}
-
-component_state! {
-    NoState {}
-}
+use super::{component_state::ComponentState, template_loader};
 
 pub struct Component<State: ComponentState> {
     _id: String,

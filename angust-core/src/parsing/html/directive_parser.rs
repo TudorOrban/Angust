@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::rendering::elements::component::component::ComponentState;
+use crate::rendering::elements::component::component_state::ComponentState;
 
 use super::html_parser::ParsingContext;
 
