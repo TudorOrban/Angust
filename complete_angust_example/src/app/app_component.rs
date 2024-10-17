@@ -19,9 +19,9 @@ impl AppComponentState {
     
     pub fn toggle_content(&mut self) {
         if self.content.value == "Hello, App Component!" {
-            self.content.value = "Hello, World!".to_string();
+            self.content.set("Hello, World!".to_string(), String::from("1"));
         } else {
-            self.content.value = "Hello, App Component!".to_string();
+            self.content.set("Hello, App Component!".to_string(), String::from("1"));
         }
     }
 

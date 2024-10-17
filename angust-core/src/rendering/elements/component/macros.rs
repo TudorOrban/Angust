@@ -22,23 +22,24 @@ macro_rules! define_component_state {
         impl ComponentState for $name {
             fn get_property(&self, property_name: &str) -> Option<&dyn Any> {
                 match property_name {
-                    $(stringify!($field) => Some(&self.$field.value as &dyn Any),)*  // Explicitly access the `value` field
+                    $(stringify!($field) => Some(&self.$field.value as &dyn Any),)*
                     _ => None,
                 }
             }
 
-            fn set_property(&mut self, property_name: &str, value: Box<dyn Any>) {
+            fn set_property(&mut self, property_name: &str, value: Box<dyn Any>, component_id: String) {
                 match property_name {
                     $(
                         stringify!($field) => {
                             if let Ok(casted_value) = value.downcast::<$type>() {
-                                self.$field.set_value(*casted_value);  // Use `set_value` to set the field and notify listeners
+                                self.$field.set(*casted_value, component_id);
                             }
                         },
                     )*
                     _ => {},
                 }
             }
+            
             
             fn get_all_properties(&self) -> Vec<&str> {
                 vec![

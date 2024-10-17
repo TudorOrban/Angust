@@ -1,13 +1,13 @@
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
-use crate::rendering::{elements::{
+use crate::{application::event_loop_proxy::get_event_loop_proxy, rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
     container::Container, 
     element::{Element, ElementType, EventType}, 
     element_id_generator::IDGenerator, 
     event_propagator, 
     styles::Styles
-}, layout::effective_size_estimator};
+}, layout::effective_size_estimator}};
 
 use super::{component_state::ComponentState, reactivity::{ComponentEvent, EventQueue}, template_loader};
 
@@ -55,16 +55,21 @@ impl<State: ComponentState> Component<State> {
         self.load_component_template();
     }
     
-    fn setup_listeners(&mut self) {
-        let event_queue = self.event_queue.clone();
-
-        self.state.subscribe_to_property("content", move |event: &ComponentEvent| {
-            match event {
-                ComponentEvent::ReloadTemplate(component_id) => {
-                    event_queue.borrow_mut().push(ComponentEvent::ReloadTemplate(component_id.clone()));
+    pub fn setup_listeners(&mut self) {
+        // Get the global event loop proxy
+        if let Some(event_proxy) = get_event_loop_proxy() {
+            println!("Setting up listeners for component: {}", self.get_id());
+            self.state.subscribe_to_property("content", move |event: &ComponentEvent| {
+                println!("Received event: {:?}", event);
+                match event {
+                    ComponentEvent::ReloadTemplate(component_id) => {
+                        // Send event using the global proxy
+                        event_proxy.send_event(ComponentEvent::ReloadTemplate(component_id.clone()))
+                            .expect("Failed to send event");
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     fn load_component_template(&mut self) {

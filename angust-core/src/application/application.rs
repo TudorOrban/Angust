@@ -6,7 +6,7 @@ use std::{ffi::CString, num::NonZeroU32};
 
 use crate::{parsing::{css::stylesheet_parser::{self, Stylesheet}, html::html_parser::{self, ParsingContext}}, rendering::{elements::{component::{self, no_state::NoState, reactivity::ComponentEvent}, element::EventType}, renderer::Renderer}, window::WindowingSystem};
 
-use super::{angust_configuration::AngustConfiguration, resource_loader::configuration_loader::load_angust_configuration, ui_initializer::load_resources};
+use super::{angust_configuration::AngustConfiguration, event_loop_proxy::set_event_loop_proxy, resource_loader::configuration_loader::load_angust_configuration, ui_initializer::load_resources};
 
 
 pub struct Application<State> {
@@ -31,7 +31,9 @@ impl<State> Application<State> {
     pub fn new(initial_state: State, app_title: String) -> Self {
         let event_loop = EventLoop::<ComponentEvent>::with_user_event().build()
             .expect("Failed to create event loop");
-        
+        let event_loop_proxy = event_loop.create_proxy();
+        set_event_loop_proxy(event_loop_proxy);
+
         let mut windowing_system = Self::init_windowing_system(&event_loop, app_title);
     
         let fb_info = Self::init_framebuffer_info();
@@ -216,6 +218,7 @@ impl<State> ApplicationHandler<ComponentEvent> for Application<State> {
     }
 
     fn user_event(&mut self, event_loop: &ActiveEventLoop, event: ComponentEvent) {
-        // match event 
+        // match event
+        println!("User event: {:?}", event);
     }
 }

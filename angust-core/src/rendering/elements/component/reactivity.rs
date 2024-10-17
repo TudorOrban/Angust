@@ -1,9 +1,9 @@
-use std::fmt::{Debug, Formatter};
+use std::{fmt::{Debug, Formatter}, ops::{Deref, DerefMut}};
 
 
 pub struct ReactiveField<T> {
     pub value: T,
-    listeners: Vec<Box<dyn FnMut(&ComponentEvent)>>,  
+    listeners: Vec<Box<dyn FnMut(&ComponentEvent)>>,
 }
 
 impl<T> Debug for ReactiveField<T>
@@ -15,7 +15,6 @@ where
     }
 }
 
-
 impl<T> ReactiveField<T> {
     pub fn new(value: T) -> Self {
         Self {
@@ -24,6 +23,7 @@ impl<T> ReactiveField<T> {
         }
     }
 
+    // Subscribe to property changes
     pub fn subscribe<F>(&mut self, callback: F)
     where
         F: 'static + FnMut(&ComponentEvent),
@@ -31,18 +31,38 @@ impl<T> ReactiveField<T> {
         self.listeners.push(Box::new(callback));
     }
 
-    pub fn set_value(&mut self, value: T) {
-        self.value = value;
-        self.notify_listeners(&ComponentEvent::ReloadTemplate(String::from("")));
+    // Set value and notify listeners
+    pub fn set(&mut self, new_value: T, component_id: String) {
+        self.value = new_value;
+        // Notify listeners regardless of value changes
+        self.notify_listeners(&ComponentEvent::ReloadTemplate(component_id));
     }
 
     fn notify_listeners(&mut self, event: &ComponentEvent) {
         for callback in self.listeners.iter_mut() {
-            callback(event); 
+            callback(event);
         }
     }
 }
 
+
+// Implement Deref to get a reference to the value
+impl<T> Deref for ReactiveField<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
+// Implement DerefMut to allow mutable access to the value
+impl<T> DerefMut for ReactiveField<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.value
+    }
+}
+
+#[derive(Debug)]
 pub enum ComponentEvent {
     ReloadTemplate(String),
 }
