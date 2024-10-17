@@ -1,10 +1,10 @@
 use skia_safe::{gpu::gl::FramebufferInfo, Point};
-use winit::{application::ApplicationHandler, dpi::PhysicalSize, event::{ElementState, KeyEvent, Modifiers, MouseButton, MouseScrollDelta, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}};
+use winit::{application::ApplicationHandler, dpi::PhysicalSize, event::{ElementState, Event, KeyEvent, Modifiers, MouseButton, MouseScrollDelta, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}};
 use gl_rs as gl;
 use glutin::{config::GlConfig, display::GetGlDisplay, prelude::GlDisplay, surface::GlSurface};
 use std::{ffi::CString, num::NonZeroU32};
 
-use crate::{parsing::{css::stylesheet_parser::{self, Stylesheet}, html::html_parser::{self, ParsingContext}}, rendering::{elements::{component::no_state::NoState, element::EventType}, renderer::Renderer}, window::WindowingSystem};
+use crate::{parsing::{css::stylesheet_parser::{self, Stylesheet}, html::html_parser::{self, ParsingContext}}, rendering::{elements::{component::{self, no_state::NoState, reactivity::ComponentEvent}, element::EventType}, renderer::Renderer}, window::WindowingSystem};
 
 use super::{angust_configuration::AngustConfiguration, resource_loader::configuration_loader::load_angust_configuration, ui_initializer::load_resources};
 
@@ -19,7 +19,7 @@ pub struct Application<State> {
 
     windowing_system: WindowingSystem,
     fb_info: FramebufferInfo,
-    event_loop: Option<EventLoop<()>>,
+    event_loop: Option<EventLoop<ComponentEvent>>,
     modifiers: Modifiers,
 
     mouse_position: Option<Point>,
@@ -29,7 +29,7 @@ pub struct Application<State> {
 impl<State> Application<State> {
     // Initialization
     pub fn new(initial_state: State, app_title: String) -> Self {
-        let event_loop = EventLoop::new()
+        let event_loop = EventLoop::<ComponentEvent>::with_user_event().build()
             .expect("Failed to create event loop");
         
         let mut windowing_system = Self::init_windowing_system(&event_loop, app_title);
@@ -70,7 +70,7 @@ impl<State> Application<State> {
         }
     }
     
-    fn init_windowing_system(event_loop: &EventLoop<()>, app_title: String) -> WindowingSystem {
+    fn init_windowing_system(event_loop: &EventLoop<ComponentEvent>, app_title: String) -> WindowingSystem {
         let windowing_system = WindowingSystem::new(event_loop, app_title);
     
         gl::load_with(|s| windowing_system
@@ -130,7 +130,7 @@ impl<State> Application<State> {
     }
 }
 
-impl<State> ApplicationHandler for Application<State> {
+impl<State> ApplicationHandler<ComponentEvent> for Application<State> {
     fn resumed(&mut self, _event_loop: &ActiveEventLoop) {
         self.windowing_system.window.request_redraw();
     }
@@ -213,5 +213,9 @@ impl<State> ApplicationHandler for Application<State> {
         }
 
         event_loop.set_control_flow(ControlFlow::Wait);
+    }
+
+    fn user_event(&mut self, event_loop: &ActiveEventLoop, event: ComponentEvent) {
+        // match event 
     }
 }

@@ -33,7 +33,7 @@ impl<T> ReactiveField<T> {
 
     pub fn set_value(&mut self, value: T) {
         self.value = value;
-        self.notify_listeners(&ComponentEvent::ReloadTemplate);
+        self.notify_listeners(&ComponentEvent::ReloadTemplate(String::from("")));
     }
 
     fn notify_listeners(&mut self, event: &ComponentEvent) {
@@ -44,7 +44,7 @@ impl<T> ReactiveField<T> {
 }
 
 pub enum ComponentEvent {
-    ReloadTemplate,
+    ReloadTemplate(String),
 }
 
 pub struct EventQueue {

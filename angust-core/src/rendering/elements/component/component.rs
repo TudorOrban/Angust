@@ -60,8 +60,8 @@ impl<State: ComponentState> Component<State> {
 
         self.state.subscribe_to_property("content", move |event: &ComponentEvent| {
             match event {
-                ComponentEvent::ReloadTemplate => {
-                    event_queue.borrow_mut().push(ComponentEvent::ReloadTemplate);
+                ComponentEvent::ReloadTemplate(component_id) => {
+                    event_queue.borrow_mut().push(ComponentEvent::ReloadTemplate(component_id.clone()));
                 }
             }
         });
@@ -69,6 +69,20 @@ impl<State: ComponentState> Component<State> {
 
     fn load_component_template(&mut self) {
         template_loader::load_component_template(self);
+    }
+
+    
+    pub fn process_events(&mut self) {
+        let events = self.event_queue.borrow_mut().drain();
+        for event in events {
+            match event {
+                ComponentEvent::ReloadTemplate(component_id) => {
+                    if component_id == self.get_id() {
+                        self.load_component_template();
+                    }
+                }
+            }
+        }
     }
 
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
