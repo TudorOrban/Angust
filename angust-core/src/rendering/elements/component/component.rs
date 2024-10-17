@@ -1,4 +1,4 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 use crate::{application::event_loop_proxy::get_event_loop_proxy, rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
@@ -9,7 +9,7 @@ use crate::{application::event_loop_proxy::get_event_loop_proxy, rendering::{ele
     styles::Styles
 }, layout::effective_size_estimator}};
 
-use super::{component_state::ComponentState, reactivity::{ComponentEvent, EventQueue}, template_loader};
+use super::{component_functions::ComponentFunctions, component_state::ComponentState, reactivity::{ComponentEvent, EventQueue}, template_loader};
 
 pub struct Component<State: ComponentState> {
     _id: String,
@@ -25,10 +25,11 @@ pub struct Component<State: ComponentState> {
 
     // User-defined properties
     pub state: State,
-    pub event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
+    pub component_functions: ComponentFunctions<State>,
 
     // Reactivity
     pub event_queue: Rc<RefCell<EventQueue>>,
+
 }
 
 impl<State: ComponentState> Component<State> {
@@ -44,7 +45,7 @@ impl<State: ComponentState> Component<State> {
             requested_size: OptionalSize::default(),
             styles: Styles::default(),
             state,
-            event_handlers: HashMap::new(),
+            component_functions: ComponentFunctions::default(),
             event_queue: Rc::new(RefCell::new(EventQueue::new())), 
         };
 
@@ -61,33 +62,42 @@ impl<State: ComponentState> Component<State> {
     pub fn setup_listeners(&mut self) {
         let component_id = self._id.clone();
 
-        // Get the global event loop proxy
-        if let Some(event_proxy) = get_event_loop_proxy() {
-            self.state.subscribe_to_property("content", move |event: &ComponentEvent| {
-                match event {
-                    ComponentEvent::StateChange(_) => { // Previous component_id was a placeholder
-                        event_proxy.send_event(ComponentEvent::StateChange(component_id.clone()))
-                            .expect("Failed to send event");
-                    }
-                }
-            });
+        let event_proxy_option = get_event_loop_proxy();
+        if event_proxy_option.is_none() {
+            println!("Event proxy is None");
+            return;
         }
+        let event_proxy = event_proxy_option.unwrap();
+        
+        self.state.subscribe_to_property("content", move |event: &ComponentEvent| {
+            match event {
+                ComponentEvent::StateChange(_) => { // Previous component_id was a placeholder
+                    event_proxy.send_event(ComponentEvent::StateChange(component_id.clone()))
+                        .expect("Failed to send event");
+                }
+            }
+        });
     }
 
     fn load_component_template(&mut self) {
         template_loader::load_component_template(self);
     }
 
+    // Setters
+    pub fn add_component_functions(&mut self, functions: ComponentFunctions<State>) {
+        self.component_functions = functions;
+    }
+
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
     where
         F: 'static + FnMut(&mut State),
     {
-        self.event_handlers.insert(event_name, Box::new(handler));
+        self.component_functions.event_handlers.insert(event_name, Box::new(handler));
     }
     
     pub fn add_event_handlers(&mut self, handlers: Vec<(&str, Box<dyn FnMut(&mut State)>)>) {
         for (event_name, handler) in handlers {
-            self.event_handlers.insert(event_name.to_string(), handler);
+            self.component_functions.event_handlers.insert(event_name.to_string(), handler);
         }
     }
 }
@@ -110,7 +120,7 @@ impl<State: ComponentState> Element for Component<State> {
         let event_handler_names = event_propagator::propagate_event(self, cursor_position, event_type);
         
         for handler_name in event_handler_names.iter() {
-            if let Some(handler) = self.event_handlers.get_mut(handler_name) {
+            if let Some(handler) = self.component_functions.event_handlers.get_mut(handler_name) {
                 handler(&mut self.state);
             }
         }
@@ -214,9 +224,4 @@ impl<State: ComponentState> Element for Component<State> {
             self.load_component_template();
         }
     }
-}
-
-pub struct EventHandler<F> {
-    pub event_name: String,
-    pub handler: F,
 }

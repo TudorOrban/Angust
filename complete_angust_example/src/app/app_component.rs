@@ -3,8 +3,13 @@
 use std::collections::HashMap;
 
 use angust::{
-    define_component_state, rendering::elements::component::{component::{Component, EventHandler}, component_factory_registry::ComponentFactory
-}};
+    define_component_state, 
+    rendering::elements::component::{
+        component::Component, 
+        component_factory_registry::ComponentFactory, 
+        component_functions::ComponentFunctions
+    }
+};
 
 
 define_component_state! {
@@ -47,10 +52,15 @@ impl AppComponent {
                 state_factory() 
             );
 
-            component.add_event_handlers(vec![
-                ("print_something", Box::new(|state: &mut AppComponentState| state.toggle_content())),
-                ("increment_count", Box::new(|state: &mut AppComponentState| state.increment_count()))
-            ]);
+            let component_functions: ComponentFunctions<AppComponentState> = ComponentFunctions::new(
+                vec![
+                    ("print_something", Box::new(|state: &mut AppComponentState| state.toggle_content())),
+                    ("increment_count", Box::new(|state: &mut AppComponentState| state.increment_count()))
+                ],
+                vec![],
+                vec![]
+            );
+            component.add_component_functions(component_functions);
 
             Box::new(component)
         }));
