@@ -2,7 +2,7 @@
 macro_rules! define_component_state {
     ($name:ident { $($field:ident: $type:ty),* $(,)? }) => {
         use $crate::rendering::elements::component::component_state::ComponentState;
-        use $crate::rendering::elements::component::reactivity::ReactiveField;
+        use $crate::rendering::elements::component::reactivity::{ReactiveField, ComponentEvent};
         use std::any::Any;
 
         #[derive(Debug)]
@@ -16,6 +16,7 @@ macro_rules! define_component_state {
                     $($field: ReactiveField::new($field),)*
                 }
             }
+            
         }
 
         impl ComponentState for $name {
@@ -43,6 +44,16 @@ macro_rules! define_component_state {
                 vec![
                     $( stringify!($field), )*
                 ]
+            }
+
+            fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
+            where
+                F: 'static + FnMut(ComponentEvent),
+            {
+                match property_name {
+                    $(stringify!($field) => self.$field.subscribe(callback),)*
+                    _ => {}
+                }
             }
         }
     };

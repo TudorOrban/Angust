@@ -9,7 +9,7 @@ use crate::rendering::{elements::{
     styles::Styles
 }, layout::effective_size_estimator};
 
-use super::{component_state::ComponentState, template_loader};
+use super::{component_state::ComponentState, reactivity::{Action, ActionQueue, ComponentEvent}, template_loader};
 
 pub struct Component<State: ComponentState> {
     _id: String,
@@ -25,6 +25,7 @@ pub struct Component<State: ComponentState> {
     // User-defined properties
     pub state: State,
     pub event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
+    pub action_queue: ActionQueue<State>,
 }
 
 impl<State: ComponentState> Component<State> {
@@ -41,9 +42,11 @@ impl<State: ComponentState> Component<State> {
             styles: Styles::default(),
             state,
             event_handlers: HashMap::new(),
+            action_queue: ActionQueue::new(),
         };
 
         component.initialize();
+        component.setup_listeners();
 
         component
     }
@@ -51,6 +54,26 @@ impl<State: ComponentState> Component<State> {
     fn initialize(&mut self) {
         self.load_component_template();
     }
+
+    
+    
+    fn setup_listeners(&mut self) {
+        // Move the action queue, no need to clone anything complex here
+        let action_queue = &mut self.action_queue;
+
+        // Subscribe to state changes
+        self.state.subscribe_to_property("content", move |event: &ComponentEvent| {
+            match event {
+                ComponentEvent::ReloadTemplate => {
+                    action_queue.push(Action::ReloadComponent(Box::new(|component| {
+                        component.load_component_template();
+                    })));
+                }
+                // Handle other events if needed
+            }
+        });
+    }
+
 
     fn load_component_template(&mut self) {
         template_loader::load_component_template(self);
