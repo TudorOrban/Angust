@@ -1,10 +1,10 @@
 use skia_safe::{gpu::gl::FramebufferInfo, Point};
-use winit::{application::ApplicationHandler, dpi::PhysicalSize, event::{ElementState, Event, KeyEvent, Modifiers, MouseButton, MouseScrollDelta, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}};
+use winit::{application::ApplicationHandler, dpi::PhysicalSize, event::{ElementState, KeyEvent, Modifiers, MouseButton, MouseScrollDelta, WindowEvent}, event_loop::{ActiveEventLoop, ControlFlow, EventLoop}};
 use gl_rs as gl;
 use glutin::{config::GlConfig, display::GetGlDisplay, prelude::GlDisplay, surface::GlSurface};
 use std::{ffi::CString, num::NonZeroU32};
 
-use crate::{parsing::{css::stylesheet_parser::{self, Stylesheet}, html::html_parser::{self, ParsingContext}}, rendering::{elements::{component::{self, no_state::NoState, reactivity::ComponentEvent}, element::EventType}, renderer::Renderer}, window::WindowingSystem};
+use crate::{parsing::{css::stylesheet_parser::{self, Stylesheet}, html::html_parser::{self, ParsingContext}}, rendering::{elements::{component::{no_state::NoState, reactivity::ComponentEvent}, element::EventType}, renderer::Renderer}, window::WindowingSystem};
 
 use super::{angust_configuration::AngustConfiguration, event_loop_proxy::set_event_loop_proxy, resource_loader::configuration_loader::load_angust_configuration, ui_initializer::load_resources};
 
@@ -219,7 +219,7 @@ impl<State> ApplicationHandler<ComponentEvent> for Application<State> {
 
     fn user_event(&mut self, _: &ActiveEventLoop, event: ComponentEvent) {
         match event {
-            ComponentEvent::ReloadTemplate(component_id) => {
+            ComponentEvent::StateChange(component_id) => {
                 self.renderer.react_to_state_change(component_id);
                 self.renderer.layout();
                 self.windowing_system.window.request_redraw();

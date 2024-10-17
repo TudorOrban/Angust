@@ -16,6 +16,7 @@ pub struct Component<State: ComponentState> {
     pub name: String,
     pub template_relative_path: String,
     pub content: Box<dyn Element>,
+
     position: Position,
     size: Size, 
     natural_size: Size,
@@ -25,6 +26,8 @@ pub struct Component<State: ComponentState> {
     // User-defined properties
     pub state: State,
     pub event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
+
+    // Reactivity
     pub event_queue: Rc<RefCell<EventQueue>>,
 }
 
@@ -62,8 +65,8 @@ impl<State: ComponentState> Component<State> {
         if let Some(event_proxy) = get_event_loop_proxy() {
             self.state.subscribe_to_property("content", move |event: &ComponentEvent| {
                 match event {
-                    ComponentEvent::ReloadTemplate(_) => { // Previous component_id was a placeholder
-                        event_proxy.send_event(ComponentEvent::ReloadTemplate(component_id.clone()))
+                    ComponentEvent::StateChange(_) => { // Previous component_id was a placeholder
+                        event_proxy.send_event(ComponentEvent::StateChange(component_id.clone()))
                             .expect("Failed to send event");
                     }
                 }
@@ -72,7 +75,6 @@ impl<State: ComponentState> Component<State> {
     }
 
     fn load_component_template(&mut self) {
-        println!("Loading component template: {}", self.template_relative_path);
         template_loader::load_component_template(self);
     }
 
@@ -82,12 +84,17 @@ impl<State: ComponentState> Component<State> {
     {
         self.event_handlers.insert(event_name, Box::new(handler));
     }
+    
+    pub fn add_event_handlers(&mut self, handlers: Vec<(&str, Box<dyn FnMut(&mut State)>)>) {
+        for (event_name, handler) in handlers {
+            self.event_handlers.insert(event_name.to_string(), handler);
+        }
+    }
 }
 
 impl<State: ComponentState> Element for Component<State> {
     
     fn render(&self, canvas: &skia_safe::Canvas) {
-        println!("Rendering component: {}", self.get_id());
         self.content.render(canvas);
     }
 
@@ -207,4 +214,9 @@ impl<State: ComponentState> Element for Component<State> {
             self.load_component_template();
         }
     }
+}
+
+pub struct EventHandler<F> {
+    pub event_name: String,
+    pub handler: F,
 }

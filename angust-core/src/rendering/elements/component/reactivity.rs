@@ -35,7 +35,7 @@ impl<T> ReactiveField<T> {
     pub fn set(&mut self, new_value: T) {
         self.value = new_value;
         // Notify listeners regardless of value changes
-        self.notify_listeners(&ComponentEvent::ReloadTemplate(String::from("placeholder_id")));
+        self.notify_listeners(&ComponentEvent::StateChange(String::from("placeholder_id")));
     }
 
     fn notify_listeners(&mut self, event: &ComponentEvent) {
@@ -64,7 +64,7 @@ impl<T> DerefMut for ReactiveField<T> {
 
 #[derive(Debug)]
 pub enum ComponentEvent {
-    ReloadTemplate(String),
+    StateChange(String),
 }
 
 pub struct EventQueue {

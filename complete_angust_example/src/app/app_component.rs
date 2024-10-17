@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use angust::{
-    define_component_state, rendering::elements::component::{component::Component, component_factory_registry::ComponentFactory
+    define_component_state, rendering::elements::component::{component::{Component, EventHandler}, component_factory_registry::ComponentFactory
 }};
 
 
@@ -13,7 +13,6 @@ define_component_state! {
         count: i32,
     }
 }
-
 
 impl AppComponentState {
     
@@ -29,7 +28,6 @@ impl AppComponentState {
         self.count.value += 1;
     }
 }
-
 
 pub struct AppComponent {
     component: Component<AppComponentState>,    
@@ -49,25 +47,13 @@ impl AppComponent {
                 state_factory() 
             );
 
-            component.add_event_handler(String::from("print_something"), |state| {
-                Self::print_something(state);
-            });
-            component.add_event_handler(String::from("increment_count"), |state| {
-                Self::increment_count(state);
-            });
-
+            component.add_event_handlers(vec![
+                ("print_something", Box::new(|state: &mut AppComponentState| state.toggle_content())),
+                ("increment_count", Box::new(|state: &mut AppComponentState| state.increment_count()))
+            ]);
 
             Box::new(component)
         }));
-    }
-
-    fn print_something(state: &mut AppComponentState) {
-        state.toggle_content();
-        println!("{}", state.content.value);
-    }
-
-    fn increment_count(state: &mut AppComponentState) {
-        state.increment_count();
     }
 }
     
