@@ -29,4 +29,8 @@ impl UIManager {
     pub fn layout(&mut self, allocated_position: Position, allocated_size: Size) {
         self.root_element.layout(allocated_position, allocated_size);
     }
+
+    pub fn react_to_state_change(&mut self, component_id: String) {
+        self.root_element.react_to_state_change(component_id);
+    }
 }

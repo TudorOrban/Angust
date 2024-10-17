@@ -40,7 +40,7 @@ impl Renderer {
 
     pub fn render_frame(&mut self, _gr_context: &mut DirectContext) {
         let canvas = self.surface.canvas();
-        canvas.clear(skia_safe::Color::WHITE);
+        canvas.clear(skia_safe::Color::TRANSPARENT);
 
         self.ui_manager.render(canvas);
     }
@@ -51,6 +51,10 @@ impl Renderer {
 
     pub fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
         self.ui_manager.propagate_event(cursor_position, event_type)
+    }
+
+    pub fn react_to_state_change(&mut self, component_id: String) {
+        self.ui_manager.react_to_state_change(component_id);
     }
     
     fn create_surface(

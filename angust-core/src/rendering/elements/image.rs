@@ -147,5 +147,7 @@ impl Element for Image {
         self.estimate_sizes();
         self.allocate_space(allocated_position, allocated_size);
     }
+
+    fn react_to_state_change(&mut self, component_id: String) {}
 }
 

@@ -197,4 +197,11 @@ impl Element for Container {
         self.estimate_sizes();
         self.allocate_space(allocated_position, allocated_size);
     }
+
+    // Reactivity
+    fn react_to_state_change(&mut self, component_id: String) {
+        for child in &mut self.children {
+            child.react_to_state_change(component_id.clone());
+        }
+    }
 }

@@ -218,7 +218,12 @@ impl<State> ApplicationHandler<ComponentEvent> for Application<State> {
     }
 
     fn user_event(&mut self, _: &ActiveEventLoop, event: ComponentEvent) {
-        // match event
-        println!("User event: {:?}", event);
+        match event {
+            ComponentEvent::ReloadTemplate(component_id) => {
+                self.renderer.react_to_state_change(component_id);
+                self.renderer.layout();
+                self.windowing_system.window.request_redraw();
+            },
+        }
     }
 }

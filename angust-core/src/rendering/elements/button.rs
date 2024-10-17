@@ -222,4 +222,16 @@ impl Element for Button {
         self.estimate_sizes();
         self.allocate_space(allocated_position, allocated_size);
     }
+
+    // Reactivity
+    fn react_to_state_change(&mut self, component_id: String) {
+        if let Some(child_container) = self.get_children_mut() {
+            if child_container.len() != 1 {
+                return;
+            }
+            if let Some(child_element) = child_container.get_mut(0) {
+                child_element.react_to_state_change(component_id);
+            }
+        }
+    }
 }

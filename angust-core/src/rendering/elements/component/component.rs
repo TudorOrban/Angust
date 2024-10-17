@@ -72,21 +72,8 @@ impl<State: ComponentState> Component<State> {
     }
 
     fn load_component_template(&mut self) {
+        println!("Loading component template: {}", self.template_relative_path);
         template_loader::load_component_template(self);
-    }
-
-    
-    pub fn process_events(&mut self) {
-        let events = self.event_queue.borrow_mut().drain();
-        for event in events {
-            match event {
-                ComponentEvent::ReloadTemplate(component_id) => {
-                    if component_id == self.get_id() {
-                        self.load_component_template();
-                    }
-                }
-            }
-        }
     }
 
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
@@ -100,6 +87,7 @@ impl<State: ComponentState> Component<State> {
 impl<State: ComponentState> Element for Component<State> {
     
     fn render(&self, canvas: &skia_safe::Canvas) {
+        println!("Rendering component: {}", self.get_id());
         self.content.render(canvas);
     }
 
@@ -192,6 +180,7 @@ impl<State: ComponentState> Element for Component<State> {
         return self.content.get_children_mut();
     }
 
+    // Layout system
     fn estimate_sizes(&mut self) {
         self.content.estimate_sizes();
         self.set_natural_size(self.content.get_natural_size());
@@ -210,5 +199,12 @@ impl<State: ComponentState> Element for Component<State> {
     fn layout(&mut self, allocated_position: Position, allocated_size: Size) {
         self.estimate_sizes();
         self.allocate_space(allocated_position, allocated_size);
+    }
+
+    // Reactivity
+    fn react_to_state_change(&mut self, component_id: String) {
+        if component_id == self.get_id() {
+            self.load_component_template();
+        }
     }
 }

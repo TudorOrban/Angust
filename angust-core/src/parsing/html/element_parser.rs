@@ -52,7 +52,7 @@ fn process_button_element<State : ComponentState>(
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
 
     let on_click_handler_name = directive_parser::parse_on_click_attribute(&attributes, context);
-    
+
     let mut button = Button::new(on_click_handler_name, None, Some(styles));
 
     let mut child_container = Container::new();

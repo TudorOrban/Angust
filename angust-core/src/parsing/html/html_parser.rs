@@ -66,6 +66,7 @@ fn process_text_element<State : ComponentState>(
             .unwrap_or_else(|_| trimmed_text.to_string()),
         None => trimmed_text.to_string(),
     };
+    println!("Final text: {}", final_text);
 
     let mut text_element = Text::new(final_text);
     if let Some(styles) = parent_styles {

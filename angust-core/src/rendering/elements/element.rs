@@ -37,6 +37,9 @@ pub trait Element {
     fn estimate_sizes(&mut self);
     fn allocate_space(&mut self, allocated_position: Position, allocated_size: Size);
     fn layout(&mut self, allocated_position: Position, allocated_size: Size);
+
+    // Reactivity
+    fn react_to_state_change(&mut self, component_id: String);
 }
 
 
