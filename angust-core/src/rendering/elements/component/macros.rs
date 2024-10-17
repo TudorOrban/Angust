@@ -4,7 +4,6 @@ macro_rules! define_component_state {
         use $crate::rendering::elements::component::component_state::ComponentState;
         use $crate::rendering::elements::component::reactivity::ReactiveField;
         use std::any::Any;
-        use std::sync::Arc;
 
         #[derive(Debug)]
         pub struct $name {
@@ -44,20 +43,6 @@ macro_rules! define_component_state {
                 vec![
                     $( stringify!($field), )*
                 ]
-            }
-
-            fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
-            where
-                F: Fn() + 'static,
-            {
-                match property_name {
-                    $(
-                        stringify!($field) => {
-                            self.$field.subscribe(callback);
-                        },
-                    )*
-                    _ => {},  // Do nothing if the property doesn't exist
-                }
             }
         }
     };
