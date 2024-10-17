@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use crate::rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
@@ -9,7 +9,7 @@ use crate::rendering::{elements::{
     styles::Styles
 }, layout::effective_size_estimator};
 
-use super::{component_state::ComponentState, reactivity::{Action, ActionQueue, ComponentEvent}, template_loader};
+use super::{component_state::ComponentState, reactivity::{ComponentEvent, EventQueue}, template_loader};
 
 pub struct Component<State: ComponentState> {
     _id: String,
@@ -25,7 +25,7 @@ pub struct Component<State: ComponentState> {
     // User-defined properties
     pub state: State,
     pub event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
-    pub action_queue: ActionQueue<State>,
+    pub event_queue: Rc<RefCell<EventQueue>>,
 }
 
 impl<State: ComponentState> Component<State> {
@@ -42,7 +42,7 @@ impl<State: ComponentState> Component<State> {
             styles: Styles::default(),
             state,
             event_handlers: HashMap::new(),
-            action_queue: ActionQueue::new(),
+            event_queue: Rc::new(RefCell::new(EventQueue::new())), 
         };
 
         component.initialize();
@@ -54,26 +54,18 @@ impl<State: ComponentState> Component<State> {
     fn initialize(&mut self) {
         self.load_component_template();
     }
-
-    
     
     fn setup_listeners(&mut self) {
-        // Move the action queue, no need to clone anything complex here
-        let action_queue = &mut self.action_queue;
+        let event_queue = self.event_queue.clone();
 
-        // Subscribe to state changes
         self.state.subscribe_to_property("content", move |event: &ComponentEvent| {
             match event {
                 ComponentEvent::ReloadTemplate => {
-                    action_queue.push(Action::ReloadComponent(Box::new(|component| {
-                        component.load_component_template();
-                    })));
+                    event_queue.borrow_mut().push(ComponentEvent::ReloadTemplate);
                 }
-                // Handle other events if needed
             }
         });
     }
-
 
     fn load_component_template(&mut self) {
         template_loader::load_component_template(self);

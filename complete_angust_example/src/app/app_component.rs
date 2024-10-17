@@ -18,15 +18,15 @@ define_component_state! {
 impl AppComponentState {
     
     pub fn toggle_content(&mut self) {
-        if *self.content == "Hello, App Component!" {
-            *self.content = "Hello, World!".to_string();
+        if self.content.value == "Hello, App Component!" {
+            self.content.value = "Hello, World!".to_string();
         } else {
-            *self.content = "Hello, App Component!".to_string();
+            self.content.value = "Hello, App Component!".to_string();
         }
     }
 
     pub fn increment_count(&mut self) {
-        *self.count += 1;
+        self.count.value += 1;
     }
 }
 
@@ -63,7 +63,7 @@ impl AppComponent {
 
     fn print_something(state: &mut AppComponentState) {
         state.toggle_content();
-        println!("{}", *state.content);
+        println!("{}", state.content.value);
     }
 
     fn increment_count(state: &mut AppComponentState) {

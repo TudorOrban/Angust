@@ -22,7 +22,7 @@ macro_rules! define_component_state {
         impl ComponentState for $name {
             fn get_property(&self, property_name: &str) -> Option<&dyn Any> {
                 match property_name {
-                    $(stringify!($field) => Some(&*self.$field as &dyn Any),)*
+                    $(stringify!($field) => Some(&self.$field.value as &dyn Any),)*  // Explicitly access the `value` field
                     _ => None,
                 }
             }
@@ -32,7 +32,7 @@ macro_rules! define_component_state {
                     $(
                         stringify!($field) => {
                             if let Ok(casted_value) = value.downcast::<$type>() {
-                                *self.$field = *casted_value;  // This will trigger listeners automatically
+                                self.$field.set_value(*casted_value);  // Use `set_value` to set the field and notify listeners
                             }
                         },
                     )*
@@ -48,7 +48,7 @@ macro_rules! define_component_state {
 
             fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
             where
-                F: 'static + FnMut(ComponentEvent),
+                F: 'static + FnMut(&ComponentEvent),
             {
                 match property_name {
                     $(stringify!($field) => self.$field.subscribe(callback),)*

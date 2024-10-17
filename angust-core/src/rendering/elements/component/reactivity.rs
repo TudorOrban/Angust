@@ -1,14 +1,9 @@
-use std::{collections::VecDeque, fmt::{Debug, Formatter}};
+use std::fmt::{Debug, Formatter};
 
-use super::{component::Component, component_state::ComponentState};
 
 pub struct ReactiveField<T> {
-    value: T,
+    pub value: T,
     listeners: Vec<Box<dyn FnMut(&ComponentEvent)>>,  
-}
-
-pub enum ComponentEvent {
-    ReloadTemplate,
 }
 
 impl<T> Debug for ReactiveField<T>
@@ -48,30 +43,26 @@ impl<T> ReactiveField<T> {
     }
 }
 
-pub enum Action<State: ComponentState> {
-    ReloadComponent(Box<dyn FnOnce(&mut Component<State>)>),
+pub enum ComponentEvent {
+    ReloadTemplate,
 }
 
-pub struct ActionQueue<State: ComponentState> {
-    queue: Vec<Action<State>>,
+pub struct EventQueue {
+    events: Vec<ComponentEvent>,  // Store events
 }
 
-impl<State: ComponentState> ActionQueue<State> {
+impl EventQueue {
     pub fn new() -> Self {
         Self {
-            queue: Vec::new(),
+            events: Vec::new(),
         }
     }
 
-    pub fn push(&mut self, action: Action<State>) {
-        self.queue.push(action);
+    pub fn push(&mut self, event: ComponentEvent) {
+        self.events.push(event);
     }
 
-    pub fn process(&mut self, component: &mut Component<State>) {
-        while let Some(action) = self.queue.pop() {
-            match action {
-                Action::ReloadComponent(mut f) => f(component),
-            }
-        }
+    pub fn drain(&mut self) -> Vec<ComponentEvent> {
+        std::mem::take(&mut self.events)
     }
 }
