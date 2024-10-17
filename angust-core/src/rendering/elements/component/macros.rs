@@ -27,12 +27,12 @@ macro_rules! define_component_state {
                 }
             }
 
-            fn set_property(&mut self, property_name: &str, value: Box<dyn Any>, component_id: String) {
+            fn set_property(&mut self, property_name: &str, value: Box<dyn Any>) {
                 match property_name {
                     $(
                         stringify!($field) => {
                             if let Ok(casted_value) = value.downcast::<$type>() {
-                                self.$field.set(*casted_value, component_id);
+                                self.$field.set(*casted_value);
                             }
                         },
                     )*

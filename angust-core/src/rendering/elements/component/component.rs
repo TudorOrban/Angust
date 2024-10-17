@@ -56,14 +56,13 @@ impl<State: ComponentState> Component<State> {
     }
     
     pub fn setup_listeners(&mut self) {
+        let component_id = self._id.clone();
+
         // Get the global event loop proxy
         if let Some(event_proxy) = get_event_loop_proxy() {
-            println!("Setting up listeners for component: {}", self.get_id());
             self.state.subscribe_to_property("content", move |event: &ComponentEvent| {
-                println!("Received event: {:?}", event);
                 match event {
-                    ComponentEvent::ReloadTemplate(component_id) => {
-                        // Send event using the global proxy
+                    ComponentEvent::ReloadTemplate(_) => { // Previous component_id was a placeholder
                         event_proxy.send_event(ComponentEvent::ReloadTemplate(component_id.clone()))
                             .expect("Failed to send event");
                     }

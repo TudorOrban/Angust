@@ -217,7 +217,7 @@ impl<State> ApplicationHandler<ComponentEvent> for Application<State> {
         event_loop.set_control_flow(ControlFlow::Wait);
     }
 
-    fn user_event(&mut self, event_loop: &ActiveEventLoop, event: ComponentEvent) {
+    fn user_event(&mut self, _: &ActiveEventLoop, event: ComponentEvent) {
         // match event
         println!("User event: {:?}", event);
     }

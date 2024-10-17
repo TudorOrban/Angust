@@ -32,10 +32,10 @@ impl<T> ReactiveField<T> {
     }
 
     // Set value and notify listeners
-    pub fn set(&mut self, new_value: T, component_id: String) {
+    pub fn set(&mut self, new_value: T) {
         self.value = new_value;
         // Notify listeners regardless of value changes
-        self.notify_listeners(&ComponentEvent::ReloadTemplate(component_id));
+        self.notify_listeners(&ComponentEvent::ReloadTemplate(String::from("placeholder_id")));
     }
 
     fn notify_listeners(&mut self, event: &ComponentEvent) {
