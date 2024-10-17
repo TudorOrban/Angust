@@ -6,3 +6,4 @@ pub mod reactivity;
 pub mod component_state;
 mod template_loader;
 pub mod no_state;
+mod component_updater;

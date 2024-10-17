@@ -45,6 +45,20 @@ macro_rules! define_component_state {
                     $( stringify!($field), )*
                 ]
             }
+
+            fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
+            where
+                F: Fn() + 'static,
+            {
+                match property_name {
+                    $(
+                        stringify!($field) => {
+                            self.$field.subscribe(callback);
+                        },
+                    )*
+                    _ => {},  // Do nothing if the property doesn't exist
+                }
+            }
         }
     };
 }

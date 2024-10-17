@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc, sync::Arc};
 
 use crate::rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
@@ -23,7 +23,7 @@ pub struct Component<State: ComponentState> {
     styles: Styles,
 
     // User-defined properties
-    pub state: State,
+    pub state: Rc<RefCell<State>>,
     pub event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
 }
 
@@ -33,22 +33,51 @@ impl<State: ComponentState> Component<State> {
         let mut component = Self {
             _id: id,
             name,
-            template_relative_path: template_relative_path,
+            template_relative_path,
             content: Box::new(Container::new()),
             position: Position::default(),
             size: Size::default(),
             natural_size: Size::default(),
             requested_size: OptionalSize::default(),
             styles: Styles::default(),
-            state,
+            state: Rc::new(RefCell::new(state)),
             event_handlers: HashMap::new(),
         };
+
+        // Initialize the component (load template, subscribe to state changes)
         component.initialize();
+
         component
     }
 
     fn initialize(&mut self) {
+        // Load the template
         template_loader::load_component_template(self);
+
+        // Subscribe to state changes
+        self.subscribe_to_state_changes();
+    }
+
+    fn subscribe_to_state_changes(&self) {  // Notice the removal of &mut self
+        let properties = self.state.borrow().get_all_properties();
+        let state_weak = Rc::downgrade(&self.state);  // Create a weak reference to avoid circular references
+
+        for property in properties {
+            let property_clone = property.to_string();
+            let state_clone = state_weak.clone();  // Clone the weak reference for each property
+
+            self.state.borrow_mut().subscribe_to_property(property, move || {
+                if let Some(state) = state_clone.upgrade() {  // Attempt to upgrade the weak reference
+                    state.borrow_mut().update_component(&property_clone);
+                }
+            });
+        }
+    }
+
+    fn update_component(&mut self, property_name: &str) {
+        // Perform update actions, such as recomputing layout or rerendering
+        println!("Property {} changed, updating component!", property_name);
+        // This method might trigger layout recomputation and rendering
     }
 
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
