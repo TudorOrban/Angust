@@ -7,8 +7,8 @@ use angust::{
     rendering::elements::component::{
         component::Component, 
         component_factory_registry::ComponentFactory, 
-        component_functions::ComponentFunctions
-    }
+        functions::component_functions::ComponentFunctions
+    }, wrap_fn
 };
 
 
@@ -16,6 +16,7 @@ define_component_state! {
     AppComponentState {
         content: String,
         count: i32,
+        active_tab: String
     }
 }
 
@@ -32,6 +33,14 @@ impl AppComponentState {
     pub fn increment_count(&mut self) {
         self.count.value += 1;
     }
+    
+    pub fn is_active_tab(&self, tab_name: &str, is_active: bool) -> bool {
+        if !is_active {  
+            return false;
+        }
+
+        self.active_tab.value == tab_name
+    }
 }
 
 pub struct AppComponent {
@@ -42,7 +51,8 @@ impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
         let state_factory = || AppComponentState::new(
             String::from("Hello, App Component!"),
-            0
+            0,
+            String::from("app-component")
         );
 
         registry.insert("app-component".to_string(), Box::new(move || {
@@ -58,12 +68,16 @@ impl AppComponent {
                     ("increment_count", Box::new(|state: &mut AppComponentState| state.increment_count()))
                 ],
                 vec![],
-                vec![]
+                vec![],
+                vec![
+                    ("is_active_tab", Box::new(wrap_fn!(AppComponentState::is_active_tab)))
+                ]
             );
             component.add_component_functions(component_functions);
 
             Box::new(component)
         }));
     }
+
 }
     

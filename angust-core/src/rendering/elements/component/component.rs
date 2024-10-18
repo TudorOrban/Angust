@@ -9,7 +9,7 @@ use crate::{application::event_loop_proxy::get_event_loop_proxy, rendering::{ele
     styles::Styles
 }, layout::effective_size_estimator}};
 
-use super::{component_functions::ComponentFunctions, component_state::ComponentState, reactivity::{ComponentEvent, EventQueue}, template_loader};
+use super::{functions::component_functions::ComponentFunctions, component_state::ComponentState, reactivity::{ComponentEvent, EventQueue}, template_loader};
 
 pub struct Component<State: ComponentState> {
     _id: String,
