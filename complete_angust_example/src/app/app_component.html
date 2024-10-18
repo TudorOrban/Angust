@@ -19,7 +19,7 @@
         </div>
     </button>
 
-    <div @if="count == 1.0" style="width: 200px; height: 200px; background-color: rgb(0, 0, 255);">
+    <div @if="count != get_number_plus_one(count) - 1" style="width: 200px; height: 200px; background-color: rgb(0, 0, 255);">
 
     </div>
 

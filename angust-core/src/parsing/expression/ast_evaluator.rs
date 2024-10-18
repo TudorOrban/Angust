@@ -37,6 +37,7 @@ fn evaluate_component_function<State: ComponentState>(
     let arg_values: Result<Vec<Box<dyn Any>>, String> = args.iter()
         .map(|arg| evaluate_ast(arg, state, functions))
         .collect();
+
     match functions.dynamic_params_functions.get(name) {
         Some(func) => Ok(func(state, arg_values?)),
         None => Err(format!("Function {} not found in component functions", name)),

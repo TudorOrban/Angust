@@ -77,7 +77,7 @@ pub fn parse_if_expression<State: ComponentState>(
             let state = context.component_state.unwrap();
             let functions = context.component_functions.unwrap();
             let evaluation_result = ast_evaluator::evaluate_ast::<State>(&ast, state, functions);
-            
+
             if let Ok(result) = evaluation_result {
                 if let Some(is_if_true) = result.downcast_ref::<bool>() {
                     println!("If expression evaluated to: {}", is_if_true);

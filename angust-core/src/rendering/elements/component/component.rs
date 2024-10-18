@@ -37,7 +37,7 @@ pub struct Component<State: ComponentState> {
 
 impl<State: ComponentState> Component<State> {
     pub fn new(name: String, template_relative_path: String, state: State) -> Self {
-        let mut component = Self {
+        Self {
             _id: IDGenerator::get(),
             name,
             template_relative_path,
@@ -51,14 +51,11 @@ impl<State: ComponentState> Component<State> {
             component_functions: ComponentFunctions::default(),
             event_queue: Rc::new(RefCell::new(EventQueue::new())), 
             template_expressions_asts: vec![]
-        };
-
-        component.initialize();
-
-        component
+        }
     }
 
-    fn initialize(&mut self) {
+    pub fn initialize(&mut self) {
+        self.setup_listeners();
         self.load_component_template();
     }
 
@@ -66,7 +63,7 @@ impl<State: ComponentState> Component<State> {
         template_loader::load_component_template(self);
     }
 
-    pub fn setup_listeners(&mut self) {
+    fn setup_listeners(&mut self) {
         let component_id = self._id.clone();
 
         let event_proxy_option = get_event_loop_proxy();
@@ -97,6 +94,7 @@ impl<State: ComponentState> Component<State> {
     // Setters
     pub fn add_component_functions(&mut self, functions: ComponentFunctions<State>) {
         self.component_functions = functions;
+
     }
 
     pub fn add_event_handler<F>(&mut self, event_name: String, handler: F)
@@ -110,6 +108,7 @@ impl<State: ComponentState> Component<State> {
         for (event_name, handler) in handlers {
             self.component_functions.event_handlers.insert(event_name.to_string(), handler);
         }
+
     }
 }
 
@@ -232,7 +231,7 @@ impl<State: ComponentState> Element for Component<State> {
     // Reactivity
     fn react_to_state_change(&mut self, component_id: String) {
         if component_id == self.get_id() {
-            self.load_component_template();
+            self.load_component_template(); // Naive approach; to be replaced later
         }
     }
 }

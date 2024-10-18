@@ -66,16 +66,10 @@ fn parse_pair_to_ast(pair: Pair<Rule>) -> ASTNode {
         Rule::identifier => {
             ASTNode::Identifier(pair.as_str().to_string())
         },
-        Rule::function_call => {
-            let mut inner_pairs = pair.into_inner();
-            let name = inner_pairs.next().unwrap().as_str().to_string();
-            let args = inner_pairs.map(parse_pair_to_ast).collect();
-            ASTNode::FunctionCall(name, args)
-        },
-        Rule::logical_expression | Rule::comparison_expression | Rule::additive_expression | Rule::multiplicative_expression => {
-            parse_operation(pair)
-        },
-        
+        Rule::function_call => 
+            parse_function_call(pair),
+        Rule::logical_expression | Rule::comparison_expression | Rule::additive_expression | Rule::multiplicative_expression => 
+            parse_operation(pair),
         Rule::primary => {
             let inner = pair.into_inner().next().unwrap();
             parse_pair_to_ast(inner)
@@ -91,6 +85,25 @@ fn parse_expression_content(pair: Pair<Rule>) -> ASTNode {
     } else {
         unreachable!("Expression rule must contain inner content")
     }
+}
+
+fn parse_function_call(
+    pair: Pair<Rule>,
+) -> ASTNode {
+    let mut inner_pairs = pair.into_inner();
+    let function_name = inner_pairs.next().unwrap().as_str().to_string();
+
+    let args = if let Some(arg_list_pair) = inner_pairs.next() {
+        if arg_list_pair.as_rule() == Rule::expression_list {
+            arg_list_pair.into_inner().map(parse_pair_to_ast).collect()
+        } else {
+            vec![parse_pair_to_ast(arg_list_pair)]
+        }
+    } else {
+        vec![]
+    };
+
+    ASTNode::FunctionCall(function_name, args)
 }
 
 fn parse_operation(pair: Pair<Rule>) -> ASTNode {

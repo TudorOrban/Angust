@@ -33,8 +33,6 @@ impl AppComponentState {
     pub fn increment_count(&mut self) {
         let current_value = self.count.value + 1.0;
         self.count.set(current_value);
-        println!("Incrementing count: {}", self.count.value);
-
     }
     
     pub fn is_active_tab(&self, tab_name: String, is_active: bool, some: bool) -> bool {
@@ -47,6 +45,10 @@ impl AppComponentState {
 
     pub fn get_something(&self, some_param: String) -> String {
         format!("Something: {}", some_param)
+    }
+
+    pub fn get_number_plus_one(&self, number: f64) -> f64 {
+        number + 1.0
     }
 }
 
@@ -78,12 +80,13 @@ impl AppComponent {
                 vec![],
                 vec![
                     ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool, bool)),
-                    ("get_something", wrap_fn!(AppComponentState, AppComponentState::get_something, String))
+                    ("get_something", wrap_fn!(AppComponentState, AppComponentState::get_something, String)),
+                    ("get_number_plus_one", wrap_fn!(AppComponentState, AppComponentState::get_number_plus_one, f64))
                 ]
             );
             component.add_component_functions(component_functions);
 
-            component.setup_listeners();
+            component.initialize();
 
             Box::new(component)
         }));
