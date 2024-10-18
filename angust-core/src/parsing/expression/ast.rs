@@ -94,4 +94,3 @@ fn parse_operation(pair: Pair<Rule>) -> ASTNode {
     }
     left
 }
-

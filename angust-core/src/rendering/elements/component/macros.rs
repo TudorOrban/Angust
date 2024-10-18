@@ -20,9 +20,9 @@ macro_rules! define_component_state {
         }
 
         impl ComponentState for $name {
-            fn get_property(&self, property_name: &str) -> Option<&dyn Any> {
+            fn get_property(&self, property_name: &str) -> Option<Box<dyn Any>> {
                 match property_name {
-                    $(stringify!($field) => Some(&self.$field.value as &dyn Any),)*
+                    $(stringify!($field) => Some(Box::new(self.$field.value.clone())),)*
                     _ => None,
                 }
             }
