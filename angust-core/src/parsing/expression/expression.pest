@@ -23,6 +23,7 @@ additive_expression = {
 
 multiplicative_expression = {
     primary
+    | "(" ~ expression ~ ")" 
 }
 
 primary = {

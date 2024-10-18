@@ -1,5 +1,4 @@
 use super::expression_parser::{parse_expression, Rule};
-use itertools::Itertools;
 use pest::iterators::Pair;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -51,25 +50,17 @@ fn str_to_operator(op_str: &str) -> Operator {
 
 pub fn parse_string_to_ast(input: String) -> Result<ASTNode, pest::error::Error<Rule>> {
     let mut pairs = parse_expression(&input)?;
-    println!("Pairs: {:?}", pairs);
     let root_pair = pairs.next().unwrap(); 
-    if let Some(second_pair) = pairs.peek() {
-        println!("Second pair detected, indicating incomplete parsing at the top level: {:?}", second_pair);
-    }
     let ast = parse_pair_to_ast(root_pair);
     Ok(ast)
 }
 
-
 fn parse_pair_to_ast(pair: Pair<Rule>) -> ASTNode {
-    println!("Processing pair: {:?}, Content: '{}'", pair.as_rule(), pair.as_span().as_str());
-
     match pair.as_rule() {
         Rule::expression => {
             parse_expression_content(pair)
         },
         Rule::number => {
-            println!("Number: {}", pair.as_str());
             ASTNode::Number(pair.as_str().parse::<f64>().unwrap())
         },
         Rule::identifier => {
@@ -83,6 +74,11 @@ fn parse_pair_to_ast(pair: Pair<Rule>) -> ASTNode {
         },
         Rule::logical_expression | Rule::comparison_expression | Rule::additive_expression | Rule::multiplicative_expression => {
             parse_operation(pair)
+        },
+        
+        Rule::primary => {
+            let inner = pair.into_inner().next().unwrap();
+            parse_pair_to_ast(inner)
         },
         _ => unreachable!("Unexpected rule: {:?}", pair.as_rule()),
     }
@@ -108,26 +104,36 @@ fn parse_operation(pair: Pair<Rule>) -> ASTNode {
 
         if let Some(right_pair) = inner_pairs.next() {
             let right = parse_pair_to_ast(right_pair);
+
             current = match pair.as_rule() {
-                Rule::comparison_expression => ASTNode::Comparison {
-                    operator,
-                    left: Box::new(current),
-                    right: Box::new(right),
+                Rule::comparison_expression => {
+                    ASTNode::Comparison {
+                        operator,
+                        left: Box::new(current),
+                        right: Box::new(right),
+                    }
                 },
-                Rule::logical_expression => ASTNode::LogicalOperation {
-                    operator,
-                    left: Box::new(current),
-                    right: Box::new(right),
+                Rule::logical_expression => {
+                    ASTNode::LogicalOperation {
+                        operator,
+                        left: Box::new(current),
+                        right: Box::new(right),
+                    }
                 },
-                _ => ASTNode::BinaryOperation {
-                    operator,
-                    left: Box::new(current),
-                    right: Box::new(right),
+                Rule::additive_expression | Rule::multiplicative_expression => {
+                    ASTNode::BinaryOperation {
+                        operator,
+                        left: Box::new(current),
+                        right: Box::new(right),
+                    }
                 },
+                _ => unreachable!("Unexpected rule: {:?}", pair.as_rule()),
             };
         } else {
             break;
         }
     }
+
     current
 }
+
