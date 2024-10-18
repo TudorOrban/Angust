@@ -96,6 +96,7 @@ dependencies = [
  "kuchiki",
  "lazy_static",
  "once_cell",
+ "paste",
  "raw-window-handle",
  "regex",
  "serde",

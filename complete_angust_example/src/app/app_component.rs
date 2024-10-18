@@ -34,7 +34,7 @@ impl AppComponentState {
         self.count.value += 1;
     }
     
-    pub fn is_active_tab(&self, tab_name: &str, is_active: bool) -> bool {
+    pub fn is_active_tab(&self, tab_name: String, is_active: bool, some: bool) -> bool {
         if !is_active {  
             return false;
         }
@@ -70,7 +70,7 @@ impl AppComponent {
                 vec![],
                 vec![],
                 vec![
-                    ("is_active_tab", Box::new(wrap_fn!(AppComponentState::is_active_tab)))
+                    ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool, bool))
                 ]
             );
             component.add_component_functions(component_functions);
