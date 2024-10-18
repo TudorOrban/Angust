@@ -1,0 +1,17 @@
+
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+number = @{ "-"? ~ ('0'..'9')+ }
+identifier = @{ ('a'..'z' | 'A'..'Z') ~ ('a'..'z' | 'A'..'Z' | '0'..'9' | "_")* }
+operator = _{ "+" | "-" | "*" | "/" }
+comparison_operator = _{ "==" | "!=" | "<" | ">" | "<=" | ">=" }
+logical_operator = _{ "&&" | "||" }
+
+expression = _{ logical_expression }
+logical_expression = _{ comparison_expression ~ (logical_operator ~ comparison_expression)* }
+comparison_expression = _{ additive_expression ~ (comparison_operator ~ additive_expression)* }
+additive_expression = _{ multiplicative_expression ~ (operator ~ multiplicative_expression)* }
+multiplicative_expression = _{ primary ~ (operator ~ primary)* }
+
+primary = _{ number | function_call | identifier }
+function_call = _{ identifier ~ "(" ~ expression_list? ~ ")" }
+expression_list = _{ expression ~ ("," ~ expression)* }

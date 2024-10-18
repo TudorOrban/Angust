@@ -1,5 +1,4 @@
 
-use std::any::Any;
 
 #[macro_export]
 macro_rules! wrap_fn {
@@ -17,8 +16,7 @@ macro_rules! wrap_fn {
                     $(
                         *arg_iter.next().expect("Missing argument")
                             .downcast::<$t>()
-                            .expect("Type mismatch in argument downcasting")
-                            .into_inner(),
+                            .expect("Type mismatch in argument downcasting"),
                     )+
                 )
             };

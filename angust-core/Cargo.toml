@@ -12,20 +12,18 @@ winit = "0.30.2"
 glutin = "0.32.0"
 glutin-winit = "0.5.0"
 raw-window-handle = "0.6.0"
-
 gl-rs = { version = "0.14.0", package = "gl" }
 skia-safe = { version = "0.78.2", features = ["gl"] }
 
 lazy_static = "1.4"
+once_cell = "1.20.2"
 
 kuchiki = "0.8"
+pest = "2.7.14"
+pest_derive = "2.7.14"
+itertools = "0.13.0"
 
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.128"
 image = "0.25"
-
 regex = "1.11.0"
-
-once_cell = "1.20.2"
-
-paste = "1.0.15"

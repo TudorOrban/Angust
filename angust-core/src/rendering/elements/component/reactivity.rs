@@ -31,10 +31,8 @@ impl<T> ReactiveField<T> {
         self.listeners.push(Box::new(callback));
     }
 
-    // Set value and notify listeners
     pub fn set(&mut self, new_value: T) {
         self.value = new_value;
-        // Notify listeners regardless of value changes
         self.notify_listeners(&ComponentEvent::StateChange(String::from("placeholder_id")));
     }
 
@@ -46,7 +44,6 @@ impl<T> ReactiveField<T> {
 }
 
 
-// Implement Deref to get a reference to the value
 impl<T> Deref for ReactiveField<T> {
     type Target = T;
 
@@ -55,7 +52,6 @@ impl<T> Deref for ReactiveField<T> {
     }
 }
 
-// Implement DerefMut to allow mutable access to the value
 impl<T> DerefMut for ReactiveField<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.value
@@ -68,7 +64,7 @@ pub enum ComponentEvent {
 }
 
 pub struct EventQueue {
-    events: Vec<ComponentEvent>,  // Store events
+    events: Vec<ComponentEvent>,
 }
 
 impl EventQueue {

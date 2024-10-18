@@ -41,6 +41,10 @@ impl AppComponentState {
 
         self.active_tab.value == tab_name
     }
+
+    pub fn get_something(&self, some_param: String) -> String {
+        format!("Something: {}", some_param)
+    }
 }
 
 pub struct AppComponent {
@@ -70,7 +74,8 @@ impl AppComponent {
                 vec![],
                 vec![],
                 vec![
-                    ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool, bool))
+                    ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool, bool)),
+                    ("get_something", wrap_fn!(AppComponentState, AppComponentState::get_something, String))
                 ]
             );
             component.add_component_functions(component_functions);
