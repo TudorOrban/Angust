@@ -1,6 +1,5 @@
 use kuchiki::NodeRef;
 
-use crate::parsing::expression::ast;
 use crate::{parsing::css::css_parser, rendering::elements::component::component_state::ComponentState};
 use crate::rendering::elements::button::Button;
 use crate::rendering::elements::component::component_factory_registry::create_component;
@@ -36,14 +35,10 @@ fn process_div_element<State : ComponentState>(
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
     container.set_styles(styles);
 
-    let if_expression_option = directive_parser::parse_if_attribute::<State>(&attributes);
-    if let Some(if_expression) = if_expression_option {
-        println!("If expression: {}", if_expression);
-        let ast_result = ast::parse_string_to_ast(if_expression);
-        println!("AST: {:?}", ast_result);
-        if let Ok(ast) = ast_result {
-            ParsingContext::add_ast(context, ast);
-        }
+    let should_add_to_dom = directive_parser::parse_if_expression(context, &attributes);
+    if should_add_to_dom.is_err() || !should_add_to_dom.unwrap() {
+        println!("Skipping div element");
+        return Box::new(container)
     }
 
     node.children()

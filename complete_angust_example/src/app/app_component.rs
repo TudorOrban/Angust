@@ -15,7 +15,7 @@ use angust::{
 define_component_state! {
     AppComponentState {
         content: String,
-        count: i32,
+        count: f64,
         active_tab: String
     }
 }
@@ -31,7 +31,8 @@ impl AppComponentState {
     }
 
     pub fn increment_count(&mut self) {
-        self.count.value += 1;
+        println!("Incrementing count: {}", self.count.value);
+        self.count.set(self.count.value + 1.0);
     }
     
     pub fn is_active_tab(&self, tab_name: String, is_active: bool, some: bool) -> bool {
@@ -55,7 +56,7 @@ impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
         let state_factory = || AppComponentState::new(
             String::from("Hello, App Component!"),
-            0,
+            0.0,
             String::from("app-component")
         );
 

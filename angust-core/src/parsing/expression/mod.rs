@@ -1,3 +1,3 @@
 mod expression_parser;
 pub mod ast;
-mod ast_evaluator;
+pub mod ast_evaluator;

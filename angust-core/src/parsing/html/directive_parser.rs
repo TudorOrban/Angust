@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::rendering::elements::component::component_state::ComponentState;
+use crate::{parsing::expression::{ast, ast_evaluator}, rendering::elements::component::component_state::ComponentState};
 
 use super::html_parser::ParsingContext;
 
@@ -57,4 +57,36 @@ pub fn parse_state_placeholder<State: ComponentState>(
     }
 
     Ok(result)
+}
+
+pub fn parse_if_expression<State: ComponentState>(
+    context: &mut ParsingContext<State>,
+    attributes: &kuchiki::Attributes,
+) -> Result<bool, String> {
+    let if_expression_option = parse_if_attribute::<State>(&attributes);
+    if let Some(if_expression) = if_expression_option {
+        let ast_result = ast::parse_string_to_ast(if_expression);
+        if let Ok(ast) = ast_result {
+            ParsingContext::add_ast(context, ast.clone());
+
+            let state = context.component_state.unwrap();
+            let functions = context.component_functions.unwrap();
+            let evaluation_result = ast_evaluator::evaluate_ast::<State>(&ast, state, functions);
+            
+            if let Ok(result) = evaluation_result {
+                if let Some(is_if_true) = result.downcast_ref::<bool>() {
+                    println!("If expression evaluated to: {}", is_if_true);
+                    return Ok(*is_if_true);
+                } else {
+                    return Err("If expression did not evaluate to a boolean".to_string());
+                }
+            } else {
+                return Err("Failed to evaluate if expression".to_string());
+            }
+        } else {
+            return Err("Failed to parse if expression".to_string());
+        }
+    } else {
+        return Ok(true);
+    }
 }

@@ -9,8 +9,19 @@
         </div>
     </button>
 
-    <div @if="count == 0 + count * (count - content)" style="width: 200px; height: 200px; background-color: rgb(0, 0, 255);">
+    {{ count }}
+
+    
+    <button style="width: 400px; height: 200px; background-color: rgb(255, 0, 0);" @onclick="increment_count">
+
+        <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
+
+        </div>
+    </button>
+
+    <div @if="count == 1.0" style="width: 200px; height: 200px; background-color: rgb(0, 0, 255);">
 
     </div>
+
 
 </div>

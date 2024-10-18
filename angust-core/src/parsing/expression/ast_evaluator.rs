@@ -4,7 +4,6 @@ use crate::rendering::elements::component::{component_state::ComponentState, fun
 
 use super::ast::{ASTNode, Operator};
 
-#[allow(dead_code)]
 pub fn evaluate_ast<State: ComponentState>(
     node: &ASTNode,
     state: &State,
@@ -54,7 +53,6 @@ fn evaluate_binary_operation<State: ComponentState>(
     let left_val = evaluate_ast(left, state, functions)?;
     let right_val = evaluate_ast(right, state, functions)?;
 
-    // Convert Box<dyn Any> to f64 as needed, implement similar for each supported type
     let left_float = *left_val.downcast::<f64>().map_err(|_| "Type mismatch")?;
     let right_float = *right_val.downcast::<f64>().map_err(|_| "Type mismatch")?;
 
