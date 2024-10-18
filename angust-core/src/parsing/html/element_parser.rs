@@ -32,14 +32,18 @@ fn process_div_element<State : ComponentState>(
 ) -> Box<dyn Element> {
     let mut container = Container::new();
     let attributes = elem_data.attributes.borrow();
-    let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
-    container.set_styles(styles);
 
     let should_add_to_dom = directive_parser::parse_if_expression(context, &attributes);
-    if should_add_to_dom.is_err() || !should_add_to_dom.unwrap() {
-        println!("Skipping div element");
+    if should_add_to_dom.is_err() {
+        println!("Error parsing @if directive: {:?}", should_add_to_dom.err());
+        return Box::new(container) // TODO: Report error
+    }
+    if !should_add_to_dom.unwrap() {
         return Box::new(container)
     }
+
+    let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
+    container.set_styles(styles);
 
     node.children()
         .filter_map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(&styles), context))

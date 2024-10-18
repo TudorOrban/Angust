@@ -54,7 +54,6 @@ impl<State: ComponentState> Component<State> {
         };
 
         component.initialize();
-        component.setup_listeners();
 
         component
     }
@@ -77,14 +76,22 @@ impl<State: ComponentState> Component<State> {
         }
         let event_proxy = event_proxy_option.unwrap();
         
-        self.state.subscribe_to_property("content", move |event: &ComponentEvent| {
-            match event {
-                ComponentEvent::StateChange(_) => { // Previous component_id was a placeholder
-                    event_proxy.send_event(ComponentEvent::StateChange(component_id.clone()))
-                        .expect("Failed to send event");
+        let all_properties: Vec<String> = self.state.get_all_properties().into_iter().map(|s| s.to_string()).collect();
+    
+        for property_name in all_properties.iter() {
+            let property_name_clone = property_name.clone(); 
+            let component_id_clone = component_id.clone(); 
+            let event_proxy_clone = event_proxy.clone();
+
+            self.state.subscribe_to_property(&property_name_clone, move |event: &ComponentEvent| {
+                match event {
+                    ComponentEvent::StateChange(_) => {
+                        event_proxy_clone.send_event(ComponentEvent::StateChange(component_id_clone.clone()))
+                            .expect("Failed to send event");
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     // Setters

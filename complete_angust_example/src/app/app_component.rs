@@ -31,8 +31,10 @@ impl AppComponentState {
     }
 
     pub fn increment_count(&mut self) {
+        let current_value = self.count.value + 1.0;
+        self.count.set(current_value);
         println!("Incrementing count: {}", self.count.value);
-        self.count.set(self.count.value + 1.0);
+
     }
     
     pub fn is_active_tab(&self, tab_name: String, is_active: bool, some: bool) -> bool {
@@ -80,6 +82,8 @@ impl AppComponent {
                 ]
             );
             component.add_component_functions(component_functions);
+
+            component.setup_listeners();
 
             Box::new(component)
         }));

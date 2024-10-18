@@ -48,12 +48,17 @@ pub fn parse_state_placeholder<State: ComponentState>(
             None => return Err(format!("Property '{}' not found in state", key)),
         };
 
-        let value = match property.downcast_ref::<String>() {
-            Some(val) => val,
-            None => return Err(format!("Property '{}' is not a String type", key)),
+        let value = if let Some(val) = property.downcast_ref::<String>() {
+            val.clone()
+        } else if let Some(val) = property.downcast_ref::<f64>() {
+            val.to_string()
+        } else if let Some(val) = property.downcast_ref::<i32>() {
+            val.to_string()
+        } else {
+            return Err(format!("Property '{}' is of an unsupported type", key));
         };
 
-        result = result.replace(matched_text.as_str(), value);
+        result = result.replace(matched_text.as_str(), &value);
     }
 
     Ok(result)

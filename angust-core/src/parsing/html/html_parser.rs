@@ -65,7 +65,10 @@ fn process_text_element<State : ComponentState>(
     // Apply state placeholders
     let final_text = match context.component_state {
         Some(state) => directive_parser::parse_state_placeholder(trimmed_text, state)
-            .unwrap_or_else(|_| trimmed_text.to_string()),
+            .unwrap_or_else(|er| {
+                println!("Error parsing state placeholders in text element: {}", er);
+                trimmed_text.to_string()
+            }),
         None => trimmed_text.to_string(),
     };
 
