@@ -1,5 +1,6 @@
 use kuchiki::NodeRef;
 
+use crate::parsing::expression::ast;
 use crate::{parsing::css::css_parser, rendering::elements::component::component_state::ComponentState};
 use crate::rendering::elements::button::Button;
 use crate::rendering::elements::component::component_factory_registry::create_component;
@@ -14,7 +15,7 @@ pub fn dispatch_element_processing<State : ComponentState>(
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &mut ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     match elem_data.name.local.as_ref() {
         "div" => Some(process_div_element::<State>(elem_data, node, parent_styles, context)),
@@ -28,12 +29,22 @@ fn process_div_element<State : ComponentState>(
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &mut ParsingContext<State>,
 ) -> Box<dyn Element> {
     let mut container = Container::new();
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
     container.set_styles(styles);
+
+    let if_expression_option = directive_parser::parse_if_attribute::<State>(&attributes);
+    if let Some(if_expression) = if_expression_option {
+        println!("If expression: {}", if_expression);
+        let ast_result = ast::parse_string_to_ast(if_expression);
+        println!("AST: {:?}", ast_result);
+        if let Ok(ast) = ast_result {
+            ParsingContext::add_ast(context, ast);
+        }
+    }
 
     node.children()
         .filter_map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(&styles), context))
@@ -46,7 +57,7 @@ fn process_button_element<State : ComponentState>(
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &mut ParsingContext<State>,
 ) -> Box<dyn Element> {
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
@@ -72,7 +83,7 @@ fn process_image_element<State : ComponentState>(
     elem_data: &kuchiki::ElementData, 
     _: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &mut ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     let attributes = elem_data.attributes.borrow();
     let src = attributes.get("src").unwrap_or_default();
@@ -90,7 +101,7 @@ fn process_custom_component<State : ComponentState>(
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &mut ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     let skippable_elements = vec!["!DOCTYPE", "html", "head", "meta", "body", "title", "h1"]; // To be implemented in the future
     if skippable_elements.contains(&component_name) {

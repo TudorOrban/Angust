@@ -6,7 +6,9 @@ use kuchiki::traits::TendrilSink;
 use crate::application::angust_configuration::AngustConfiguration;
 use crate::parsing::css::css_parser::merge_styles;
 use crate::parsing::css::stylesheet_parser::Stylesheet;
+use crate::parsing::expression::ast::ASTNode;
 use crate::rendering::elements::component::component_state::ComponentState;
+use crate::rendering::elements::component::functions::component_functions::ComponentFunctions;
 use crate::rendering::elements::element::Element;
 use crate::rendering::elements::styles::Styles;
 use crate::rendering::elements::text::Text;
@@ -25,7 +27,7 @@ pub fn parse_html_content(html: &str) -> NodeRef {
 pub fn map_dom_to_elements<State : ComponentState>(
     dom: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &mut ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     match dom.data() {
         NodeData::Document(_) | NodeData::Doctype(_) => process_document_nodes::<State>(dom, parent_styles, context),
@@ -42,7 +44,7 @@ pub fn map_dom_to_elements<State : ComponentState>(
 fn process_document_nodes<State : ComponentState>(
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &mut ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     node.children()
         .filter_map(|child| map_dom_to_elements::<State>(&child, parent_styles, context))
@@ -53,7 +55,7 @@ fn process_document_nodes<State : ComponentState>(
 fn process_text_element<State : ComponentState>(
     text: &str,
     parent_styles: Option<&Styles>,
-    context: &ParsingContext<State>,
+    context: &mut ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     let trimmed_text = text.trim();
     if trimmed_text.is_empty() {
@@ -79,7 +81,7 @@ fn process_text_element<State : ComponentState>(
 pub fn general_traversal<State : ComponentState>(
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
-    context: &ParsingContext<State>,
+    context: &mut ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     let mut root_element: Option<Box<dyn Element>> = None;
 
@@ -100,6 +102,8 @@ pub struct ParsingContext<'a, State : ComponentState> {
     pub angust_config: Option<AngustConfiguration>,
     pub stylesheet: Option<Stylesheet>,
     pub component_state: Option<&'a State>,
+    pub component_functions: Option<&'a ComponentFunctions<State>>,
+    pub template_expressions_asts: Option<&'a mut Vec<ASTNode>>,
 }
 
 impl<'a, State : ComponentState> Default for ParsingContext<'a, State> {
@@ -108,6 +112,8 @@ impl<'a, State : ComponentState> Default for ParsingContext<'a, State> {
             angust_config: None,
             stylesheet: None,
             component_state: None,
+            component_functions: None,
+            template_expressions_asts: None,
         }
     }
 }
@@ -117,11 +123,21 @@ impl<'a, State : ComponentState> ParsingContext<'a, State> {
         angust_config: Option<AngustConfiguration>,
         stylesheet: Option<Stylesheet>,
         component_state: Option<&'a State>,
+        component_functions: Option<&'a ComponentFunctions<State>>,
+        template_expressions_asts: Option<&'a mut Vec<ASTNode>>
     ) -> Self {
         ParsingContext {
             angust_config,
             stylesheet,
             component_state,
+            component_functions,
+            template_expressions_asts,
+        }
+    }
+
+    pub fn add_ast(&mut self, ast: ASTNode) {
+        if let Some(template_expressions_asts) = &mut self.template_expressions_asts {
+            template_expressions_asts.push(ast);
         }
     }
 }

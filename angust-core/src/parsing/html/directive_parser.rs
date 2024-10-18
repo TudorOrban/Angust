@@ -5,7 +5,7 @@ use crate::rendering::elements::component::component_state::ComponentState;
 use super::html_parser::ParsingContext;
 
 
-pub fn parse_on_click_attribute<State : ComponentState>(
+pub fn parse_on_click_attribute<State: ComponentState>(
     attributes: &kuchiki::Attributes,
     _: &ParsingContext<State>
 ) -> Option<String> {
@@ -15,6 +15,16 @@ pub fn parse_on_click_attribute<State : ComponentState>(
         let handler = handler.trim_end_matches("')");
         let handler = handler.to_string();
         return Some(handler);
+    }
+    None
+}
+
+pub fn parse_if_attribute<State: ComponentState>(
+    attributes: &kuchiki::Attributes,
+) -> Option<String> {
+    if let Some(expression_value) = attributes.get("@if") {
+        let expression = expression_value.to_string().trim().to_string();
+        return Some(expression);
     }
     None
 }

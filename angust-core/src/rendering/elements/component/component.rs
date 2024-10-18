@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc};
 
-use crate::{application::event_loop_proxy::get_event_loop_proxy, rendering::{elements::{
+use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::expression::ast::ASTNode, rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
     container::Container, 
     element::{Element, ElementType, EventType}, 
@@ -30,6 +30,9 @@ pub struct Component<State: ComponentState> {
     // Reactivity
     pub event_queue: Rc<RefCell<EventQueue>>,
 
+    // Expression evaluation
+    pub template_expressions_asts: Vec<ASTNode>,
+
 }
 
 impl<State: ComponentState> Component<State> {
@@ -47,6 +50,7 @@ impl<State: ComponentState> Component<State> {
             state,
             component_functions: ComponentFunctions::default(),
             event_queue: Rc::new(RefCell::new(EventQueue::new())), 
+            template_expressions_asts: vec![]
         };
 
         component.initialize();
@@ -58,7 +62,11 @@ impl<State: ComponentState> Component<State> {
     fn initialize(&mut self) {
         self.load_component_template();
     }
-    
+
+    fn load_component_template(&mut self) {
+        template_loader::load_component_template(self);
+    }
+
     pub fn setup_listeners(&mut self) {
         let component_id = self._id.clone();
 
@@ -77,10 +85,6 @@ impl<State: ComponentState> Component<State> {
                 }
             }
         });
-    }
-
-    fn load_component_template(&mut self) {
-        template_loader::load_component_template(self);
     }
 
     // Setters
