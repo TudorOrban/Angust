@@ -51,7 +51,8 @@ fn str_to_operator(op_str: &str) -> Operator {
 
 pub fn parse_string_to_ast(input: String) -> Result<ASTNode, pest::error::Error<Rule>> {
     let mut pairs = parse_expression(&input)?;
-    let root_pair = pairs.next().unwrap();  // Assuming there is at least one pair
+    println!("Pairs: {:?}", pairs);
+    let root_pair = pairs.next().unwrap(); 
     if let Some(second_pair) = pairs.peek() {
         println!("Second pair detected, indicating incomplete parsing at the top level: {:?}", second_pair);
     }
