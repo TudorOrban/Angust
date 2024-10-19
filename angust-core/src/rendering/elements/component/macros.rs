@@ -43,21 +43,23 @@ macro_rules! define_component_state {
             }
 
             
-            
-    fn get_nested_state(&self, property_name: &str) -> Option<Box<dyn $crate::rendering::elements::component::component_state::ComponentState>> {
-        match property_name {
-            $(
-                stringify!($field) => {
-                    if let Some(nested) = (&self.$field.value as &dyn Any).downcast_ref::<$crate::rendering::elements::component::component_state::ComponentStateType>() {
-                        Some(Box::new(nested.clone()))
-                    } else {
-                        None
-                    }
+            fn get_nested_state(&self, property_name: &str) -> Option<&dyn $crate::rendering::elements::component::component_state::ComponentState> {
+                match property_name {
+                    $(
+                        stringify!($field) => {
+                            // If the field implements `ComponentState`, return it as nested state
+                            if let Some(nested) = self.$field.value.as_any().downcast_ref::<$type>()
+                                .and_then(|state| state.as_any().downcast_ref::<dyn $crate::rendering::elements::component::component_state::ComponentState>()) {
+                                Some(nested)
+                            } else {
+                                None
+                            }
+                        },
+                    )*
+                    _ => None,
                 }
-            )*
-            _ => None,
-        }
-    }
+            }
+        
         }
 
         impl $crate::rendering::elements::component::component_state::ReactiveState for $name {
