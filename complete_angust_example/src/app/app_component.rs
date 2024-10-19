@@ -16,7 +16,8 @@ define_component_state! {
     AppComponentState {
         content: String,
         count: f64,
-        active_tab: String
+        active_tab: String,
+        items: Vec<String>
     }
 }
 
@@ -35,7 +36,7 @@ impl AppComponentState {
         self.count.set(current_value);
     }
     
-    pub fn is_active_tab(&self, tab_name: String, is_active: bool, some: bool) -> bool {
+    pub fn is_active_tab(&self, tab_name: String, is_active: bool) -> bool {
         if !is_active {  
             return false;
         }
@@ -43,12 +44,16 @@ impl AppComponentState {
         self.active_tab.value == tab_name
     }
 
-    pub fn get_something(&self, some_param: String) -> String {
-        format!("Something: {}", some_param)
+    pub fn set_active_tab_home(&mut self) {
+        self.active_tab.set("Home".to_string());
     }
 
-    pub fn get_number_plus_one(&self, number: f64) -> f64 {
-        number + 1.0
+    pub fn set_active_tab_dashboard(&mut self) {
+        self.active_tab.set("Dashboard".to_string());
+    }
+
+    pub fn set_active_tab_settings(&mut self) {
+        self.active_tab.set("Settings".to_string());
     }
 }
 
@@ -61,7 +66,12 @@ impl AppComponent {
         let state_factory = || AppComponentState::new(
             String::from("Hello, App Component!"),
             0.0,
-            String::from("Home")
+            String::from("Home"),
+            vec![
+                String::from("Home"),
+                String::from("Dashboard"),
+                String::from("Settings"),
+            ]
         );
 
         registry.insert("app-component".to_string(), Box::new(move || {
@@ -74,14 +84,15 @@ impl AppComponent {
             let component_functions: ComponentFunctions<AppComponentState> = ComponentFunctions::new(
                 vec![
                     ("print_something", Box::new(|state: &mut AppComponentState| state.toggle_content())),
-                    ("increment_count", Box::new(|state: &mut AppComponentState| state.increment_count()))
+                    ("increment_count", Box::new(|state: &mut AppComponentState| state.increment_count())),
+                    ("set_active_tab_home", Box::new(|state: &mut AppComponentState| state.set_active_tab_home())),
+                    ("set_active_tab_dashboard", Box::new(|state: &mut AppComponentState| state.set_active_tab_dashboard())),
+                    ("set_active_tab_settings", Box::new(|state: &mut AppComponentState| state.set_active_tab_settings())),
                 ],
                 vec![],
                 vec![],
                 vec![
-                    ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool, bool)),
-                    ("get_something", wrap_fn!(AppComponentState, AppComponentState::get_something, String)),
-                    ("get_number_plus_one", wrap_fn!(AppComponentState, AppComponentState::get_number_plus_one, f64))
+                    ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool)),
                 ]
             );
             component.add_component_functions(component_functions);

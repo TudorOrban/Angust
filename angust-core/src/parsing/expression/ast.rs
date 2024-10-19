@@ -58,7 +58,6 @@ pub fn parse_string_to_ast(input: String) -> Result<ASTNode, pest::error::Error<
 }
 
 fn parse_pair_to_ast(pair: Pair<Rule>) -> ASTNode {
-    println!("Parsing pair: {:?}", pair);
     match pair.as_rule() {
         Rule::expression => {
             parse_expression_content(pair)
