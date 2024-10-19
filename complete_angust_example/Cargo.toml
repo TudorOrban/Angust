@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 angust = { path = "../angust-core/" } 
+angust_macros = { path = "../angust_macros/" }
 
 [[bin]]
 name = "complete_angust_example"

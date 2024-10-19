@@ -1,8 +1,9 @@
 [workspace]
 members = [
-    "angust-core",                     
+    "angust-core", "angust_macros",                     
     "cartan",
-    "complete_angust_example"
+    "complete_angust_example",
+    "angust_macros"
 ]
 resolver = "2"
 exclude = [

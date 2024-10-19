@@ -10,45 +10,28 @@ use angust::{
         functions::component_functions::ComponentFunctions, test::Reflect
     }, wrap_fn
 };
+use angust_macros::ReflectiveStruct;
 
+#[derive(ReflectiveStruct)]
+struct Location {
+    lat: f64,
+    lon: f64,
+}
 
+#[derive(ReflectiveStruct)]
 struct Address {
     street: String,
     zip: u32,
+    location: Location,
 }
 
+#[derive(ReflectiveStruct)]
 struct User {
     name: String,
     age: u8,
     address: Address,
 }
 
-impl Reflect for Address {
-    fn get_field(&self, name: &str) -> Option<&dyn Reflect> {
-        match name {
-            "street" => Some(&self.street),
-            "zip" => Some(&self.zip),
-            _ => None,
-        }
-    }
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-}
-
-impl Reflect for User {
-    fn get_field(&self, name: &str) -> Option<&dyn Reflect> {
-        match name {
-            "name" => Some(&self.name),
-            "age" => Some(&self.age),
-            "address" => Some(&self.address),
-            _ => None,
-        }
-    }
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-}
 fn print_reflect_value(field: &dyn Reflect) {
     if let Some(val) = field.as_any().downcast_ref::<String>() {
         println!("String value: {}", val);
@@ -56,6 +39,8 @@ fn print_reflect_value(field: &dyn Reflect) {
         println!("u32 value: {}", val);
     } else if let Some(val) = field.as_any().downcast_ref::<u8>() {
         println!("u8 value: {}", val);
+    } else if let Some(val) = field.as_any().downcast_ref::<f64>() {
+        println!("f64 value: {}", val);
     } else {
         println!("Unknown type");
     }
@@ -137,13 +122,16 @@ impl AppComponent {
             address: Address {
                 street: "123 Main St".to_string(),
                 zip: 90210,
+                location: Location {
+                    lat: 34.0522,
+                    lon: -118.2437,
+                },
             },
         };
-    
         
-    if let Some(field) = get_nested_field(&user, &["address", "street"]) {
-        print_reflect_value(field);
-    }
+        if let Some(field) = get_nested_field(&user, &["address", "location", "lat"]) {
+            print_reflect_value(field);
+        }
 
         registry.insert("app-component".to_string(), Box::new(move || {
             let some_state_part = SomeStatePart::new(

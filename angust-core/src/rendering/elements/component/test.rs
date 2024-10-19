@@ -31,3 +31,12 @@ impl Reflect for u8 {
         self
     }
 }
+
+impl Reflect for f64 {
+    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+        None
+    }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
