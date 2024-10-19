@@ -14,12 +14,8 @@ macro_rules! define_component_state {
                 }
             }
         }
-
-        
         
         impl $crate::rendering::elements::component::component_state::ComponentState for $name {
-            type Output = Self;
-            
             fn get_property(&self, path: &[&str]) -> Option<String> {
                 if path.is_empty() {
                     return None;
@@ -30,18 +26,10 @@ macro_rules! define_component_state {
                         stringify!($field) => {
                             // Handle nested structs
                             if path.len() > 1 {
-                                // If the field is a struct, recursively call get_property
                                 return self.$field.value.get_property(&path[1..]);
                             }
 
-                            // For primitive types, convert to string
-                            if std::any::TypeId::of::<$type>() == std::any::TypeId::of::<String>()
-                                || std::any::TypeId::of::<$type>() == std::any::TypeId::of::<f64>()
-                                || std::any::TypeId::of::<$type>() == std::any::TypeId::of::<bool>() {
-                                return None;
-                            }
-
-                            None // Return None if it's a struct (no further path to drill down)
+                            None
                         },
                     )*
                     _ => None,

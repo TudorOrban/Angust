@@ -23,7 +23,7 @@ pest = "2.7.14"
 pest_derive = "2.7.14"
 itertools = "0.13.0"
 
-serde = { version = "1.0.210", features = ["derive"] }
+serde = { version = "1.0.210", features = ["derive"]}
 serde_json = "1.0.128"
 image = "0.25"
 regex = "1.11.0"

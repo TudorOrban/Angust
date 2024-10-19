@@ -7,10 +7,12 @@ use angust::{
     rendering::elements::component::{
         component::Component, 
         component_factory_registry::ComponentFactory, 
-        functions::component_functions::ComponentFunctions, test::Reflect
+        functions::component_functions::ComponentFunctions, 
+        component_state::{Reflect, ReactiveState},
+        reactivity::{ComponentEvent, ReactiveField}
     }, wrap_fn
 };
-use angust_macros::ReflectiveStruct;
+use angust_macros::{reactive_struct, ReflectiveStruct};
 
 #[derive(ReflectiveStruct)]
 struct Location {

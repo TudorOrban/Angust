@@ -9,38 +9,88 @@ pub enum StateValue<T> {
     Nested(T),
 }
 
-// impl StateValue< {
-//     pub fn as_text(&self) -> Option<&String> {
-//         if let StateValue::Text(ref val) = self {
-//             Some(val)
-//         } else {
-//             None
-//         }
-//     }
+pub trait Reflect {
+    fn get_field(&self, name: &str) -> Option<&dyn Reflect>;
+    fn set_field(&mut self, name: &str, value: Box<dyn std::any::Any>);
+    fn get_all_properties(&self) -> Vec<&str>;
 
-//     pub fn as_number(&self) -> Option<f64> {
-//         if let StateValue::Number(val) = self {
-//             Some(*val)
-//         } else {
-//             None
-//         }
-//     }
-
-//     // Delegating to the nested state's `get_property`
-//     pub fn get_nested_property(&self, property_name: &str) -> Option<StateValue> {
-//         if let StateValue::Nested(ref nested) = self {
-//             nested.get_property(property_name)
-//         } else {
-//             None
-//         }
-//     }
-// }
+    fn as_any(&self) -> &dyn std::any::Any;
+}
 
 
+impl Reflect for String {
+    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+        None
+    }
+
+    fn set_field(&mut self, _name: &str, value: Box<dyn std::any::Any>) {
+        // Do nothing
+    }
+
+    fn get_all_properties(&self) -> Vec<&str> {
+        vec![]
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl Reflect for u32 {
+    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+        None
+    }
+
+    fn set_field(&mut self, _name: &str, value: Box<dyn std::any::Any>) {
+        // Do nothing
+    }
+
+    fn get_all_properties(&self) -> Vec<&str> {
+        vec![]
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl Reflect for u8 {
+    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+        None
+    }
+
+    fn set_field(&mut self, _name: &str, value: Box<dyn std::any::Any>) {
+        // Do nothing
+    }
+
+    fn get_all_properties(&self) -> Vec<&str> {
+        vec![]
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl Reflect for f64 {
+    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+        None
+    }
+
+    fn set_field(&mut self, _name: &str, value: Box<dyn std::any::Any>) {
+        // Do nothing
+    }
+    
+    fn get_all_properties(&self) -> Vec<&str> {
+        vec![]
+    }
+    
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
 
 pub trait ComponentState {
-    type Output;
-
     fn get_property(&self, path: &[&str]) -> Option<String>;
     fn set_property(&mut self, property_name: &str, value: Box<dyn Any>);
     fn get_all_properties(&self) -> Vec<&str>;
@@ -57,8 +107,6 @@ pub trait ReactiveState : ComponentState {
 pub struct NoState {}
 
 impl ComponentState for NoState {
-    type Output = ();
-
     fn get_property(&self, path: &[&str]) -> Option<String> {
         None
     }
@@ -80,8 +128,6 @@ impl ReactiveState for NoState {
 }
 
 impl ComponentState for String {
-    type Output = String;
-
     fn get_property(&self, path: &[&str]) -> Option<String> {
         None
     }
@@ -96,8 +142,6 @@ impl ComponentState for String {
 }
 
 impl ComponentState for f64 {
-    type Output = f64;
-
     fn get_property(&self, path: &[&str]) -> Option<String> {
         None
     }
@@ -112,8 +156,6 @@ impl ComponentState for f64 {
 }
 
 impl ComponentState for bool {
-    type Output = bool;
-
     fn get_property(&self, path: &[&str]) -> Option<String> {
         None
     }
