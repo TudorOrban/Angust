@@ -23,7 +23,7 @@ impl Reflect for String {
         None
     }
 
-    fn set_field(&mut self, _name: &str, value: Box<dyn std::any::Any>) {
+    fn set_field(&mut self, _name: &str, _value: Box<dyn std::any::Any>) {
         // Do nothing
     }
 
@@ -41,7 +41,7 @@ impl Reflect for u32 {
         None
     }
 
-    fn set_field(&mut self, _name: &str, value: Box<dyn std::any::Any>) {
+    fn set_field(&mut self, _name: &str, _value: Box<dyn std::any::Any>) {
         // Do nothing
     }
 
@@ -59,7 +59,7 @@ impl Reflect for u8 {
         None
     }
 
-    fn set_field(&mut self, _name: &str, value: Box<dyn std::any::Any>) {
+    fn set_field(&mut self, _name: &str, _value: Box<dyn std::any::Any>) {
         // Do nothing
     }
 
@@ -77,7 +77,7 @@ impl Reflect for f64 {
         None
     }
 
-    fn set_field(&mut self, _name: &str, value: Box<dyn std::any::Any>) {
+    fn set_field(&mut self, _name: &str, _value: Box<dyn std::any::Any>) {
         // Do nothing
     }
     
@@ -96,7 +96,7 @@ pub trait ComponentState {
     fn get_all_properties(&self) -> Vec<&str>;
 }
 
-pub trait ReactiveState : ComponentState {
+pub trait ReactiveState : Reflect {
     fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
         where
             F: 'static + FnMut(&ComponentEvent);
@@ -107,7 +107,7 @@ pub trait ReactiveState : ComponentState {
 pub struct NoState {}
 
 impl ComponentState for NoState {
-    fn get_property(&self, path: &[&str]) -> Option<String> {
+    fn get_property(&self, _path: &[&str]) -> Option<String> {
         None
     }
 
@@ -115,6 +115,22 @@ impl ComponentState for NoState {
 
     fn get_all_properties(&self) -> Vec<&str> {
         vec![]
+    }
+}
+
+impl Reflect for NoState {
+    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+        None
+    }
+
+    fn set_field(&mut self, _name: &str, _value: Box<dyn std::any::Any>) {}
+
+    fn get_all_properties(&self) -> Vec<&str> {
+        vec![]
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 }
 
@@ -128,7 +144,7 @@ impl ReactiveState for NoState {
 }
 
 impl ComponentState for String {
-    fn get_property(&self, path: &[&str]) -> Option<String> {
+    fn get_property(&self, _path: &[&str]) -> Option<String> {
         None
     }
     
@@ -142,7 +158,7 @@ impl ComponentState for String {
 }
 
 impl ComponentState for f64 {
-    fn get_property(&self, path: &[&str]) -> Option<String> {
+    fn get_property(&self, _path: &[&str]) -> Option<String> {
         None
     }
     
@@ -156,7 +172,7 @@ impl ComponentState for f64 {
 }
 
 impl ComponentState for bool {
-    fn get_property(&self, path: &[&str]) -> Option<String> {
+    fn get_property(&self, _path: &[&str]) -> Option<String> {
         None
     }
     

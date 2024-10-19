@@ -1,7 +1,7 @@
 extern crate proc_macro;
 use proc_macro::TokenStream;
-use quote::{format_ident, quote, ToTokens};
-use syn::{parse_macro_input, DeriveInput, Fields, FieldsNamed, ItemStruct, Type, Ident};
+use quote::{format_ident, quote};
+use syn::{parse_macro_input, DeriveInput, Fields, FieldsNamed};
 
 #[proc_macro_derive(ReflectiveStruct)]
 pub fn reflective_struct_derive(input: TokenStream) -> TokenStream {
@@ -80,55 +80,69 @@ pub fn reflective_struct_derive(input: TokenStream) -> TokenStream {
 }
 
 
-// Not functional yet
+
 #[proc_macro_attribute]
-pub fn reactive_struct(_attr: TokenStream, input: TokenStream) -> TokenStream {
-    let mut input_struct = parse_macro_input!(input as ItemStruct);
+pub fn reactive_struct(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let mut struct_ast = parse_macro_input!(item as syn::ItemStruct);
+    let struct_name = &struct_ast.ident;
 
-    // Only proceed if the struct has named fields
-    if let Fields::Named(ref mut fields) = input_struct.fields {
-        for field in fields.named.iter_mut() {
-            let field_type = &field.ty;
-            // Wrap each field type with `ReactiveField`
-            field.ty = syn::parse(quote!(ReactiveField<#field_type>).into()).unwrap();
-        }
+    // Collect field setups
+    let fields = if let syn::Fields::Named(ref fields) = struct_ast.fields {
+        fields.named.iter().collect::<Vec<_>>()
     } else {
-        panic!("reactive_struct can only be used with structs having named fields");
-    }
+        panic!("ReactiveState can only be applied to structs with named fields");
+    };
 
-    let struct_name = &input_struct.ident;
-    let fields_initializers = input_struct.fields.iter().map(|field| {
-        let field_name = field.ident.as_ref().unwrap();
+    // Add ReactiveField properties and modify constructor
+    let reactive_field_definitions = fields.iter().map(|f| {
+        let field_name = &f.ident;
+        let field_type = &f.ty;
+        let reactive_field_name = format_ident!("{}_reactive", field_name.clone().unwrap());
         quote! {
-            #field_name: ReactiveField::new(Default::default()),
+            pub #reactive_field_name: ReactiveField<#field_type>,
         }
     });
 
-    let subscribe_methods = input_struct.fields.iter().map(|field| {
-        let field_name = field.ident.as_ref().unwrap();
+    let reactive_field_initializations = fields.iter().map(|f| {
+        let field_name = &f.ident;
+        let reactive_field_name = format_ident!("{}_reactive", field_name.clone().unwrap());
         quote! {
-            stringify!(#field_name) => self.#field_name.subscribe(callback),
+            #reactive_field_name: ReactiveField::new(Default::default()),
         }
     });
 
-    // Output the transformed struct with additional ReactiveState implementation
+    let reactive_field_subscriptions = fields.iter().map(|f| {
+        let field_name = &f.ident;
+        let reactive_field_name = format_ident!("{}_reactive", field_name.clone().unwrap());
+        quote! {
+            stringify!(#field_name) => self.#reactive_field_name.subscribe(callback),
+        }
+    });
+
     let expanded = quote! {
-        #input_struct
+        // Modify the original struct to include reactive fields
+        pub struct #struct_name {
+            #(#fields),*
+            #(#reactive_field_definitions)*
+        }
 
         impl #struct_name {
-            pub fn new() -> Self {
+            // Adjusted new function to initialize both normal and reactive fields
+            pub fn new(#(#fields),*) -> Self {
                 Self {
-                    #(#fields_initializers)*
+                    #(#fields),*
+                    #(#reactive_field_initializations)*
                 }
             }
         }
 
+        // Implement ReactiveState for added reactive functionalities
         impl ReactiveState for #struct_name {
             fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
             where F: 'static + FnMut(&ComponentEvent) {
                 match property_name {
-                    #(#subscribe_methods)*,
-                    _ => {} // Handle case where property name does not match
+                    #(#reactive_field_subscriptions,)*
+                    _ => {} // handle default case
                 }
             }
         }

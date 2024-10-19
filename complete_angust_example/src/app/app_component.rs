@@ -14,6 +14,7 @@ use angust::{
 };
 use angust_macros::{reactive_struct, ReflectiveStruct};
 
+#[reactive_struct]
 #[derive(ReflectiveStruct)]
 struct Location {
     lat: f64,

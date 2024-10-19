@@ -6,6 +6,11 @@ pub struct ReactiveField<T> {
     listeners: Vec<Box<dyn FnMut(&ComponentEvent)>>,
 }
 
+#[derive(Debug)]
+pub enum ComponentEvent {
+    StateChange(String),
+}
+
 impl<T> Debug for ReactiveField<T>
 where
     T: Debug,
@@ -67,10 +72,6 @@ impl<T> DerefMut for ReactiveField<T> {
     }
 }
 
-#[derive(Debug)]
-pub enum ComponentEvent {
-    StateChange(String),
-}
 
 pub struct EventQueue {
     events: Vec<ComponentEvent>,
