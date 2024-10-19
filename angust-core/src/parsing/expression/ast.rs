@@ -4,6 +4,8 @@ use pest::iterators::Pair;
 #[derive(Debug, Clone, PartialEq)]
 pub enum ASTNode {
     Number(f64),
+    StringLiteral(String),
+    Boolean(bool),
     Identifier(String),
     FunctionCall(String, Vec<ASTNode>),
     BinaryOperation {
@@ -56,6 +58,7 @@ pub fn parse_string_to_ast(input: String) -> Result<ASTNode, pest::error::Error<
 }
 
 fn parse_pair_to_ast(pair: Pair<Rule>) -> ASTNode {
+    println!("Parsing pair: {:?}", pair);
     match pair.as_rule() {
         Rule::expression => {
             parse_expression_content(pair)
@@ -65,6 +68,14 @@ fn parse_pair_to_ast(pair: Pair<Rule>) -> ASTNode {
         },
         Rule::identifier => {
             ASTNode::Identifier(pair.as_str().to_string())
+        },
+        Rule::string_literal => {
+            let content = &pair.as_str()[1..pair.as_str().len()-1];
+            ASTNode::StringLiteral(content.to_string()) 
+        },
+        Rule::boolean_literal => {
+            let bool_value = pair.as_str().parse::<bool>().unwrap();
+            ASTNode::Boolean(bool_value)
         },
         Rule::function_call => 
             parse_function_call(pair),

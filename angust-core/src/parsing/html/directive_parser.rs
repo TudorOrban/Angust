@@ -86,6 +86,7 @@ pub fn parse_if_expression<State: ComponentState>(
                     return Err("If expression did not evaluate to a boolean".to_string());
                 }
             } else {
+                println!("Error evaluating if expression: {:?}", evaluation_result.err());
                 return Err("Failed to evaluate if expression".to_string());
             }
         } else {

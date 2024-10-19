@@ -2,6 +2,8 @@ WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 
 number = @{ "-"? ~ ('0'..'9')+ }
 identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+string_literal = @{ "'" ~ (!"'" ~ ANY)* ~ "'" }
+boolean_literal = { "true" | "false" }
 
 comparison_operator = { "==" | "!=" | "<" | ">" | "<=" | ">=" }
 logical_operator = { "&&" | "||" }
@@ -22,13 +24,15 @@ additive_expression = {
 }
 
 multiplicative_expression = {
-    primary
+    function_call
     | "(" ~ expression ~ ")" 
+    | primary
 }
 
 primary = {
     number
-    | function_call
+    | string_literal
+    | boolean_literal
     | identifier
 }
 

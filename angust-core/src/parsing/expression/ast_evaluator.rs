@@ -11,6 +11,8 @@ pub fn evaluate_ast<State: ComponentState>(
 ) -> Result<Box<dyn Any>, String> {
     match node {
         ASTNode::Number(num) => Ok(Box::new(*num)),
+        ASTNode::StringLiteral(string) => Ok(Box::new(string.clone())),
+        ASTNode::Boolean(boolean) => Ok(Box::new(*boolean)),
         ASTNode::Identifier(name) => {
             state.get_property(name)
                 .ok_or_else(
@@ -78,21 +80,63 @@ fn evaluate_comparison<State: ComponentState>(
     let left_val = evaluate_ast(left, state, functions)?;
     let right_val = evaluate_ast(right, state, functions)?;
 
-    let left_float = *left_val.downcast::<f64>().map_err(|_| "Type mismatch")?;
-    let right_float = *right_val.downcast::<f64>().map_err(|_| "Type mismatch")?;
+    // Try comparing as f64
+    if let Some(result) = try_numeric_comparison(operator, &left_val, &right_val)? {
+        return Ok(Box::new(result));
+    }
 
-    let result = match operator {
-        Operator::Equal => left_float == right_float,
-        Operator::NotEqual => left_float != right_float,
-        Operator::Less => left_float < right_float,
-        Operator::Greater => left_float > right_float,
-        Operator::LessEqual => left_float <= right_float,
-        Operator::GreaterEqual => left_float >= right_float,
-        _ => return Err("Unsupported operation for comparison".to_string()),
-    };
+    // Try comparing as String
+    if let Some(result) = try_string_comparison(operator, &left_val, &right_val)? {
+        return Ok(Box::new(result));
+    }
 
-    Ok(Box::new(result))
+    Err("Type mismatch or unsupported comparison type".to_string())
 }
+
+fn try_numeric_comparison(
+    operator: &Operator,
+    left_val: &Box<dyn Any>,
+    right_val: &Box<dyn Any>,
+) -> Result<Option<bool>, String> {
+    if let (Some(left_float), Some(right_float)) = (
+        left_val.downcast_ref::<f64>(),
+        right_val.downcast_ref::<f64>(),
+    ) {
+        let result = match operator {
+            Operator::Equal => left_float == right_float,
+            Operator::NotEqual => left_float != right_float,
+            Operator::Less => left_float < right_float,
+            Operator::Greater => left_float > right_float,
+            Operator::LessEqual => left_float <= right_float,
+            Operator::GreaterEqual => left_float >= right_float,
+            _ => return Err("Unsupported operator for numeric comparison".to_string()),
+        };
+
+        return Ok(Some(result));
+    }
+    Ok(None)
+}
+
+fn try_string_comparison(
+    operator: &Operator,
+    left_val: &Box<dyn Any>,
+    right_val: &Box<dyn Any>,
+) -> Result<Option<bool>, String> {
+    if let (Some(left_str), Some(right_str)) = (
+        left_val.downcast_ref::<String>(),
+        right_val.downcast_ref::<String>(),
+    ) {
+        let result = match operator {
+            Operator::Equal => left_str == right_str,
+            Operator::NotEqual => left_str != right_str,
+            _ => return Err("String comparison only supports Equal and NotEqual".to_string()),
+        };
+
+        return Ok(Some(result));
+    }
+    Ok(None)
+}
+
 
 fn evaluate_logical_operation<State: ComponentState>(
     operator: &Operator,

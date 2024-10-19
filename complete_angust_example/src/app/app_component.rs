@@ -61,7 +61,7 @@ impl AppComponent {
         let state_factory = || AppComponentState::new(
             String::from("Hello, App Component!"),
             0.0,
-            String::from("app-component")
+            String::from("Home")
         );
 
         registry.insert("app-component".to_string(), Box::new(move || {
