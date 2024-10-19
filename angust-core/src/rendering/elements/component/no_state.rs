@@ -1,4 +1,4 @@
-use super::component_state::ComponentState;
+use super::component_state::{ComponentState, ReactiveState};
 
 pub struct NoState {}
 
@@ -12,6 +12,13 @@ impl ComponentState for NoState {
     fn get_all_properties(&self) -> Vec<&str> {
         vec![]
     }
+
+    fn get_nested_state(&self, property_name: &str) -> Option<&dyn ComponentState> {
+        None
+    }
+}
+
+impl ReactiveState for NoState {
 
     fn subscribe_to_property<F>(&mut self, _property_name: &str, _callback: F)
     where

@@ -6,10 +6,10 @@ use crate::{
     rendering::elements::{container::Container, element::Element}
 };
 
-use super::{component::Component, component_state::ComponentState};
+use super::{component::Component, component_state::ReactiveState};
 
 
-pub fn load_component_template<State: ComponentState>(component: &mut Component<State>) {
+pub fn load_component_template<State: ReactiveState>(component: &mut Component<State>) {
     // Load template
     let project_root = PathBuf::from(identify_project_root_path());
     let template_path = project_root.join(component.template_relative_path.clone());

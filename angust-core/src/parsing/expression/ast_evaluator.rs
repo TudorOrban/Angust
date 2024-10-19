@@ -1,10 +1,10 @@
 use std::any::Any;
 
-use crate::rendering::elements::component::{component_state::ComponentState, functions::component_functions::ComponentFunctions};
+use crate::rendering::elements::component::{component_state::ReactiveState, functions::component_functions::ComponentFunctions};
 
 use super::ast::{ASTNode, Operator};
 
-pub fn evaluate_ast<State: ComponentState>(
+pub fn evaluate_ast<State: ReactiveState>(
     node: &ASTNode,
     state: &State,
     functions: &ComponentFunctions<State>,
@@ -30,7 +30,7 @@ pub fn evaluate_ast<State: ComponentState>(
     }
 }
 
-fn evaluate_component_function<State: ComponentState>(
+fn evaluate_component_function<State: ReactiveState>(
     name: &str,
     args: Vec<ASTNode>,
     state: &State,
@@ -46,7 +46,7 @@ fn evaluate_component_function<State: ComponentState>(
     }
 }
 
-fn evaluate_binary_operation<State: ComponentState>(
+fn evaluate_binary_operation<State: ReactiveState>(
     operator: &Operator,
     left: &ASTNode,
     right: &ASTNode,
@@ -70,7 +70,7 @@ fn evaluate_binary_operation<State: ComponentState>(
     Ok(Box::new(result))
 }
 
-fn evaluate_comparison<State: ComponentState>(
+fn evaluate_comparison<State: ReactiveState>(
     operator: &Operator,
     left: &ASTNode,
     right: &ASTNode,
@@ -138,7 +138,7 @@ fn try_string_comparison(
 }
 
 
-fn evaluate_logical_operation<State: ComponentState>(
+fn evaluate_logical_operation<State: ReactiveState>(
     operator: &Operator,
     left: &ASTNode,
     right: &ASTNode,

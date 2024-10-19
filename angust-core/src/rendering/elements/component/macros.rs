@@ -2,7 +2,7 @@
 macro_rules! define_component_state {
     ($name:ident { $($field:ident: $type:ty),* $(,)? }) => {
 
-        #[derive(Debug)]
+        #[derive(Debug, Clone)]
         pub struct $name {
             $(pub $field: $crate::rendering::elements::component::reactivity::ReactiveField<$type>,)*
         }
@@ -36,13 +36,31 @@ macro_rules! define_component_state {
                 }
             }
             
-            
             fn get_all_properties(&self) -> Vec<&str> {
                 vec![
                     $( stringify!($field), )*
                 ]
             }
 
+            
+            
+    fn get_nested_state(&self, property_name: &str) -> Option<Box<dyn $crate::rendering::elements::component::component_state::ComponentState>> {
+        match property_name {
+            $(
+                stringify!($field) => {
+                    if let Some(nested) = (&self.$field.value as &dyn Any).downcast_ref::<$crate::rendering::elements::component::component_state::ComponentStateType>() {
+                        Some(Box::new(nested.clone()))
+                    } else {
+                        None
+                    }
+                }
+            )*
+            _ => None,
+        }
+    }
+        }
+
+        impl $crate::rendering::elements::component::component_state::ReactiveState for $name {
             fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
             where
                 F: 'static + FnMut(&$crate::rendering::elements::component::reactivity::ComponentEvent),

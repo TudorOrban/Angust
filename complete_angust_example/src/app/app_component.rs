@@ -6,6 +6,7 @@ use angust::{
     define_component_state, 
     rendering::elements::component::{
         component::Component, 
+        component_state::AsAny,
         component_factory_registry::ComponentFactory, 
         functions::component_functions::ComponentFunctions
     }, wrap_fn
@@ -72,23 +73,23 @@ pub struct AppComponent {
 
 impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
-        let some_state_part = SomeStatePart::new(
-            String::from("Some value"),
-            true,
-        );
-        let state_factory = || AppComponentState::new(
-            String::from("Hello, App Component!"),
-            0.0,
-            String::from("Home"),
-            vec![
-                String::from("Home"),
-                String::from("Dashboard"),
-                String::from("Settings"),
-            ],
-            some_state_part,
-        );
-
         registry.insert("app-component".to_string(), Box::new(move || {
+            let some_state_part = SomeStatePart::new(
+                String::from("Some value"),
+                true,
+            );
+            let state_factory = || AppComponentState::new(
+                String::from("Hello, App Component!"),
+                0.0,
+                String::from("Home"),
+                vec![
+                    String::from("Home"),
+                    String::from("Dashboard"),
+                    String::from("Settings"),
+                ],
+                some_state_part,
+            );
+
             let mut component = Component::new(
                 "app-component".to_string(),
                 "src/app/app_component.html".to_string(),
@@ -99,9 +100,6 @@ impl AppComponent {
                 vec![
                     ("print_something", Box::new(|state: &mut AppComponentState| state.toggle_content())),
                     ("increment_count", Box::new(|state: &mut AppComponentState| state.increment_count())),
-                    ("set_active_tab_home", Box::new(|state: &mut AppComponentState| state.set_active_tab_home())),
-                    ("set_active_tab_dashboard", Box::new(|state: &mut AppComponentState| state.set_active_tab_dashboard())),
-                    ("set_active_tab_settings", Box::new(|state: &mut AppComponentState| state.set_active_tab_settings())),
                 ],
                 vec![],
                 vec![],

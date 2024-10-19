@@ -1,6 +1,6 @@
 use kuchiki::NodeRef;
 
-use crate::{parsing::css::css_parser, rendering::elements::component::component_state::ComponentState};
+use crate::{parsing::css::css_parser, rendering::elements::component::component_state::ReactiveState};
 use crate::rendering::elements::button::Button;
 use crate::rendering::elements::component::component_factory_registry::create_component;
 use crate::rendering::elements::container::Container;
@@ -10,7 +10,7 @@ use crate::rendering::elements::styles::Styles;
 
 use super::{directive_parser, html_parser::{self, ParsingContext}};
 
-pub fn dispatch_element_processing<State : ComponentState>(
+pub fn dispatch_element_processing<State : ReactiveState>(
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
@@ -24,7 +24,7 @@ pub fn dispatch_element_processing<State : ComponentState>(
     }
 }
 
-fn process_div_element<State : ComponentState>(
+fn process_div_element<State : ReactiveState>(
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
@@ -46,8 +46,6 @@ fn process_div_element<State : ComponentState>(
     if for_loop_context.is_err() {
         println!("Error parsing @for directive: {:?}", for_loop_context.err());
         return Box::new(container) // TODO: Report error
-    } else {
-        println!("For loop context: {:?}", for_loop_context.unwrap());
     }
 
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
@@ -60,7 +58,7 @@ fn process_div_element<State : ComponentState>(
     Box::new(container)
 }
 
-fn process_button_element<State : ComponentState>(
+fn process_button_element<State : ReactiveState>(
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
@@ -86,7 +84,7 @@ fn process_button_element<State : ComponentState>(
     Box::new(button)
 }
 
-fn process_image_element<State : ComponentState>(
+fn process_image_element<State : ReactiveState>(
     elem_data: &kuchiki::ElementData, 
     _: &NodeRef, 
     parent_styles: Option<&Styles>, 
@@ -103,7 +101,7 @@ fn process_image_element<State : ComponentState>(
     Some(Box::new(image))
 }
 
-fn process_custom_component<State : ComponentState>(
+fn process_custom_component<State : ReactiveState>(
     component_name: &str, 
     elem_data: &kuchiki::ElementData, 
     node: &NodeRef, 

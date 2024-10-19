@@ -9,9 +9,9 @@ use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::expres
     styles::Styles
 }, layout::effective_size_estimator}};
 
-use super::{functions::component_functions::ComponentFunctions, component_state::ComponentState, reactivity::{ComponentEvent, EventQueue}, template_loader};
+use super::{functions::component_functions::ComponentFunctions, component_state::ReactiveState, reactivity::{ComponentEvent, EventQueue}, template_loader};
 
-pub struct Component<State: ComponentState> {
+pub struct Component<State: ReactiveState> {
     _id: String,
     pub name: String,
     pub template_relative_path: String,
@@ -35,7 +35,7 @@ pub struct Component<State: ComponentState> {
 
 }
 
-impl<State: ComponentState> Component<State> {
+impl<State: ReactiveState> Component<State> {
     pub fn new(name: String, template_relative_path: String, state: State) -> Self {
         Self {
             _id: IDGenerator::get(),
@@ -112,7 +112,7 @@ impl<State: ComponentState> Component<State> {
     }
 }
 
-impl<State: ComponentState> Element for Component<State> {
+impl<State: ReactiveState> Element for Component<State> {
     
     fn render(&self, canvas: &skia_safe::Canvas) {
         self.content.render(canvas);

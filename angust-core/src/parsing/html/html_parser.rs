@@ -7,7 +7,7 @@ use crate::application::angust_configuration::AngustConfiguration;
 use crate::parsing::css::css_parser::merge_styles;
 use crate::parsing::css::stylesheet_parser::Stylesheet;
 use crate::parsing::expression::ast::ASTNode;
-use crate::rendering::elements::component::component_state::ComponentState;
+use crate::rendering::elements::component::component_state::ReactiveState;
 use crate::rendering::elements::component::functions::component_functions::ComponentFunctions;
 use crate::rendering::elements::element::Element;
 use crate::rendering::elements::styles::Styles;
@@ -24,7 +24,7 @@ pub fn parse_html_content(html: &str) -> NodeRef {
 /*
  * Function that maps the parsed DOM into a tree of Angust elements.
  */
-pub fn map_dom_to_elements<State : ComponentState>(
+pub fn map_dom_to_elements<State : ReactiveState>(
     dom: &NodeRef, 
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
@@ -41,7 +41,7 @@ pub fn map_dom_to_elements<State : ComponentState>(
     }
 }
 
-fn process_document_nodes<State : ComponentState>(
+fn process_document_nodes<State : ReactiveState>(
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
@@ -52,7 +52,7 @@ fn process_document_nodes<State : ComponentState>(
 }
 
 
-fn process_text_element<State : ComponentState>(
+fn process_text_element<State : ReactiveState>(
     text: &str,
     parent_styles: Option<&Styles>,
     context: &mut ParsingContext<State>,
@@ -81,7 +81,7 @@ fn process_text_element<State : ComponentState>(
     Some(Box::new(text_element))
 }
 
-pub fn general_traversal<State : ComponentState>(
+pub fn general_traversal<State : ReactiveState>(
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
@@ -101,7 +101,7 @@ pub fn general_traversal<State : ComponentState>(
     root_element
 }
 
-pub struct ParsingContext<'a, State : ComponentState> {
+pub struct ParsingContext<'a, State : ReactiveState> {
     pub angust_config: Option<AngustConfiguration>,
     pub stylesheet: Option<Stylesheet>,
     pub component_state: Option<&'a State>,
@@ -109,7 +109,7 @@ pub struct ParsingContext<'a, State : ComponentState> {
     pub template_expressions_asts: Option<&'a mut Vec<ASTNode>>,
 }
 
-impl<'a, State : ComponentState> Default for ParsingContext<'a, State> {
+impl<'a, State : ReactiveState> Default for ParsingContext<'a, State> {
     fn default() -> Self {
         ParsingContext {
             angust_config: None,
@@ -121,7 +121,7 @@ impl<'a, State : ComponentState> Default for ParsingContext<'a, State> {
     }
 }
 
-impl<'a, State : ComponentState> ParsingContext<'a, State> {
+impl<'a, State : ReactiveState> ParsingContext<'a, State> {
     pub fn new(
         angust_config: Option<AngustConfiguration>,
         stylesheet: Option<Stylesheet>,

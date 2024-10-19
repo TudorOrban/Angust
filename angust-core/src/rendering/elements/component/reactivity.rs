@@ -15,6 +15,15 @@ where
     }
 }
 
+impl<T: Clone> Clone for ReactiveField<T> {
+    fn clone(&self) -> Self {
+        Self {
+            value: self.value.clone(),
+            listeners: Vec::new(),
+        }
+    }
+}
+
 impl<T> ReactiveField<T> {
     pub fn new(value: T) -> Self {
         Self {

@@ -2,12 +2,12 @@ use std::any::Any;
 
 use regex::Regex;
 
-use crate::{parsing::expression::{ast, ast_evaluator}, rendering::elements::component::component_state::ComponentState};
+use crate::{parsing::expression::{ast, ast_evaluator}, rendering::elements::component::component_state::{ComponentState, ReactiveState}};
 
 use super::html_parser::ParsingContext;
 
 // On click attribute @onclick="event_handler_name()"
-pub fn parse_on_click_attribute<State: ComponentState>(
+pub fn parse_on_click_attribute<State: ReactiveState>(
     attributes: &kuchiki::Attributes,
     _: &ParsingContext<State>
 ) -> Option<String> {
@@ -35,20 +35,34 @@ pub fn parse_state_placeholder<State: ComponentState>(
             None => continue,
         };
 
-        let key = cap[1].trim();
-        let property = match state.get_property(key) {
-            Some(prop) => prop,
-            None => return Err(format!("Property '{}' not found in state", key)),
-        };
+        let keys: Vec<&str> = cap[1].trim().split('.').collect();
 
-        let value = if let Some(val) = property.downcast_ref::<String>() {
-            val.clone()
-        } else if let Some(val) = property.downcast_ref::<f64>() {
-            val.to_string()
-        } else if let Some(val) = property.downcast_ref::<i32>() {
-            val.to_string()
+        let mut current_state: &dyn ComponentState = state;
+        let mut property: Option<Box<dyn Any>> = None;
+
+        for key in keys {
+            // Try to find nested state or property
+            if let Some(nested_state) = current_state.get_nested_state(key) {
+                current_state = nested_state;
+            } else {
+                property = current_state.get_property(key);
+                break;
+            }
+        }
+
+        // Extract the final value into the appropriate type
+        let value = if let Some(val) = property {
+            if let Some(val) = val.downcast_ref::<String>() {
+                val.clone()
+            } else if let Some(val) = val.downcast_ref::<f64>() {
+                val.to_string()
+            } else if let Some(val) = val.downcast_ref::<i32>() {
+                val.to_string()
+            } else {
+                return Err(format!("Property '{}' is of an unsupported type", cap[1].trim()));
+            }
         } else {
-            return Err(format!("Property '{}' is of an unsupported type", key));
+            return Err(format!("Property '{}' not found in state", cap[1].trim()));
         };
 
         result = result.replace(matched_text.as_str(), &value);
@@ -57,8 +71,12 @@ pub fn parse_state_placeholder<State: ComponentState>(
     Ok(result)
 }
 
+
+
+
+
 // If directive @if="expression"
-pub fn parse_if_expression<State: ComponentState>(
+pub fn parse_if_expression<State: ReactiveState>(
     context: &mut ParsingContext<State>,
     attributes: &kuchiki::Attributes,
 ) -> Result<bool, String> {
@@ -83,7 +101,7 @@ pub fn parse_if_expression<State: ComponentState>(
     Ok(*is_if_true)
 }
 
-pub fn parse_if_attribute<State: ComponentState>(
+pub fn parse_if_attribute<State: ReactiveState>(
     attributes: &kuchiki::Attributes,
 ) -> Option<String> {
     if let Some(expression_value) = attributes.get("@if") {
@@ -94,7 +112,7 @@ pub fn parse_if_attribute<State: ComponentState>(
 }
 
 // For directive @for="for item in array"
-pub fn parse_for_expression<State: ComponentState>(
+pub fn parse_for_expression<State: ReactiveState>(
     context: &mut ParsingContext<State>,
     attributes: &kuchiki::Attributes,
 ) -> Result<ForLoopContext, String> {
@@ -129,7 +147,7 @@ pub fn parse_for_expression<State: ComponentState>(
     })
 }
 
-pub fn parse_for_attribute<State: ComponentState>(
+pub fn parse_for_attribute<State: ReactiveState>(
     attributes: &kuchiki::Attributes,
 ) -> Option<String> {
     if let Some(expression_value) = attributes.get("@for") {
