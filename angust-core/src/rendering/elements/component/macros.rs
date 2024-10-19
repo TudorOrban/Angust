@@ -1,25 +1,21 @@
 #[macro_export]
 macro_rules! define_component_state {
     ($name:ident { $($field:ident: $type:ty),* $(,)? }) => {
-        use $crate::rendering::elements::component::component_state::ComponentState;
-        use $crate::rendering::elements::component::reactivity::{ReactiveField, ComponentEvent};
-        use std::any::Any;
 
         #[derive(Debug)]
         pub struct $name {
-            $(pub $field: ReactiveField<$type>,)*
+            $(pub $field: $crate::rendering::elements::component::reactivity::ReactiveField<$type>,)*
         }
 
         impl $name {
             pub fn new($($field: $type,)*) -> Self {
                 Self {
-                    $($field: ReactiveField::new($field),)*
+                    $($field: $crate::rendering::elements::component::reactivity::ReactiveField::new($field),)*
                 }
             }
-            
         }
 
-        impl ComponentState for $name {
+        impl $crate::rendering::elements::component::component_state::ComponentState for $name {
             fn get_property(&self, property_name: &str) -> Option<Box<dyn Any>> {
                 match property_name {
                     $(stringify!($field) => Some(Box::new(self.$field.value.clone())),)*
@@ -49,7 +45,7 @@ macro_rules! define_component_state {
 
             fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
             where
-                F: 'static + FnMut(&ComponentEvent),
+                F: 'static + FnMut(&$crate::rendering::elements::component::reactivity::ComponentEvent),
             {
                 match property_name {
                     $(stringify!($field) => self.$field.subscribe(callback),)*

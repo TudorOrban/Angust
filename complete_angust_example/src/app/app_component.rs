@@ -1,6 +1,6 @@
 
 
-use std::collections::HashMap;
+use std::{collections::HashMap, any::Any};
 
 use angust::{
     define_component_state, 
@@ -12,12 +12,21 @@ use angust::{
 };
 
 
+
 define_component_state! {
     AppComponentState {
         content: String,
         count: f64,
         active_tab: String,
-        items: Vec<String>
+        items: Vec<String>,
+        some_state_part: SomeStatePart,
+    }
+}
+
+define_component_state! {
+    SomeStatePart {
+        value: String,
+        is_active: bool,
     }
 }
 
@@ -63,6 +72,10 @@ pub struct AppComponent {
 
 impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
+        let some_state_part = SomeStatePart::new(
+            String::from("Some value"),
+            true,
+        );
         let state_factory = || AppComponentState::new(
             String::from("Hello, App Component!"),
             0.0,
@@ -71,7 +84,8 @@ impl AppComponent {
                 String::from("Home"),
                 String::from("Dashboard"),
                 String::from("Settings"),
-            ]
+            ],
+            some_state_part,
         );
 
         registry.insert("app-component".to_string(), Box::new(move || {
