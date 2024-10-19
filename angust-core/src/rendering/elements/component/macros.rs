@@ -15,14 +15,39 @@ macro_rules! define_component_state {
             }
         }
 
+        
+        
         impl $crate::rendering::elements::component::component_state::ComponentState for $name {
-            fn get_property(&self, property_name: &str) -> Option<Box<dyn Any>> {
-                match property_name {
-                    $(stringify!($field) => Some(Box::new(self.$field.value.clone())),)*
+            type Output = Self;
+            
+            fn get_property(&self, path: &[&str]) -> Option<String> {
+                if path.is_empty() {
+                    return None;
+                }
+
+                match path[0] {
+                    $(
+                        stringify!($field) => {
+                            // Handle nested structs
+                            if path.len() > 1 {
+                                // If the field is a struct, recursively call get_property
+                                return self.$field.value.get_property(&path[1..]);
+                            }
+
+                            // For primitive types, convert to string
+                            if std::any::TypeId::of::<$type>() == std::any::TypeId::of::<String>()
+                                || std::any::TypeId::of::<$type>() == std::any::TypeId::of::<f64>()
+                                || std::any::TypeId::of::<$type>() == std::any::TypeId::of::<bool>() {
+                                return None;
+                            }
+
+                            None // Return None if it's a struct (no further path to drill down)
+                        },
+                    )*
                     _ => None,
                 }
             }
-
+        
             fn set_property(&mut self, property_name: &str, value: Box<dyn Any>) {
                 match property_name {
                     $(
@@ -42,24 +67,6 @@ macro_rules! define_component_state {
                 ]
             }
 
-            
-            fn get_nested_state(&self, property_name: &str) -> Option<&dyn $crate::rendering::elements::component::component_state::ComponentState> {
-                match property_name {
-                    $(
-                        stringify!($field) => {
-                            // If the field implements `ComponentState`, return it as nested state
-                            if let Some(nested) = self.$field.value.as_any().downcast_ref::<$type>()
-                                .and_then(|state| state.as_any().downcast_ref::<dyn $crate::rendering::elements::component::component_state::ComponentState>()) {
-                                Some(nested)
-                            } else {
-                                None
-                            }
-                        },
-                    )*
-                    _ => None,
-                }
-            }
-        
         }
 
         impl $crate::rendering::elements::component::component_state::ReactiveState for $name {

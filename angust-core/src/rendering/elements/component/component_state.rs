@@ -2,13 +2,48 @@ use std::any::Any;
 
 use super::reactivity::ComponentEvent;
 
+pub enum StateValue<T> {
+    Text(String),
+    Number(f64),
+    Boolean(bool),
+    Nested(T),
+}
 
-pub trait ComponentState: AsAny {
-    fn get_property(&self, property_name: &str) -> Option<Box<dyn Any>>;
+// impl StateValue< {
+//     pub fn as_text(&self) -> Option<&String> {
+//         if let StateValue::Text(ref val) = self {
+//             Some(val)
+//         } else {
+//             None
+//         }
+//     }
+
+//     pub fn as_number(&self) -> Option<f64> {
+//         if let StateValue::Number(val) = self {
+//             Some(*val)
+//         } else {
+//             None
+//         }
+//     }
+
+//     // Delegating to the nested state's `get_property`
+//     pub fn get_nested_property(&self, property_name: &str) -> Option<StateValue> {
+//         if let StateValue::Nested(ref nested) = self {
+//             nested.get_property(property_name)
+//         } else {
+//             None
+//         }
+//     }
+// }
+
+
+
+pub trait ComponentState {
+    type Output;
+
+    fn get_property(&self, path: &[&str]) -> Option<String>;
     fn set_property(&mut self, property_name: &str, value: Box<dyn Any>);
     fn get_all_properties(&self) -> Vec<&str>;
-
-    fn get_nested_state(&self, property_name: &str) -> Option<&dyn ComponentState>;
 }
 
 pub trait ReactiveState : ComponentState {
@@ -17,33 +52,21 @@ pub trait ReactiveState : ComponentState {
             F: 'static + FnMut(&ComponentEvent);
 }
 
-pub trait AsAny {
-    fn as_any(&self) -> &dyn Any;
-}
-
-impl<T: Any> AsAny for T {
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-}
-
 
 // Implementations
 pub struct NoState {}
 
 impl ComponentState for NoState {
-    fn get_property(&self, _property_name: &str) -> Option<Box<dyn std::any::Any>> {
+    type Output = ();
+
+    fn get_property(&self, path: &[&str]) -> Option<String> {
         None
     }
 
-    fn set_property(&mut self, _property_name: &str, _value: Box<dyn std::any::Any>) {}
+    fn set_property(&mut self, _property_name: &str, _value: Box<dyn Any>) {}
 
     fn get_all_properties(&self) -> Vec<&str> {
         vec![]
-    }
-
-    fn get_nested_state(&self, _property_name: &str) -> Option<&dyn ComponentState> {
-        None
     }
 }
 
@@ -57,8 +80,10 @@ impl ReactiveState for NoState {
 }
 
 impl ComponentState for String {
-    fn get_property(&self, _property_name: &str) -> Option<Box<dyn Any>> {
-        None // Strings don't have nested properties
+    type Output = String;
+
+    fn get_property(&self, path: &[&str]) -> Option<String> {
+        None
     }
     
     fn set_property(&mut self, _property_name: &str, _value: Box<dyn Any>) {
@@ -67,16 +92,14 @@ impl ComponentState for String {
     
     fn get_all_properties(&self) -> Vec<&str> {
         vec![]
-    }
-    
-    fn get_nested_state(&self, _property_name: &str) -> Option<&dyn ComponentState> {
-        None // Strings aren't complex types
     }
 }
 
 impl ComponentState for f64 {
-    fn get_property(&self, _property_name: &str) -> Option<Box<dyn Any>> {
-        None // f64 doesn't have nested properties
+    type Output = f64;
+
+    fn get_property(&self, path: &[&str]) -> Option<String> {
+        None
     }
     
     fn set_property(&mut self, _property_name: &str, _value: Box<dyn Any>) {
@@ -86,8 +109,20 @@ impl ComponentState for f64 {
     fn get_all_properties(&self) -> Vec<&str> {
         vec![]
     }
+}
+
+impl ComponentState for bool {
+    type Output = bool;
+
+    fn get_property(&self, path: &[&str]) -> Option<String> {
+        None
+    }
     
-    fn get_nested_state(&self, _property_name: &str) -> Option<&dyn ComponentState> {
-        None // f64 isn't a complex type
+    fn set_property(&mut self, _property_name: &str, _value: Box<dyn Any>) {
+        // Do nothing
+    }
+    
+    fn get_all_properties(&self) -> Vec<&str> {
+        vec![]
     }
 }

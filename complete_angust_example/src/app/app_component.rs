@@ -6,20 +6,78 @@ use angust::{
     define_component_state, 
     rendering::elements::component::{
         component::Component, 
-        component_state::AsAny,
         component_factory_registry::ComponentFactory, 
-        functions::component_functions::ComponentFunctions
+        functions::component_functions::ComponentFunctions, test::Reflect
     }, wrap_fn
 };
 
 
+struct Address {
+    street: String,
+    zip: u32,
+}
+
+struct User {
+    name: String,
+    age: u8,
+    address: Address,
+}
+
+impl Reflect for Address {
+    fn get_field(&self, name: &str) -> Option<&dyn Reflect> {
+        match name {
+            "street" => Some(&self.street),
+            "zip" => Some(&self.zip),
+            _ => None,
+        }
+    }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl Reflect for User {
+    fn get_field(&self, name: &str) -> Option<&dyn Reflect> {
+        match name {
+            "name" => Some(&self.name),
+            "age" => Some(&self.age),
+            "address" => Some(&self.address),
+            _ => None,
+        }
+    }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+fn print_reflect_value(field: &dyn Reflect) {
+    if let Some(val) = field.as_any().downcast_ref::<String>() {
+        println!("String value: {}", val);
+    } else if let Some(val) = field.as_any().downcast_ref::<u32>() {
+        println!("u32 value: {}", val);
+    } else if let Some(val) = field.as_any().downcast_ref::<u8>() {
+        println!("u8 value: {}", val);
+    } else {
+        println!("Unknown type");
+    }
+}
+fn get_nested_field<'a>(obj: &'a dyn Reflect, path: &[&str]) -> Option<&'a dyn Reflect> {
+    let mut current = obj;
+    for &field in path {
+        if let Some(next) = current.get_field(field) {
+            current = next;
+        } else {
+            return None;
+        }
+    }
+    Some(current)
+}
 
 define_component_state! {
     AppComponentState {
         content: String,
         count: f64,
         active_tab: String,
-        items: Vec<String>,
+        // items: Vec<String>,
         some_state_part: SomeStatePart,
     }
 }
@@ -73,6 +131,20 @@ pub struct AppComponent {
 
 impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
+        let user = User {
+            name: "Alice".to_string(),
+            age: 30,
+            address: Address {
+                street: "123 Main St".to_string(),
+                zip: 90210,
+            },
+        };
+    
+        
+    if let Some(field) = get_nested_field(&user, &["address", "street"]) {
+        print_reflect_value(field);
+    }
+
         registry.insert("app-component".to_string(), Box::new(move || {
             let some_state_part = SomeStatePart::new(
                 String::from("Some value"),
@@ -82,11 +154,11 @@ impl AppComponent {
                 String::from("Hello, App Component!"),
                 0.0,
                 String::from("Home"),
-                vec![
-                    String::from("Home"),
-                    String::from("Dashboard"),
-                    String::from("Settings"),
-                ],
+                // vec![
+                //     String::from("Home"),
+                //     String::from("Dashboard"),
+                //     String::from("Settings"),
+                // ],
                 some_state_part,
             );
 
