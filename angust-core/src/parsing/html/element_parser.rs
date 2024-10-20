@@ -33,14 +33,14 @@ fn process_div_element<State : ReactiveState>(
     let mut container = Container::new();
     let attributes = elem_data.attributes.borrow();
 
-    // let should_add_to_dom = directive_parser::parse_if_expression(context, &attributes);
-    // if should_add_to_dom.is_err() {
-    //     println!("Error parsing @if directive: {:?}", should_add_to_dom.err());
-    //     return Box::new(container) // TODO: Report error
-    // }
-    // if !should_add_to_dom.unwrap() {
-    //     return Box::new(container)
-    // }
+    let should_add_to_dom = directive_parser::parse_if_expression(context, &attributes);
+    if should_add_to_dom.is_err() {
+        println!("Error parsing @if directive: {:?}", should_add_to_dom.err());
+        return Box::new(container) // TODO: Report error
+    }
+    if !should_add_to_dom.unwrap() {
+        return Box::new(container)
+    }
 
     // let for_loop_context = directive_parser::parse_for_expression(context, &attributes);
     // if for_loop_context.is_err() {

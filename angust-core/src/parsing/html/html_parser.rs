@@ -63,15 +63,14 @@ fn process_text_element<State : ReactiveState>(
     }
 
     // Apply state placeholders
-    // let final_text = match context.component_state {
-    //     Some(state) => directive_parser::parse_state_placeholder(trimmed_text, state)
-    //         .unwrap_or_else(|er| {
-    //             println!("Error parsing state placeholders in text element: {}", er);
-    //             trimmed_text.to_string()
-    //         }),
-    //     None => trimmed_text.to_string(),
-    // };
-    let final_text = trimmed_text.to_string();
+    let final_text = match context.component_state {
+        Some(state) => directive_parser::parse_state_placeholder(trimmed_text, state)
+            .unwrap_or_else(|er| {
+                println!("Error parsing state placeholders in text element: {}", er);
+                trimmed_text.to_string()
+            }),
+        None => trimmed_text.to_string(),
+    };
 
     let mut text_element = Text::new(final_text);
     if let Some(styles) = parent_styles {

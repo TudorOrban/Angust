@@ -18,6 +18,7 @@ use angust_macros::component_state;
 struct Location {
     lat: f64,
     lon: f64,
+    label: String,
 }
 
 #[component_state]
@@ -51,17 +52,6 @@ struct AppComponentState {
 //     } else {
 //         println!("Unknown type");
 //     }
-// }
-// fn get_nested_field<'a>(obj: &'a dyn Reflect, path: &[&str]) -> Option<&'a dyn Reflect> {
-//     let mut current = obj;
-//     for &field in path {
-//         if let Some(next) = current.get_field(field) {
-//             current = next;
-//         } else {
-//             return None;
-//         }
-//     }
-//     Some(current)
 // }
 
 // define_component_state! {
@@ -139,6 +129,7 @@ impl AppComponent {
                     Location::new(
                         34.0522,
                         -118.2437,
+                        "Los Angeles".to_string()
                     ),
                 ),
                 "Hello, App Component!".to_string(),
