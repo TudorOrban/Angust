@@ -3,7 +3,6 @@
 use std::{collections::HashMap, any::Any};
 
 use angust::{
-    define_component_state, 
     rendering::elements::component::{
         component::Component, 
         component_factory_registry::ComponentFactory, 
@@ -12,84 +11,89 @@ use angust::{
         reactivity::{ComponentEvent, ReactiveField}
     }, wrap_fn
 };
-use angust_macros::{reactive_struct, ReflectiveStruct};
+use angust_macros::component_state;
 
-#[reactive_struct]
-#[derive(ReflectiveStruct)]
+#[component_state]
+#[derive(Clone)]
 struct Location {
     lat: f64,
     lon: f64,
 }
 
-#[derive(ReflectiveStruct)]
+#[component_state]
+#[derive(Clone)]
 struct Address {
     street: String,
     zip: u32,
     location: Location,
 }
 
-#[derive(ReflectiveStruct)]
-struct User {
+#[component_state]
+#[derive(Clone)]
+struct AppComponentState {
     name: String,
     age: u8,
     address: Address,
+    content: String,
+    count: f64,
+    active_tab: String,
 }
 
-fn print_reflect_value(field: &dyn Reflect) {
-    if let Some(val) = field.as_any().downcast_ref::<String>() {
-        println!("String value: {}", val);
-    } else if let Some(val) = field.as_any().downcast_ref::<u32>() {
-        println!("u32 value: {}", val);
-    } else if let Some(val) = field.as_any().downcast_ref::<u8>() {
-        println!("u8 value: {}", val);
-    } else if let Some(val) = field.as_any().downcast_ref::<f64>() {
-        println!("f64 value: {}", val);
-    } else {
-        println!("Unknown type");
-    }
-}
-fn get_nested_field<'a>(obj: &'a dyn Reflect, path: &[&str]) -> Option<&'a dyn Reflect> {
-    let mut current = obj;
-    for &field in path {
-        if let Some(next) = current.get_field(field) {
-            current = next;
-        } else {
-            return None;
-        }
-    }
-    Some(current)
-}
+// fn print_reflect_value(field: &dyn Reflect) {
+//     if let Some(val) = field.as_any().downcast_ref::<String>() {
+//         println!("String value: {}", val);
+//     } else if let Some(val) = field.as_any().downcast_ref::<u32>() {
+//         println!("u32 value: {}", val);
+//     } else if let Some(val) = field.as_any().downcast_ref::<u8>() {
+//         println!("u8 value: {}", val);
+//     } else if let Some(val) = field.as_any().downcast_ref::<f64>() {
+//         println!("f64 value: {}", val);
+//     } else {
+//         println!("Unknown type");
+//     }
+// }
+// fn get_nested_field<'a>(obj: &'a dyn Reflect, path: &[&str]) -> Option<&'a dyn Reflect> {
+//     let mut current = obj;
+//     for &field in path {
+//         if let Some(next) = current.get_field(field) {
+//             current = next;
+//         } else {
+//             return None;
+//         }
+//     }
+//     Some(current)
+// }
 
-define_component_state! {
-    AppComponentState {
-        content: String,
-        count: f64,
-        active_tab: String,
-        // items: Vec<String>,
-        some_state_part: SomeStatePart,
-    }
-}
+// define_component_state! {
+//     AppComponentState {
+//         content: String,
+//         count: f64,
+//         active_tab: String,
+//         // items: Vec<String>,
+//         some_state_part: SomeStatePart,
+//     }
+// }
 
-define_component_state! {
-    SomeStatePart {
-        value: String,
-        is_active: bool,
-    }
-}
+// define_component_state! {
+//     SomeStatePart {
+//         value: String,
+//         is_active: bool,
+//     }
+// }
 
 impl AppComponentState {
     
     pub fn toggle_content(&mut self) {
-        if self.content.value == "Hello, App Component!" {
-            self.content.set("Hello, World!".to_string());
+        if self.content == "Hello, App Component!" {
+            self.content_reactive.set("Hello, World!".to_string());
         } else {
-            self.content.set("Hello, App Component!".to_string());
+            self.content_reactive.set("Hello, App Component!".to_string());
         }
     }
 
     pub fn increment_count(&mut self) {
-        let current_value = self.count.value + 1.0;
-        self.count.set(current_value);
+        let current_value = self.count + 1.0;
+        self.count_reactive.set(current_value);
     }
     
     pub fn is_active_tab(&self, tab_name: String, is_active: bool) -> bool {
@@ -97,60 +101,49 @@ impl AppComponentState {
             return false;
         }
 
-        self.active_tab.value == tab_name
+        self.active_tab_reactive.value == tab_name
     }
 
     pub fn set_active_tab_home(&mut self) {
-        self.active_tab.set("Home".to_string());
+        self.active_tab_reactive.set("Home".to_string());
     }
 
     pub fn set_active_tab_dashboard(&mut self) {
-        self.active_tab.set("Dashboard".to_string());
+        self.active_tab_reactive.set("Dashboard".to_string());
     }
 
     pub fn set_active_tab_settings(&mut self) {
-        self.active_tab.set("Settings".to_string());
+        self.active_tab_reactive.set("Settings".to_string());
     }
 }
 
 pub struct AppComponent {
-    component: Component<AppComponentState>,    
+    _component: Component<AppComponentState>,    
 }
 
 impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
-        let user = User {
-            name: "Alice".to_string(),
-            age: 30,
-            address: Address {
-                street: "123 Main St".to_string(),
-                zip: 90210,
-                location: Location {
-                    lat: 34.0522,
-                    lon: -118.2437,
-                },
-            },
-        };
+        // let state = 
         
-        if let Some(field) = get_nested_field(&user, &["address", "location", "lat"]) {
-            print_reflect_value(field);
-        }
+        // if let Some(field) = get_nested_field(&state, &["address", "location", "lat"]) {
+        //     print_reflect_value(field);
+        // }
 
         registry.insert("app-component".to_string(), Box::new(move || {
-            let some_state_part = SomeStatePart::new(
-                String::from("Some value"),
-                true,
-            );
             let state_factory = || AppComponentState::new(
-                String::from("Hello, App Component!"),
+                "Alice".to_string(),
+                30,
+                Address::new(
+                    "123 Main St".to_string(),
+                    90210,
+                    Location::new(
+                        34.0522,
+                        -118.2437,
+                    ),
+                ),
+                "Hello, App Component!".to_string(),
                 0.0,
-                String::from("Home"),
-                // vec![
-                //     String::from("Home"),
-                //     String::from("Dashboard"),
-                //     String::from("Settings"),
-                // ],
-                some_state_part,
+                "Home".to_string(),
             );
 
             let mut component = Component::new(

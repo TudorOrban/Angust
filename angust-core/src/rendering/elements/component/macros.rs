@@ -57,16 +57,16 @@ macro_rules! define_component_state {
 
         }
 
-        impl $crate::rendering::elements::component::component_state::ReactiveState for $name {
-            fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
-            where
-                F: 'static + FnMut(&$crate::rendering::elements::component::reactivity::ComponentEvent),
-            {
-                match property_name {
-                    $(stringify!($field) => self.$field.subscribe(callback),)*
-                    _ => {}
-                }
-            }
-        }
+        // impl $crate::rendering::elements::component::component_state::ReactiveState for $name {
+        //     fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
+        //     where
+        //         F: 'static + FnMut(&$crate::rendering::elements::component::reactivity::ComponentEvent),
+        //     {
+        //         match property_name {
+        //             $(stringify!($field) => self.$field.subscribe(callback),)*
+        //             _ => {}
+        //         }
+        //     }
+        // }
     };
 }
