@@ -10,7 +10,7 @@ use angust::{
         component_state::{ReflectiveState, ReactiveState},
         reactivity::{ComponentEvent, ReactiveField}
     }, 
-    // wrap_fn
+    wrap_fn
 };
 use angust_macros::component_state;
 
@@ -28,6 +28,7 @@ struct Address {
     street: String,
     zip: u32,
     location: Location,
+    active_tab: String,
 }
 
 #[component_state]
@@ -38,7 +39,6 @@ struct AppComponentState {
     address: Address,
     content: String,
     count: f64,
-    active_tab: String,
 }
 
 impl AppComponentState {
@@ -57,23 +57,24 @@ impl AppComponentState {
     }
     
     pub fn is_active_tab(&self, tab_name: String, is_active: bool) -> bool {
+        println!("Checking if tab is active: {}", tab_name);
         if !is_active {  
             return false;
         }
 
-        self.active_tab_reactive.value == tab_name
+        self.address.active_tab_reactive.value == tab_name
     }
 
     pub fn set_active_tab_home(&mut self) {
-        self.active_tab_reactive.set("Home".to_string());
+        self.address.active_tab_reactive.set("Home".to_string());
     }
 
     pub fn set_active_tab_dashboard(&mut self) {
-        self.active_tab_reactive.set("Dashboard".to_string());
+        self.address.active_tab_reactive.set("Dashboard".to_string());
     }
 
     pub fn set_active_tab_settings(&mut self) {
-        self.active_tab_reactive.set("Settings".to_string());
+        self.address.active_tab_reactive.set("Settings".to_string());
     }
 }
 
@@ -95,10 +96,10 @@ impl AppComponent {
                         -118.2437,
                         "Los Angeles".to_string()
                     ),
+                    "Home".to_string(),
                 ),
                 "Hello, App Component!".to_string(),
                 0.0,
-                "Home".to_string(),
             );
 
             let mut component = Component::new(
@@ -115,8 +116,10 @@ impl AppComponent {
                 vec![],
                 vec![],
                 vec![
-                    // ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool)),
-
+                    ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool)),
+                    // ("set_active_tab_home", wrap_fn!(AppComponentState, AppComponentState::set_active_tab_home)),
+                    // ("set_active_tab_dashboard", wrap_fn!(AppComponentState, AppComponentState::set_active_tab_dashboard)),
+                    // ("set_active_tab_settings", wrap_fn!(AppComponentState, AppComponentState::set_active_tab_settings)),
                 ]
             );
             component.add_component_functions(component_functions);

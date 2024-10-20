@@ -1,10 +1,11 @@
 use std::{any::Any, collections::HashMap};
 
+
 pub struct ComponentFunctions<State> {
     pub event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
     pub boolean_evaluators: HashMap<String, Box<dyn Fn(&State) -> bool>>,
     pub array_getters: HashMap<String, Box<dyn Fn(&State) -> Vec<&dyn Any>>>,
-    pub dynamic_params_functions: HashMap<String, Box<dyn for<'a, 'b> Fn(&'a State, Vec<&'b dyn Any>) -> &'a dyn Any>>,  // Adjusted lifetimes
+    pub dynamic_params_functions: HashMap<String, Box<dyn for<'a> Fn(&'a State, Vec<&dyn Any>) -> &'a dyn Any>>,
 }
 
 impl<State> ComponentFunctions<State> {
@@ -12,7 +13,7 @@ impl<State> ComponentFunctions<State> {
         event_handlers: Vec<(&str, Box<dyn FnMut(&mut State)>)>,
         boolean_evaluators: Vec<(&str, Box<dyn Fn(&State) -> bool>)>,
         array_getters: Vec<(&str, Box<dyn Fn(&State) -> Vec<&dyn Any>>)>,
-        dynamic_params_functions: Vec<(&str, Box<dyn for<'a, 'b> Fn(&'a State, Vec<&'b dyn Any>) -> &'a dyn Any>)>,  // Adjusted lifetimes
+        dynamic_params_functions: Vec<(&str, Box<dyn for<'a> Fn(&'a State, Vec<&dyn Any>) -> &'a dyn Any>)>,  
     ) -> Self {
         let mut functions = Self::default();
 
@@ -32,7 +33,6 @@ impl<State> ComponentFunctions<State> {
         functions
     }
 }
-
 
 impl<State> Default for ComponentFunctions<State> {
     fn default() -> Self {
