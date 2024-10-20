@@ -95,8 +95,8 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        impl Reflect for #struct_name {
-            fn get_field(&self, name: &str) -> Option<&dyn Reflect> {
+        impl ReflectiveState for #struct_name {
+            fn get_field(&self, name: &str) -> Option<&dyn ReflectiveState> {
                 match name {
                     #(#get_field_arms)*
                     _ => None,

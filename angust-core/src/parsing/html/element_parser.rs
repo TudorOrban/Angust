@@ -46,6 +46,8 @@ fn process_div_element<State : ReactiveState>(
     // if for_loop_context.is_err() {
     //     println!("Error parsing @for directive: {:?}", for_loop_context.err());
     //     return Box::new(container) // TODO: Report error
+    // } else {
+    //     println!("For loop context: {:?}", for_loop_context.unwrap());
     // }
 
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);

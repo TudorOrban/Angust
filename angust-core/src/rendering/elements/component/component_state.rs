@@ -1,38 +1,39 @@
+use std::any::Any;
+
 use super::reactivity::ComponentEvent;
 
 
 // Core traits of the component state, enabling (nested) reflection and reactivity respectively
-pub trait Reflect {
-    fn get_field(&self, name: &str) -> Option<&dyn Reflect>;
+pub trait ReflectiveState {
+    fn get_field(&self, name: &str) -> Option<&dyn ReflectiveState>;
     fn set_field(&mut self, name: &str, value: Box<dyn std::any::Any>);
     fn get_all_properties(&self) -> Vec<&str>;
-
-    fn as_any(&self) -> &dyn std::any::Any;
+    fn as_any(&self) -> &dyn Any;
 }
 
-pub trait ReactiveState : Reflect {
+pub trait ReactiveState : ReflectiveState {
     fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
         where
             F: 'static + FnMut(&ComponentEvent);
 }
 
-pub fn get_nested_field<'a>(obj: &'a dyn Reflect, path: &[&str]) -> Option<&'a dyn Reflect> {
+// Nested reflection
+pub fn get_nested_field<'a>(
+    obj: &'a dyn ReflectiveState, 
+    path: &[&str]
+) -> Option<&'a dyn ReflectiveState> {
     let mut current = obj;
     for &field in path {
-        if let Some(next) = current.get_field(field) {
-            current = next;
-        } else {
-            return None;
-        }
+        current = current.get_field(field)?;
     }
     Some(current)
 }
 
-// Implementations
+
 pub struct NoState;
 
-impl Reflect for NoState {
-    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+impl ReflectiveState for NoState {
+    fn get_field(&self, _name: &str) -> Option<&dyn ReflectiveState> {
         None
     }
 
@@ -56,8 +57,8 @@ impl ReactiveState for NoState {
     }
 }
 
-impl Reflect for String {
-    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+impl ReflectiveState for String {
+    fn get_field(&self, _name: &str) -> Option<&dyn ReflectiveState> {
         None
     }
 
@@ -74,8 +75,8 @@ impl Reflect for String {
     }
 }
 
-impl Reflect for u32 {
-    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+impl ReflectiveState for u32 {
+    fn get_field(&self, _name: &str) -> Option<&dyn ReflectiveState> {
         None
     }
 
@@ -92,8 +93,8 @@ impl Reflect for u32 {
     }
 }
 
-impl Reflect for u8 {
-    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+impl ReflectiveState for u8 {
+    fn get_field(&self, _name: &str) -> Option<&dyn ReflectiveState> {
         None
     }
 
@@ -110,8 +111,8 @@ impl Reflect for u8 {
     }
 }
 
-impl Reflect for f64 {
-    fn get_field(&self, _name: &str) -> Option<&dyn Reflect> {
+impl ReflectiveState for f64 {
+    fn get_field(&self, _name: &str) -> Option<&dyn ReflectiveState> {
         None
     }
 

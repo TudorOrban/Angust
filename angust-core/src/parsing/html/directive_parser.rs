@@ -1,8 +1,6 @@
-use std::any::Any;
-
 use regex::Regex;
 
-use crate::{parsing::expression::{ast, ast_evaluator}, rendering::elements::component::component_state::{get_nested_field, ReactiveState, Reflect}};
+use crate::{parsing::expression::{ast, ast_evaluator}, rendering::elements::component::component_state::{get_nested_field, ReactiveState, ReflectiveState}};
 
 use super::html_parser::ParsingContext;
 
@@ -23,7 +21,7 @@ pub fn parse_on_click_attribute<State: ReactiveState>(
 
 // State placeholders {{ component_state_property }}
 
-pub fn parse_state_placeholder<State: Reflect>(
+pub fn parse_state_placeholder<State: ReflectiveState>(
     text: &str,
     state: &State,
 ) -> Result<String, String> {
@@ -119,8 +117,8 @@ pub fn parse_if_attribute<State: ReactiveState>(
 //     let array_name = captures.get(2).unwrap().as_str();
 
 //     let state = context.component_state.as_ref().expect("Component state not found");
-//     let array_property = match state.get_property(array_name) {
-//         Some(prop) => prop,
+//     let array_property = match state.get_field(array_name) {
+//         Some(prop) => prop.as_any(),
 //         None => return Err(format!("Array '{}' not found in state", array_name)),
 //     };
 
@@ -135,15 +133,15 @@ pub fn parse_if_attribute<State: ReactiveState>(
 //     })
 // }
 
-pub fn parse_for_attribute<State: ReactiveState>(
-    attributes: &kuchiki::Attributes,
-) -> Option<String> {
-    if let Some(expression_value) = attributes.get("@for") {
-        let expression = expression_value.to_string().trim().to_string();
-        return Some(expression);
-    }
-    None
-}
+// pub fn parse_for_attribute<State: ReactiveState>(
+//     attributes: &kuchiki::Attributes,
+// ) -> Option<String> {
+//     if let Some(expression_value) = attributes.get("@for") {
+//         let expression = expression_value.to_string().trim().to_string();
+//         return Some(expression);
+//     }
+//     None
+// }
 
 #[derive(Debug)]
 pub struct ForLoopContext {

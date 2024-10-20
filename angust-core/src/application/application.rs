@@ -123,7 +123,7 @@ impl<State> Application<State> {
 
     fn handle_redraw_requested(&mut self) {
         self.renderer.render_frame(&mut self.windowing_system.gr_context);
-        // self.windowing_system.gr_context.flush_and_submit();
+        self.windowing_system.gr_context.flush_and_submit();
     
         self.windowing_system
             .gl_surface

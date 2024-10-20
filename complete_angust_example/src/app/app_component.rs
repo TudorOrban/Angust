@@ -7,9 +7,10 @@ use angust::{
         component::Component, 
         component_factory_registry::ComponentFactory, 
         functions::component_functions::ComponentFunctions, 
-        component_state::{Reflect, ReactiveState},
+        component_state::{ReflectiveState, ReactiveState},
         reactivity::{ComponentEvent, ReactiveField}
-    }, wrap_fn
+    }, 
+    // wrap_fn
 };
 use angust_macros::component_state;
 
@@ -39,37 +40,6 @@ struct AppComponentState {
     count: f64,
     active_tab: String,
 }
-
-// fn print_reflect_value(field: &dyn Reflect) {
-//     if let Some(val) = field.as_any().downcast_ref::<String>() {
-//         println!("String value: {}", val);
-//     } else if let Some(val) = field.as_any().downcast_ref::<u32>() {
-//         println!("u32 value: {}", val);
-//     } else if let Some(val) = field.as_any().downcast_ref::<u8>() {
-//         println!("u8 value: {}", val);
-//     } else if let Some(val) = field.as_any().downcast_ref::<f64>() {
-//         println!("f64 value: {}", val);
-//     } else {
-//         println!("Unknown type");
-//     }
-// }
-
-// define_component_state! {
-//     AppComponentState {
-//         content: String,
-//         count: f64,
-//         active_tab: String,
-//         // items: Vec<String>,
-//         some_state_part: SomeStatePart,
-//     }
-// }
-
-// define_component_state! {
-//     SomeStatePart {
-//         value: String,
-//         is_active: bool,
-//     }
-// }
 
 impl AppComponentState {
     
@@ -108,17 +78,11 @@ impl AppComponentState {
 }
 
 pub struct AppComponent {
-    _component: Component<AppComponentState>,    
+
 }
 
 impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
-        // let state = 
-        
-        // if let Some(field) = get_nested_field(&state, &["address", "location", "lat"]) {
-        //     print_reflect_value(field);
-        // }
-
         registry.insert("app-component".to_string(), Box::new(move || {
             let state_factory = || AppComponentState::new(
                 "Alice".to_string(),
@@ -151,7 +115,8 @@ impl AppComponent {
                 vec![],
                 vec![],
                 vec![
-                    ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool)),
+                    // ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool)),
+
                 ]
             );
             component.add_component_functions(component_functions);

@@ -9,7 +9,7 @@ use crate::{
 use super::{component::Component, component_state::ReactiveState};
 
 
-pub fn load_component_template<State: ReactiveState>(component: &mut Component<State>) {
+pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Component<State>) {
     // Load template
     let project_root = PathBuf::from(identify_project_root_path());
     let template_path = project_root.join(component.template_relative_path.clone());
@@ -21,7 +21,7 @@ pub fn load_component_template<State: ReactiveState>(component: &mut Component<S
     let dom = html_parser::parse_html_content(&template_content);
 
     let mut container = Box::new(Container::new());
-    let mut parsing_context: ParsingContext<State> = html_parser::ParsingContext::new(
+    let mut parsing_context: ParsingContext<'a, State> = html_parser::ParsingContext::new(
         None, 
         None, 
         Some(&component.state),
