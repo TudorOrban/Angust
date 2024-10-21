@@ -1,11 +1,35 @@
 use std::{any::Any, cell::RefCell, collections::HashMap, rc::Rc};
 
-use crate::rendering::elements::component::{component_state::{get_nested_field, ReactiveState}, functions::component_functions::ComponentFunctions};
+use crate::rendering::elements::component::{component_state::{get_nested_field, get_nested_field_new, ReactiveState, ReflectiveState, ReflectiveStateNew}, functions::component_functions::ComponentFunctions};
 
 use super::ast::{ASTNode, Operator};
 
 
 // TODO: Fix Box leaks with thread_local! storage
+pub fn evaluate_ast_new<State: ReflectiveStateNew>(
+    node: &ASTNode,
+    state: &State,
+    functions: &ComponentFunctions<State>,
+) -> Result<Box<dyn Any>, String> {
+    match node {
+        ASTNode::Number(num) => {
+            Ok(Box::new(*num))
+        },
+        ASTNode::StringLiteral(string) => {
+            Ok(Box::new(string.clone()))
+        },
+        ASTNode::Identifier(name) => {
+            match get_nested_field_new(state, &[name]) {
+                Some(val) => {
+                    Ok(Box::new(val.as_any()))
+                }
+                None => Err(format!("Field {} not found", name)),
+            }
+        },
+        _ => Err("Only identifiers are supported for now".to_string()),
+    }
+}
+
 pub fn evaluate_ast<'a, State: ReactiveState>(
     node: &ASTNode,
     state: &'a State,

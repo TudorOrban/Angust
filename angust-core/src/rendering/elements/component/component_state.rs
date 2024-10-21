@@ -1,12 +1,66 @@
-use std::any::Any;
+use std::{any::Any, rc::Rc};
 
 use super::reactivity::ComponentEvent;
 
+// New
+pub trait ReflectiveStateNew {
+    fn get_field(&self, name: &str) -> Option<Box<dyn ReflectiveStateNew>>;
+    fn set_field(&mut self, name: &str, value: Box<dyn Any>);
+    fn get_all_properties(&self) -> Vec<&str>;
+    fn as_any(&self) -> Box<dyn Any>; 
+    fn clone_box(&self) -> Box<dyn ReflectiveStateNew>;
+}
 
+impl Clone for Box<dyn ReflectiveStateNew> {
+    fn clone(&self) -> Box<dyn ReflectiveStateNew> {
+        self.clone_box()
+    }
+}
+
+pub fn get_nested_field_new(
+    obj: &dyn ReflectiveStateNew, 
+    path: &[&str]
+) -> Option<Box<dyn ReflectiveStateNew>> {
+    let mut current: Box<dyn ReflectiveStateNew> = obj.clone_box(); 
+
+    for &field in path {
+        current = current.get_field(field)?;
+    }
+    Some(current)
+}
+
+
+
+impl ReflectiveStateNew for String {
+    fn get_field(&self, _name: &str) -> Option<Box<dyn ReflectiveStateNew>> {
+        None
+    }
+
+    fn set_field(&mut self, _name: &str, _value: Box<dyn Any>) {
+        // Do nothing
+    }
+
+    fn get_all_properties(&self) -> Vec<&str> {
+        vec![]
+    }
+
+    fn as_any(&self) -> Box<dyn Any> {
+        Box::new(self.clone())
+    }
+
+    fn clone_box(&self) -> Box<dyn ReflectiveStateNew> {
+        Box::new(self.clone())
+    }
+}
+
+
+
+
+// Old
 // Core traits of the component state, enabling (nested) reflection and reactivity respectively
 pub trait ReflectiveState {
     fn get_field(&self, name: &str) -> Option<&dyn ReflectiveState>;
-    fn set_field(&mut self, name: &str, value: Box<dyn std::any::Any>);
+    fn set_field(&mut self, name: &str, value: Box<dyn Any>);
     fn get_all_properties(&self) -> Vec<&str>;
     fn as_any(&self) -> &dyn Any;
 }
@@ -28,7 +82,6 @@ pub fn get_nested_field<'a>(
     }
     Some(current)
 }
-
 
 pub struct NoState;
 
