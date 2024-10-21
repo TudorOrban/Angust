@@ -148,6 +148,6 @@ impl Element for Image {
         self.allocate_space(allocated_position, allocated_size);
     }
 
-    fn react_to_state_change(&mut self, component_id: String) {}
+    fn react_to_state_change(&mut self, _component_id: String) {}
 }
 

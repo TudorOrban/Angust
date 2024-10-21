@@ -1,26 +1,28 @@
-use std::any::Any;
+use std::{any::Any, cell::RefCell, collections::HashMap, rc::Rc};
 
 use crate::rendering::elements::component::{component_state::{get_nested_field, ReactiveState}, functions::component_functions::ComponentFunctions};
 
 use super::ast::{ASTNode, Operator};
 
+
+// TODO: Fix Box leaks with thread_local! storage
 pub fn evaluate_ast<'a, State: ReactiveState>(
     node: &ASTNode,
     state: &'a State,
     functions: &ComponentFunctions<State>,
-) -> Result<&'a dyn Any, String> {  // Switch to references
+) -> Result<&'a dyn Any, String> {
     match node {
         ASTNode::Number(num) => {
-            let leaked_value = Box::leak(Box::new(*num) as Box<dyn Any>);  // Leak it temporarily
-            Ok(leaked_value as &'a dyn Any)  // Wrap in Ok()
+            let leaked_value = Box::leak(Box::new(*num) as Box<dyn Any>);
+            Ok(leaked_value as &'a dyn Any)
         },
         ASTNode::StringLiteral(string) => {
-            let leaked_value = Box::leak(Box::new(string.clone()) as Box<dyn Any>);  // Leak for string
-            Ok(leaked_value as &'a dyn Any)  // Wrap in Ok()
+            let leaked_value = Box::leak(Box::new(string.clone()) as Box<dyn Any>);
+            Ok(leaked_value as &'a dyn Any)
         },
         ASTNode::Boolean(boolean) => {
-            let leaked_value = Box::leak(Box::new(*boolean) as Box<dyn Any>);  // Leak for boolean
-            Ok(leaked_value as &'a dyn Any)  // Wrap in Ok()
+            let leaked_value = Box::leak(Box::new(*boolean) as Box<dyn Any>);
+            Ok(leaked_value as &'a dyn Any)
         },
         ASTNode::Identifier(name) => {
             match get_nested_field(state, &[name]) {
