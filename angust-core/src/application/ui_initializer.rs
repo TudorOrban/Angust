@@ -5,7 +5,7 @@ use crate::parsing::html::html_parser::parse_html_content;
 
 use super::{angust_configuration::AngustConfiguration, resource_loader::{html_loader, stylesheet_loader}};
 
-
+// To be moved into separate resource loading module
 pub fn load_resources(angust_config: &AngustConfiguration) -> (NodeRef, String) {
     let html_content = html_loader::load_index_html(
         angust_config.pathing_config.index_html_path.clone()
