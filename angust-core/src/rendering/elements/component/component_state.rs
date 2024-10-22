@@ -51,6 +51,14 @@ impl ReflectiveState for NoState {
     }
 }
 
+impl ReactiveState for NoState {
+    fn subscribe_to_property<F>(&mut self, _property_name: &str, _callback: F)
+    where
+        F: 'static + FnMut(&ComponentEvent),
+    {
+    }
+}
+
 impl Clone for NoState {
     fn clone(&self) -> Self {
         NoState {}

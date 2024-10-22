@@ -14,6 +14,7 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
         panic!("component_state can only be applied to structs with named fields");
     };
 
+
     let reactive_field_definitions = fields.iter().map(|f| {
         let name = f.ident.as_ref().unwrap();
         let ty = &f.ty;
@@ -40,12 +41,12 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
             #name: #name,
         }
     });
-
+    
     let get_field_arms = fields.iter().map(|field| {
         let field_name = &field.ident;
         let field_name_str = field_name.as_ref().unwrap().to_string();
         quote! {
-            #field_name_str => Some(&self.#field_name),
+            #field_name_str => Some(Box::new(self.#field_name.clone())),
         }
     });
 
@@ -96,7 +97,7 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         impl ReflectiveState for #struct_name {
-            fn get_field(&self, name: &str) -> Option<&dyn ReflectiveState> {
+            fn get_field(&self, name: &str) -> Option<Box<dyn ReflectiveState>> {
                 match name {
                     #(#get_field_arms)*
                     _ => None,
@@ -116,8 +117,12 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 properties
             }
 
-            fn as_any(&self) -> &dyn std::any::Any {
-                self
+            fn as_any(&self) -> Box<dyn std::any::Any> {
+                Box::new(self.clone())
+            }
+
+            fn clone_box(&self) -> Box<dyn ReflectiveState> {
+                Box::new(self.clone())
             }
         }
 

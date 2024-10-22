@@ -26,7 +26,7 @@ struct Location {
 #[derive(Clone)]
 struct Address {
     street: String,
-    zip: u32,
+    zip: f64,
     location: Location,
     active_tab: String,
 }
@@ -90,7 +90,7 @@ impl AppComponent {
                 30,
                 Address::new(
                     "123 Main St".to_string(),
-                    90210,
+                    90210.0,
                     Location::new(
                         34.0522,
                         -118.2437,

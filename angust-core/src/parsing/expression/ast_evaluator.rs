@@ -5,7 +5,6 @@ use crate::rendering::elements::component::{component_state::{get_nested_field, 
 use super::ast::{ASTNode, Operator};
 
 
-// TODO: Fix Box leaks with thread_local! storage
 pub fn evaluate_ast<State: ReactiveState>(
     node: &ASTNode,
     state: &State,
@@ -24,6 +23,9 @@ pub fn evaluate_ast<State: ReactiveState>(
         ASTNode::Identifier(name) => {
             match get_nested_field(state, &[name]) {
                 Some(val) => {
+                    if let Some(val) = val.as_any().downcast_ref::<f64>() {
+                        println!("Found number: {}", val);
+                    }
                     Ok(Box::new(val.as_any()))
                 }
                 None => Err(format!("Field {} not found", name)),
@@ -113,6 +115,7 @@ fn try_numeric_comparison_new(
         left_val.downcast_ref::<f64>(),
         right_val.downcast_ref::<f64>(),
     ) {
+        println!("Comparing {} and {}", left_float, right_float);
         let result = match operator {
             Operator::Equal => left_float == right_float,
             Operator::NotEqual => left_float != right_float,
