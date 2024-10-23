@@ -39,6 +39,7 @@ struct AppComponentState {
     address: Address,
     content: String,
     count: f64,
+    zip: f64,
 }
 
 impl AppComponentState {
@@ -100,6 +101,7 @@ impl AppComponent {
                 ),
                 "Hello, App Component!".to_string(),
                 0.0,
+                90210.0,
             );
 
             let mut component = Component::new(

@@ -111,6 +111,21 @@ fn try_numeric_comparison_new(
     left_val: Box<dyn Any>,
     right_val: Box<dyn Any>,
 ) -> Result<Option<bool>, String> {
+    println!("Type of left_val: {:?}", left_val.type_id());
+    println!("Type of right_val: {:?}", right_val.type_id());
+    println!("Is left_val f64? {}", left_val.is::<f64>());
+    println!("Is left_val i32? {}", left_val.is::<i32>());
+    println!("Is left_val String? {}", left_val.is::<String>());
+    println!("Is right_val f64? {}", right_val.is::<f64>());
+    let types = [&left_val as &dyn Any, &right_val as &dyn Any];
+    for (i, val) in types.iter().enumerate() {
+        println!("Testing types for value {}", i);
+        println!("Is f64? {}", val.is::<f64>());
+        println!("Is i32? {}", val.is::<i32>());
+        println!("Is String? {}", val.is::<String>());
+        println!("Is u32? {}", val.is::<u32>());
+        println!("Is f32? {}", val.is::<f32>());
+    }
     if let (Some(left_float), Some(right_float)) = (
         left_val.downcast_ref::<f64>(),
         right_val.downcast_ref::<f64>(),
@@ -123,6 +138,23 @@ fn try_numeric_comparison_new(
             Operator::Greater => left_float > right_float,
             Operator::LessEqual => left_float <= right_float,
             Operator::GreaterEqual => left_float >= right_float,
+            _ => return Err("Unsupported operator for numeric comparison".to_string()),
+        };
+
+        return Ok(Some(result));
+    }
+    if let (Some(left_int), Some(right_int)) = (
+        left_val.downcast_ref::<i32>(),
+        right_val.downcast_ref::<i32>(),
+    ) {
+        println!("Comparing {} and {}", left_int, right_int);
+        let result = match operator {
+            Operator::Equal => left_int == right_int,
+            Operator::NotEqual => left_int != right_int,
+            Operator::Less => left_int < right_int,
+            Operator::Greater => left_int > right_int,
+            Operator::LessEqual => left_int <= right_int,
+            Operator::GreaterEqual => left_int >= right_int,
             _ => return Err("Unsupported operator for numeric comparison".to_string()),
         };
 
