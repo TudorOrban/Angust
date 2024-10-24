@@ -20,21 +20,9 @@ pub fn evaluate_ast<State: ReactiveState>(
         ASTNode::Boolean(boolean) => {
             Ok(Box::new(*boolean))
         },
-        ASTNode::Identifier(name) => {
-            match get_nested_field(state, &[name]) {
-                Some(val) => {
-                    if let Some(val) = val.as_any().downcast_ref::<f64>() {
-                        println!("Found number: {}", val);
-                    }
-                    if let Some(val) = val.as_any().downcast_ref::<String>() {
-                        println!("Found string: {}", val);
-                    }
-                    Ok(Box::new(val.as_any()))
-                }
-                None => Err(format!("Field {} not found", name)),
-            }
-        },
-        ASTNode::FunctionCall(name, args) => {
+        ASTNode::Identifier(name) => 
+            evaluate_identifier_new(name, state),
+        ASTNode::FunctionCall(_, _) => {
             // evaluate_component_function_new(name, args.clone(), state, functions)
             Err("Function calls are not supported yet".to_string())
         },
@@ -44,6 +32,30 @@ pub fn evaluate_ast<State: ReactiveState>(
             evaluate_comparison_new(operator, left, right, state, functions),
         ASTNode::LogicalOperation { operator, left, right } =>
             evaluate_logical_operation_new(operator, left, right, state, functions),
+    }
+}
+
+fn evaluate_identifier_new<State: ReactiveState>(
+    name: &str,
+    state: &State,
+) -> Result<Box<dyn Any>, String> {
+    match get_nested_field(state, &[name]) {
+        Some(val) => {
+            if let Some(num) = val.as_any().downcast_ref::<f64>() {
+                return Ok(Box::new(*num));
+            }
+            if let Some(int) = val.as_any().downcast_ref::<i64>() {
+                return Ok(Box::new(*int));
+            }
+            if let Some(txt) = val.as_any().downcast_ref::<String>() {
+                return Ok(Box::new(txt.clone()));
+            }
+            if let Some(boolean) = val.as_any().downcast_ref::<bool>() {
+                return Ok(Box::new(*boolean));
+            }
+            Ok(Box::new(val.as_any()))
+        }
+        None => Err(format!("Field {} not found", name)),
     }
 }
 
@@ -97,92 +109,51 @@ fn evaluate_comparison_new<State: ReactiveState>(
     let left_val = evaluate_ast(left, state, functions)?;
     let right_val = evaluate_ast(right, state, functions)?;
 
-    if let Some(result) = try_numeric_comparison_new(operator, left_val, right_val)? {
-        return Ok(Box::new(result));  
+    // Attempt to downcast and compare for: f64, i64, String, bool
+    let result = left_val.downcast_ref::<f64>().and_then(|left_float| {
+        right_val.downcast_ref::<f64>().and_then(|right_float| {
+            compare_values(left_float, right_float, operator).ok()
+        })
+    }).or_else(|| {
+        left_val.downcast_ref::<i64>().and_then(|left_int| {
+            right_val.downcast_ref::<i64>().and_then(|right_int| {
+                compare_values(left_int, right_int, operator).ok()
+            })
+        })
+    }).or_else(|| {
+        left_val.downcast_ref::<String>().and_then(|left_str| {
+            right_val.downcast_ref::<String>().and_then(|right_str| {
+                compare_values(left_str, right_str, operator).ok()
+            })
+        })
+    }).or_else(|| {
+        left_val.downcast_ref::<bool>().and_then(|left_bool| {
+            right_val.downcast_ref::<bool>().and_then(|right_bool| {
+                compare_values(left_bool, right_bool, operator).ok()
+            })
+        })
+    });
+
+    match result {
+        Some(outcome) => Ok(Box::new(outcome)),
+        None => Err("Type mismatch or unsupported comparison type".to_string())
     }
-
-    // if let Some(result) = try_string_comparison_new(operator, left_val, right_val)? {
-    //     return Ok(Box::new(result));
-    // }
-
-    Err("Type mismatch or unsupported comparison type".to_string())
 }
 
-fn try_numeric_comparison_new(
+fn compare_values<T: PartialOrd + PartialEq>(
+    left: &T,
+    right: &T,
     operator: &Operator,
-    left_val: Box<dyn Any>,
-    right_val: Box<dyn Any>,
-) -> Result<Option<bool>, String> {
-    println!("Type of left_val: {:?}", left_val.type_id());
-    println!("Type of right_val: {:?}", right_val.type_id());
-    println!("Is left_val f64? {}", left_val.is::<f64>());
-    println!("Is left_val i32? {}", left_val.is::<i32>());
-    println!("Is left_val String? {}", left_val.is::<String>());
-    println!("Is right_val f64? {}", right_val.is::<f64>());
-    let types = [&left_val as &dyn Any, &right_val as &dyn Any];
-    for (i, val) in types.iter().enumerate() {
-        println!("Testing types for value {}", i);
-        println!("Is f64? {}", val.is::<f64>());
-        println!("Is i32? {}", val.is::<i32>());
-        println!("Is String? {}", val.is::<String>());
-        println!("Is u32? {}", val.is::<u32>());
-        println!("Is f32? {}", val.is::<f32>());
+) -> Result<bool, String> {
+    match operator {
+        Operator::Equal => Ok(left == right),
+        Operator::NotEqual => Ok(left != right),
+        Operator::Less => Ok(left < right),
+        Operator::Greater => Ok(left > right),
+        Operator::LessEqual => Ok(left <= right),
+        Operator::GreaterEqual => Ok(left >= right),
+        _ => Err("Unsupported operator for comparison".to_string()),
     }
-    if let (Some(left_float), Some(right_float)) = (
-        left_val.downcast_ref::<f64>(),
-        right_val.downcast_ref::<f64>(),
-    ) {
-        println!("Comparing {} and {}", left_float, right_float);
-        let result = match operator {
-            Operator::Equal => left_float == right_float,
-            Operator::NotEqual => left_float != right_float,
-            Operator::Less => left_float < right_float,
-            Operator::Greater => left_float > right_float,
-            Operator::LessEqual => left_float <= right_float,
-            Operator::GreaterEqual => left_float >= right_float,
-            _ => return Err("Unsupported operator for numeric comparison".to_string()),
-        };
-
-        return Ok(Some(result));
-    }
-    if let (Some(left_int), Some(right_int)) = (
-        left_val.downcast_ref::<i32>(),
-        right_val.downcast_ref::<i32>(),
-    ) {
-        println!("Comparing {} and {}", left_int, right_int);
-        let result = match operator {
-            Operator::Equal => left_int == right_int,
-            Operator::NotEqual => left_int != right_int,
-            Operator::Less => left_int < right_int,
-            Operator::Greater => left_int > right_int,
-            Operator::LessEqual => left_int <= right_int,
-            Operator::GreaterEqual => left_int >= right_int,
-            _ => return Err("Unsupported operator for numeric comparison".to_string()),
-        };
-
-        return Ok(Some(result));
-    }
-    Ok(None)
-}
-
-fn try_string_comparison_new(
-    operator: &Operator,
-    left_val: Box<dyn Any>,
-    right_val: Box<dyn Any>,
-) -> Result<Option<bool>, String> {
-    if let (Some(left_str), Some(right_str)) = (
-        left_val.downcast_ref::<String>(),
-        right_val.downcast_ref::<String>(),
-    ) {
-        let result = match operator {
-            Operator::Equal => left_str == right_str,
-            Operator::NotEqual => left_str != right_str,
-            _ => return Err("String comparison only supports Equal and NotEqual".to_string()),
-        };
-
-        return Ok(Some(result));
-    }
-    Ok(None)
 }
 
 fn evaluate_logical_operation_new<State: ReactiveState>(
