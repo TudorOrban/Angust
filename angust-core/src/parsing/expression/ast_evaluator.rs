@@ -26,6 +26,9 @@ pub fn evaluate_ast<State: ReactiveState>(
                     if let Some(val) = val.as_any().downcast_ref::<f64>() {
                         println!("Found number: {}", val);
                     }
+                    if let Some(val) = val.as_any().downcast_ref::<String>() {
+                        println!("Found string: {}", val);
+                    }
                     Ok(Box::new(val.as_any()))
                 }
                 None => Err(format!("Field {} not found", name)),
@@ -41,7 +44,6 @@ pub fn evaluate_ast<State: ReactiveState>(
             evaluate_comparison_new(operator, left, right, state, functions),
         ASTNode::LogicalOperation { operator, left, right } =>
             evaluate_logical_operation_new(operator, left, right, state, functions),
-        _ => Err("Only identifiers are supported for now".to_string()),
     }
 }
 
