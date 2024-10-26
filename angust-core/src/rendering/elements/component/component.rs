@@ -1,4 +1,4 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::expression::ast::ASTNode, rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
@@ -32,6 +32,8 @@ pub struct Component<State: ReactiveState> {
 
     // Expression evaluation
     pub template_expressions_asts: Vec<ASTNode>,
+    pub template_event_handler_asts: HashMap<String, ASTNode>
+
 
 }
 
@@ -50,7 +52,8 @@ impl<State: ReactiveState> Component<State> {
             state,
             component_functions: ComponentFunctions::default(),
             event_queue: Rc::new(RefCell::new(EventQueue::new())), 
-            template_expressions_asts: vec![]
+            template_expressions_asts: vec![],
+            template_event_handler_asts: HashMap::new()
         }
     }
 

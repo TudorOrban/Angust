@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use kuchiki::parse_html;
 use kuchiki::NodeData;
 use kuchiki::NodeRef;
@@ -107,6 +109,7 @@ pub struct ParsingContext<'a, State : ReactiveState> {
     pub component_state: Option<&'a State>,
     pub component_functions: Option<&'a ComponentFunctions<State>>,
     pub template_expressions_asts: Option<&'a mut Vec<ASTNode>>,
+    pub template_event_handler_asts: Option<&'a mut HashMap<String, ASTNode>>
 }
 
 impl<'a, State : ReactiveState> Default for ParsingContext<'a, State> {
@@ -117,6 +120,7 @@ impl<'a, State : ReactiveState> Default for ParsingContext<'a, State> {
             component_state: None,
             component_functions: None,
             template_expressions_asts: None,
+            template_event_handler_asts: None,
         }
     }
 }
@@ -127,7 +131,8 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
         stylesheet: Option<Stylesheet>,
         component_state: Option<&'a State>,
         component_functions: Option<&'a ComponentFunctions<State>>,
-        template_expressions_asts: Option<&'a mut Vec<ASTNode>>
+        template_expressions_asts: Option<&'a mut Vec<ASTNode>>,
+        template_event_handler_asts: Option<&'a mut HashMap<String, ASTNode>>,
     ) -> Self {
         ParsingContext {
             angust_config,
@@ -135,12 +140,19 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
             component_state,
             component_functions,
             template_expressions_asts,
+            template_event_handler_asts,
         }
     }
 
-    pub fn add_ast(&mut self, ast: ASTNode) {
+    pub fn add_template_expression_ast(&mut self, ast: ASTNode) {
         if let Some(template_expressions_asts) = &mut self.template_expressions_asts {
             template_expressions_asts.push(ast);
+        }
+    }
+
+    pub fn add_template_event_handler_ast(&mut self, event_name: String, ast: ASTNode) {
+        if let Some(template_event_handler_asts) = &mut self.template_event_handler_asts {
+            template_event_handler_asts.insert(event_name, ast);
         }
     }
 }

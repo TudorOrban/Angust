@@ -26,7 +26,8 @@ pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Comp
         None, 
         Some(&component.state),
         Some(&component.component_functions),
-        Some(&mut component.template_expressions_asts)
+        Some(&mut component.template_expressions_asts),
+        Some(&mut component.template_event_handler_asts)
     );
     
     if let Some(element) = html_parser::map_dom_to_elements::<State>(&dom, None, &mut parsing_context) {

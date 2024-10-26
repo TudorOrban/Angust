@@ -1,23 +1,8 @@
 use regex::Regex;
 
-use crate::{parsing::expression::{ast, ast_evaluator}, rendering::elements::component::component_state::{get_nested_field, ReactiveState, ReflectiveState}};
+use crate::{parsing::expression::{ast::{self, ASTNode}, ast_evaluator}, rendering::elements::component::component_state::{get_nested_field, ReactiveState, ReflectiveState}};
 
 use super::html_parser::ParsingContext;
-
-// On click attribute @onclick="event_handler_name()"
-pub fn parse_on_click_attribute<State: ReactiveState>(
-    attributes: &kuchiki::Attributes,
-    _: &ParsingContext<State>
-) -> Option<String> {
-    if let Some(on_click_value) = attributes.get("@onclick") {
-        let handler = on_click_value.to_string();
-        let handler = handler.trim_start_matches("('");
-        let handler = handler.trim_end_matches("')");
-        let handler = handler.to_string();
-        return Some(handler);
-    }
-    None
-}
 
 // State placeholders {{ component_state_property }}
 pub fn parse_state_placeholder<State: ReflectiveState>(
@@ -66,7 +51,7 @@ pub fn parse_if_expression<State: ReactiveState>(
 
     let ast = ast::parse_string_to_ast(if_expression)
         .map_err(|e| format!("Error parsing if expression: {:?}", e))?;
-    ParsingContext::add_ast(context, ast.clone());
+    ParsingContext::add_template_expression_ast(context, ast.clone());
 
     let state = context.component_state.expect("Component state not found");
     let functions = context.component_functions.expect("Component functions not found");
@@ -90,6 +75,41 @@ pub fn parse_if_attribute<State: ReactiveState>(
     }
     None
 }
+
+// On click attribute @onclick="event_handler_name()"
+pub fn parse_on_click_expression<State: ReactiveState>(
+    context: &mut ParsingContext<State>,
+    attributes: &kuchiki::Attributes,
+) -> Result<(String, ASTNode), String> {
+    let on_click_expression = match parse_on_click_attribute::<State>(attributes, context) {
+        Some(expr) => expr,
+        None => return Err("No on click attribute found".to_string()),
+    };
+
+    let ast = ast::parse_string_to_ast(on_click_expression.clone())
+        .map_err(|e| format!("Error parsing on click expression: {:?}", e))?;
+
+    // Get root function name
+    let root_function_name = match ast.clone() {
+        ASTNode::FunctionCall(function_name, _) => function_name,
+        _ => return Err("Invalid on click expression".to_string()),
+    };
+
+    Ok((root_function_name, ast))
+}
+
+pub fn parse_on_click_attribute<State: ReactiveState>(
+    attributes: &kuchiki::Attributes,
+    _: &ParsingContext<State>
+) -> Option<String> {
+    if let Some(on_click_value) = attributes.get("@onclick") {
+        let handler = on_click_value.to_string();
+        let handler = handler.to_string();
+        return Some(handler);
+    }
+    None
+}
+
 
 // For directive @for="for item in array"
 #[allow(dead_code)]
