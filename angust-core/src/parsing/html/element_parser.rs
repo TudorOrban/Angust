@@ -69,9 +69,18 @@ fn process_button_element<State : ReactiveState>(
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
 
-    let on_click_handler_name = directive_parser::parse_on_click_attribute(&attributes, context);
+    // let on_click_handler_name = directive_parser::parse_on_click_attribute(&attributes, context);
+    let (on_click_handler_name, handler_ast) = match directive_parser::parse_on_click_expression(context, &attributes) {
+        Ok((handler_name, handler)) => (handler_name, handler),
+        Err(e) => {
+            println!("Error parsing on click expression: {:?}", e);
+            return Box::new(Button::new(None, None, Some(styles)))
+        }
+    };
+        
+    context.add_template_event_handler_ast(on_click_handler_name.clone(), handler_ast);
 
-    let mut button = Button::new(on_click_handler_name, None, Some(styles));
+    let mut button = Button::new(Some(on_click_handler_name), None, Some(styles));
 
     let mut child_container = Container::new();
     node.children()

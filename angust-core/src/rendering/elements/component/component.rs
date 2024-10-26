@@ -1,6 +1,6 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{any::Any, cell::RefCell, collections::HashMap, rc::Rc};
 
-use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::expression::ast::ASTNode, rendering::{elements::{
+use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::expression::{ast::ASTNode, ast_evaluator}, rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
     container::Container, 
     element::{Element, ElementType, EventType}, 
@@ -57,6 +57,7 @@ impl<State: ReactiveState> Component<State> {
         }
     }
 
+    // Initialization
     pub fn initialize(&mut self) {
         self.setup_listeners();
         self.load_component_template();
@@ -111,7 +112,30 @@ impl<State: ReactiveState> Component<State> {
         for (event_name, handler) in handlers {
             self.component_functions.event_handlers.insert(event_name.to_string(), handler);
         }
+    }
 
+    // Event handling
+    fn trigger_dynamic_params_event(&mut self, event_name: String, event_ast: ASTNode) {
+        match event_ast {
+            ASTNode::FunctionCall(_, params_asts) => {
+                let mut param_values: Vec<Box<dyn Any>> = vec![];
+                for params_ast in params_asts {
+                    let param_value = match ast_evaluator::evaluate_ast(&params_ast, &self.state, &self.component_functions) {
+                        Ok(value) => value,
+                        Err(e) => {
+                            println!("Error evaluating dynamic params: {}", e);
+                            return;
+                        }
+                    };
+                    param_values.push(param_value);
+                }
+
+                if let Some(handler) = self.component_functions.dynamic_params_event_handlers.get_mut(&event_name) {
+                    handler(&mut self.state, param_values);
+                }
+            },
+            _ => {}
+        }
     }
 }
 
@@ -135,6 +159,10 @@ impl<State: ReactiveState> Element for Component<State> {
         for handler_name in event_handler_names.iter() {
             if let Some(handler) = self.component_functions.event_handlers.get_mut(handler_name) {
                 handler(&mut self.state);
+            }
+            
+            if let Some(ast) = self.template_event_handler_asts.get(handler_name) {
+                self.trigger_dynamic_params_event(handler_name.clone(), ast.clone());
             }
         }
 

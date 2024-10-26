@@ -54,7 +54,6 @@ impl AppComponentState {
     }
     
     pub fn is_active_tab(&self, tab_name: String, is_active: bool) -> bool {
-        println!("Checking if tab is active: {}", tab_name);
         if !is_active {  
             return false;
         }

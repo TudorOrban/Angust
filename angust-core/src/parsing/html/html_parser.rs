@@ -32,13 +32,12 @@ pub fn map_dom_to_elements<State : ReactiveState>(
     context: &mut ParsingContext<State>,
 ) -> Option<Box<dyn Element>> {
     match dom.data() {
-        NodeData::Document(_) | NodeData::Doctype(_) => process_document_nodes::<State>(dom, parent_styles, context),
-        NodeData::Element(ref elem_data) => {
-            element_parser::dispatch_element_processing::<State>(elem_data, dom, parent_styles, context)
-        },
-        NodeData::Text(ref text) => {
-            process_text_element::<State>(&text.borrow(), parent_styles, context)
-        },
+        NodeData::Document(_) | NodeData::Doctype(_) => 
+            process_document_nodes::<State>(dom, parent_styles, context),
+        NodeData::Element(ref elem_data) => 
+            element_parser::dispatch_element_processing::<State>(elem_data, dom, parent_styles, context),
+        NodeData::Text(ref text) => 
+            process_text_element::<State>(&text.borrow(), parent_styles, context),
         _ => general_traversal::<State>(dom, parent_styles, context),
     }
 }
