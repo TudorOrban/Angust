@@ -2,7 +2,7 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{layout::space_allocation_system::text::size_estimator::{determine_text_element_lines, estimate_text_element_size}, rendering_interface::element_renderer::ElementRenderer};
 
-use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, event_propagator, styles::{Dimension, Styles, Unit, WhiteSpace}};
+use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::{Dimension, Styles, Unit, WhiteSpace}};
 
 
 pub struct Text {
@@ -17,7 +17,7 @@ pub struct Text {
 
 impl Text {
     pub fn new(content: String) -> Self {
-        let id = IDGenerator::get();
+        let id = ElementIDGenerator::get();
         Self {
             _id: id,
             content: content.clone(),

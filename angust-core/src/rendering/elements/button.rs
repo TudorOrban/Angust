@@ -2,7 +2,7 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{layout::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer};
 
-use super::{common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, styles::Styles};
+use super::{common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, styles::Styles};
 
 
 pub struct Button {
@@ -20,7 +20,7 @@ pub struct Button {
 
 impl Button {
     pub fn new(on_click_handler_name: Option<String>, container: Option<Container>, styles: Option<Styles>) -> Self {
-        let id = IDGenerator::get();
+        let id = ElementIDGenerator::get();
 
         let container_vec = if let Some(container_child) = container {
             Some(vec![Box::new(container_child) as Box<dyn Element>])

@@ -1,16 +1,16 @@
 use std::sync::Mutex;
 
 lazy_static::lazy_static! {
-    static ref ID_GENERATOR: Mutex<ElementIDGenerator> = Mutex::new(ElementIDGenerator::new());
+    static ref ID_GENERATOR: Mutex<IDGenerator> = Mutex::new(IDGenerator::new());
 }
 
-pub struct ElementIDGenerator {
+pub struct IDGenerator {
     current_id: usize,
 }
 
-impl ElementIDGenerator {
+impl IDGenerator {
     pub fn new() -> Self {
-        ElementIDGenerator { current_id: 0 }
+        IDGenerator { current_id: 0 }
     }
 
     pub fn generate(&mut self) -> String {

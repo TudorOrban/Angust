@@ -4,7 +4,11 @@ use std::{collections::HashMap, any::Any};
 
 use angust::{
     rendering::elements::component::{
-        component::Component, component_factory_registry::ComponentFactory, component_state::{ReactiveState, ReflectiveState}, functions::component_functions::ComponentFunctions, reactivity::{ComponentEvent, ReactiveField}
+        component::Component, 
+        component_factory_registry::ComponentFactory, 
+        component_state::{ReactiveState, ReflectiveState}, 
+        functions::component_functions::ComponentFunctions, 
+        reactivity::{ComponentEvent, ReactiveField}
     }, 
     wrap_fn, wrap_fn_mut
 };
@@ -36,6 +40,7 @@ struct AppComponentState {
     content: String,
     count: f64,
     zip: f64,
+    active_tab: String,
 }
 
 impl AppComponentState {
@@ -58,23 +63,23 @@ impl AppComponentState {
             return false;
         }
 
-        self.address.active_tab_reactive.value == tab_name
+        self.active_tab_reactive.value == tab_name
     }
 
     pub fn set_active_tab(&mut self, tab_name: String) {
-        self.address.active_tab_reactive.set(tab_name);
+        self.active_tab_reactive.set(tab_name);
     }
 
     pub fn set_active_tab_home(&mut self) {
-        self.address.active_tab_reactive.set("Home".to_string());
+        self.active_tab_reactive.set("Home".to_string());
     }
 
     pub fn set_active_tab_dashboard(&mut self) {
-        self.address.active_tab_reactive.set("Dashboard".to_string());
+        self.active_tab_reactive.set("Dashboard".to_string());
     }
 
     pub fn set_active_tab_settings(&mut self) {
-        self.address.active_tab_reactive.set("Settings".to_string());
+        self.active_tab_reactive.set("Settings".to_string());
     }
 }
 
@@ -101,6 +106,7 @@ impl AppComponent {
                 "Hello, App Component!".to_string(),
                 0.0,
                 90210.0,
+                "Home".to_string(),
             );
 
             let mut component = Component::new(

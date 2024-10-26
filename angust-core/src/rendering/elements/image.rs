@@ -3,7 +3,7 @@ use skia_safe::{Canvas, Point};
 
 use crate::{application::resource_loader::image_loader, rendering::{layout::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer}};
 
-use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, event_propagator, styles::Styles};
+use super::{common_types::{OptionalSize, Position, Size}, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::Styles};
 
 
 pub struct Image {
@@ -19,7 +19,7 @@ pub struct Image {
 
 impl Image {
     pub fn new(image_directory_relative_path: String, image_relative_path: String, styles: Option<Styles>) -> Self {
-        let id = IDGenerator::get();
+        let id = ElementIDGenerator::get();
         let image = image_loader::load_image(image_directory_relative_path, image_relative_path.clone())
             .map_or(None, |image| Some(image));
 

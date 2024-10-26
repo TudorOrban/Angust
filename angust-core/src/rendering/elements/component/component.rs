@@ -4,7 +4,7 @@ use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::expres
     common_types::{OptionalSize, Position, Size}, 
     container::Container, 
     element::{Element, ElementType, EventType}, 
-    element_id_generator::IDGenerator, 
+    element_id_generator::ElementIDGenerator, 
     event_propagator, 
     styles::Styles
 }, layout::effective_size_estimator}};
@@ -40,7 +40,7 @@ pub struct Component<State: ReactiveState> {
 impl<State: ReactiveState> Component<State> {
     pub fn new(name: String, template_relative_path: String, state: State) -> Self {
         Self {
-            _id: IDGenerator::get(),
+            _id: ElementIDGenerator::get(),
             name,
             template_relative_path,
             content: Box::new(Container::new()),
@@ -83,7 +83,6 @@ impl<State: ReactiveState> Component<State> {
             let property_name_clone = property_name.clone(); 
             let component_id_clone = component_id.clone(); 
             let event_proxy_clone = event_proxy.clone();
-
             self.state.subscribe_to_property(&property_name_clone, move |event: &ComponentEvent| {
                 match event {
                     ComponentEvent::StateChange(_) => {
@@ -115,27 +114,38 @@ impl<State: ReactiveState> Component<State> {
     }
 
     // Event handling
-    fn trigger_dynamic_params_event(&mut self, event_name: String, event_ast: ASTNode) {
+    fn trigger_dynamic_params_event_handler(&mut self, event_name: &String, event_ast: &ASTNode) {
         match event_ast {
             ASTNode::FunctionCall(_, params_asts) => {
-                let mut param_values: Vec<Box<dyn Any>> = vec![];
-                for params_ast in params_asts {
-                    let param_value = match ast_evaluator::evaluate_ast(&params_ast, &self.state, &self.component_functions) {
-                        Ok(value) => value,
-                        Err(e) => {
-                            println!("Error evaluating dynamic params: {}", e);
-                            return;
-                        }
-                    };
-                    param_values.push(param_value);
-                }
+                let param_values = self.determine_params(params_asts);
 
-                if let Some(handler) = self.component_functions.dynamic_params_event_handlers.get_mut(&event_name) {
+                if let Some(handler) = self.component_functions.dynamic_params_event_handlers.get_mut(event_name) {
+                    println!("Triggering dynamic params event handler: {}", event_name);
                     handler(&mut self.state, param_values);
                 }
             },
             _ => {}
         }
+    }
+
+    fn determine_params(&mut self, params_asts: &Vec<ASTNode>) -> Vec<Box<dyn Any>> {
+        let mut param_values: Vec<Box<dyn Any>> = vec![];
+        for params_ast in params_asts {
+            let param_value = match ast_evaluator::evaluate_ast(&params_ast, &self.state, &self.component_functions) {
+                Ok(value) => value,
+                Err(e) => {
+                    println!("Error evaluating dynamic params: {}", e);
+                    return vec![];
+                }
+            };
+
+            if let Some(param_value) = param_value.downcast_ref::<String>() {
+                println!("Param value: {}", param_value);
+            }
+            param_values.push(param_value);
+        }
+
+        param_values
     }
 }
 
@@ -160,10 +170,7 @@ impl<State: ReactiveState> Element for Component<State> {
             if let Some(handler) = self.component_functions.event_handlers.get_mut(handler_name) {
                 handler(&mut self.state);
             }
-            
-            if let Some(ast) = self.template_event_handler_asts.get(handler_name) {
-                self.trigger_dynamic_params_event(handler_name.clone(), ast.clone());
-            }
+
         }
 
         vec![]

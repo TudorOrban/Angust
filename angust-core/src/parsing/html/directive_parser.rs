@@ -1,6 +1,16 @@
 use regex::Regex;
 
-use crate::{parsing::expression::{ast::{self, ASTNode}, ast_evaluator}, rendering::elements::component::component_state::{get_nested_field, ReactiveState, ReflectiveState}};
+use crate::{
+    parsing::{
+        expression::{ast::{self, ASTNode}, ast_evaluator}, 
+        html::id_generator::IDGenerator
+    }, 
+    rendering::elements::component::component_state::{
+        get_nested_field, 
+        ReactiveState, 
+        ReflectiveState
+    }
+};
 
 use super::html_parser::ParsingContext;
 
@@ -81,19 +91,21 @@ pub fn parse_on_click_expression<State: ReactiveState>(
     context: &mut ParsingContext<State>,
     attributes: &kuchiki::Attributes,
 ) -> Result<(String, ASTNode), String> {
-    let on_click_expression = match parse_on_click_attribute::<State>(attributes, context) {
+    let on_click_attribute = match parse_on_click_attribute::<State>(attributes, context) {
         Some(expr) => expr,
         None => return Err("No on click attribute found".to_string()),
     };
 
-    let ast = ast::parse_string_to_ast(on_click_expression.clone())
+    let ast = ast::parse_string_to_ast(on_click_attribute.clone())
         .map_err(|e| format!("Error parsing on click expression: {:?}", e))?;
 
     // Get root function name
-    let root_function_name = match ast.clone() {
+    let mut root_function_name = match ast.clone() {
         ASTNode::FunctionCall(function_name, _) => function_name,
         _ => return Err("Invalid on click expression".to_string()),
     };
+    let unique_id = IDGenerator::get();
+    root_function_name = format!("{}_{}", root_function_name, unique_id);
 
     Ok((root_function_name, ast))
 }

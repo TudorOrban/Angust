@@ -8,7 +8,7 @@ use crate::{application::event_handling::scrollbar_movement_handler::handle_scro
 }};
 
 use super::{
-    common_types::{OptionalSize, Position, ScrollbarState, Size}, element::{Element, ElementType, EventType}, element_id_generator::IDGenerator, event_propagator, styles::{Directions, Styles}
+    common_types::{OptionalSize, Position, ScrollbarState, Size}, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::{Directions, Styles}
 };
 
 pub struct Container {
@@ -24,7 +24,7 @@ pub struct Container {
 
 impl Container {
     pub fn new() -> Self {
-        let id = IDGenerator::get();
+        let id = ElementIDGenerator::get();
         Self {
             _id: id,
             position: Position::default(),
