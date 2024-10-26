@@ -4,13 +4,9 @@ use std::{collections::HashMap, any::Any};
 
 use angust::{
     rendering::elements::component::{
-        component::Component, 
-        component_factory_registry::ComponentFactory, 
-        functions::component_functions::ComponentFunctions, 
-        component_state::{ReflectiveState, ReactiveState},
-        reactivity::{ComponentEvent, ReactiveField}
+        component::Component, component_factory_registry::ComponentFactory, component_state::{ReactiveState, ReflectiveState}, functions::component_functions::ComponentFunctions, reactivity::{ComponentEvent, ReactiveField}
     }, 
-    wrap_fn
+    wrap_fn, wrap_fn_mut
 };
 use angust_macros::component_state;
 
@@ -64,6 +60,10 @@ impl AppComponentState {
         }
 
         self.address.active_tab_reactive.value == tab_name
+    }
+
+    pub fn set_active_tab(&mut self, tab_name: String) {
+        self.address.active_tab_reactive.set(tab_name);
     }
 
     pub fn set_active_tab_home(&mut self) {
@@ -122,7 +122,10 @@ impl AppComponent {
                     // ("set_active_tab_home", wrap_fn!(AppComponentState, AppComponentState::set_active_tab_home)),
                     // ("set_active_tab_dashboard", wrap_fn!(AppComponentState, AppComponentState::set_active_tab_dashboard)),
                     // ("set_active_tab_settings", wrap_fn!(AppComponentState, AppComponentState::set_active_tab_settings)),
-                ]
+                ],
+                vec![
+                    ("set_active_tab", wrap_fn_mut!(AppComponentState, AppComponentState::set_active_tab, String)),
+                ],
             );
             component.add_component_functions(component_functions);
 

@@ -6,6 +6,7 @@ pub struct ComponentFunctions<State> {
     pub boolean_evaluators: HashMap<String, Box<dyn Fn(&State) -> bool>>,
     pub array_getters: HashMap<String, Box<dyn Fn(&State) -> Vec<&dyn Any>>>,
     pub dynamic_params_functions: HashMap<String, Box<dyn Fn(&State, Vec<Box<dyn Any>>) -> Box<dyn Any>>>,
+    pub dynamic_params_event_handlers: HashMap<String, Box<dyn Fn(&mut State, Vec<Box<dyn Any>>)>>,
 }
 
 impl<State> ComponentFunctions<State> {
@@ -14,6 +15,7 @@ impl<State> ComponentFunctions<State> {
         boolean_evaluators: Vec<(&str, Box<dyn Fn(&State) -> bool>)>,
         array_getters: Vec<(&str, Box<dyn Fn(&State) -> Vec<&dyn Any>>)>,
         dynamic_params_functions: Vec<(&str, Box<dyn Fn(&State, Vec<Box<dyn Any>>) -> Box<dyn Any>>)>,
+        dynamic_params_event_handlers: Vec<(&str, Box<dyn Fn(&mut State, Vec<Box<dyn Any>>)>)>,
     ) -> Self {
         let mut functions = Self::default();
 
@@ -29,6 +31,9 @@ impl<State> ComponentFunctions<State> {
         for (function_name, function) in dynamic_params_functions {
             functions.dynamic_params_functions.insert(function_name.to_string(), function);
         }
+        for (handler_name, handler) in dynamic_params_event_handlers {
+            functions.dynamic_params_event_handlers.insert(handler_name.to_string(), handler);
+        }
 
         functions
     }
@@ -41,6 +46,7 @@ impl<State> Default for ComponentFunctions<State> {
             boolean_evaluators: HashMap::new(),
             array_getters: HashMap::new(),
             dynamic_params_functions: HashMap::new(),
+            dynamic_params_event_handlers: HashMap::new(),
         }
     }
 }
