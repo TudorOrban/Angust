@@ -1,5 +1,7 @@
 use std::{any::Any, cell::RefCell, collections::HashMap, rc::Rc};
 
+use regex::Regex;
+
 use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::expression::{ast::ASTNode, ast_evaluator}, rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
     container::Container, 
@@ -115,16 +117,27 @@ impl<State: ReactiveState> Component<State> {
 
     // Event handling
     fn trigger_dynamic_params_event_handler(&mut self, event_name: &String, event_ast: &ASTNode) {
-        match event_ast {
-            ASTNode::FunctionCall(_, params_asts) => {
-                let param_values = self.determine_params(params_asts);
+        let params_asts = match event_ast {
+            ASTNode::FunctionCall(_, params) => params,
+            _ => return,
+        };
 
-                if let Some(handler) = self.component_functions.dynamic_params_event_handlers.get_mut(event_name) {
-                    println!("Triggering dynamic params event handler: {}", event_name);
-                    handler(&mut self.state, param_values);
-                }
-            },
-            _ => {}
+        let param_values = self.determine_params(params_asts);
+
+        // Identify the function name (to be refactored later)
+        let regex = Regex::new(r"^(.+?)_id_\d+$").unwrap();
+        let function_key = regex.captures(event_name)
+            .and_then(|caps| caps.get(1))
+            .map(|m| m.as_str());
+
+        if let Some(key) = function_key {
+            if let Some(handler) = self.component_functions.dynamic_params_event_handlers.get_mut(key) {
+                handler(&mut self.state, param_values);
+            } else {
+                println!("No handler found for the function name: {}", key);
+            }
+        } else {
+            println!("No function name could be extracted from the event name: {}", event_name);
         }
     }
 
@@ -139,9 +152,6 @@ impl<State: ReactiveState> Component<State> {
                 }
             };
 
-            if let Some(param_value) = param_value.downcast_ref::<String>() {
-                println!("Param value: {}", param_value);
-            }
             param_values.push(param_value);
         }
 
@@ -170,7 +180,10 @@ impl<State: ReactiveState> Element for Component<State> {
             if let Some(handler) = self.component_functions.event_handlers.get_mut(handler_name) {
                 handler(&mut self.state);
             }
-
+            
+            if let Some(event_ast) = self.template_event_handler_asts.get(handler_name) {
+                self.trigger_dynamic_params_event_handler(&handler_name.clone(), &event_ast.clone()); // TODO: Fix this clone
+            }
         }
 
         vec![]

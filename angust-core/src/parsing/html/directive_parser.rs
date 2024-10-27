@@ -51,8 +51,8 @@ pub fn parse_state_placeholder<State: ReflectiveState>(
 
 // If directive @if="expression"
 pub fn parse_if_expression<State: ReactiveState>(
-    context: &mut ParsingContext<State>,
     attributes: &kuchiki::Attributes,
+    context: &mut ParsingContext<State>,
 ) -> Result<bool, String> {
     let if_expression = match parse_if_attribute::<State>(attributes) {
         Some(expr) => expr,
@@ -88,8 +88,8 @@ pub fn parse_if_attribute<State: ReactiveState>(
 
 // On click attribute @onclick="event_handler_name()"
 pub fn parse_on_click_expression<State: ReactiveState>(
-    context: &mut ParsingContext<State>,
     attributes: &kuchiki::Attributes,
+    context: &mut ParsingContext<State>,
 ) -> Result<(String, ASTNode), String> {
     let on_click_attribute = match parse_on_click_attribute::<State>(attributes, context) {
         Some(expr) => expr,
@@ -126,8 +126,8 @@ pub fn parse_on_click_attribute<State: ReactiveState>(
 // For directive @for="for item in array"
 #[allow(dead_code)]
 pub fn parse_for_expression<State: ReactiveState>(
-    context: &mut ParsingContext<State>,
     attributes: &kuchiki::Attributes,
+    context: &mut ParsingContext<State>,
 ) -> Result<ForLoopContext, String> {
     let for_expression = match parse_for_attribute::<State>(attributes) {
         Some(expr) => expr,

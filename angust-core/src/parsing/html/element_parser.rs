@@ -33,7 +33,7 @@ fn process_div_element<State : ReactiveState>(
     let mut container = Container::new();
     let attributes = elem_data.attributes.borrow();
 
-    let should_add_to_dom = directive_parser::parse_if_expression(context, &attributes);
+    let should_add_to_dom = directive_parser::parse_if_expression(&attributes, context);
     if should_add_to_dom.is_err() {
         println!("Error parsing @if directive: {:?}", should_add_to_dom.err());
         return Box::new(container) // TODO: Report error
@@ -70,7 +70,7 @@ fn process_button_element<State : ReactiveState>(
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
 
     // let on_click_handler_name = directive_parser::parse_on_click_attribute(&attributes, context);
-    let (on_click_handler_name, handler_ast) = match directive_parser::parse_on_click_expression(context, &attributes) {
+    let (on_click_handler_name, handler_ast) = match directive_parser::parse_on_click_expression(&attributes, context) {
         Ok((handler_name, handler)) => (handler_name, handler),
         Err(e) => {
             println!("Error parsing on click expression: {:?}", e);
