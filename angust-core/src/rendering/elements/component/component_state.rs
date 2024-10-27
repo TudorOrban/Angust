@@ -23,6 +23,15 @@ impl Clone for Box<dyn ReflectiveState> {
     }
 }
 
+pub fn access_field(
+    obj: &dyn ReflectiveState,
+    field: &str
+) -> Option<Box<dyn ReflectiveState>> {
+    let keys: Vec<&str> = field.split('.').collect();
+
+    get_nested_field(obj, &keys)
+}
+
 pub fn get_nested_field(
     obj: &dyn ReflectiveState, 
     path: &[&str]

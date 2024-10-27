@@ -1,4 +1,3 @@
-use glutin::api::egl::context;
 use regex::Regex;
 
 use crate::{
@@ -7,9 +6,7 @@ use crate::{
         html::id_generator::IDGenerator
     }, 
     rendering::elements::component::component_state::{
-        get_nested_field, 
-        ReactiveState, 
-        ReflectiveState
+        access_field, ReactiveState, ReflectiveState
     }
 };
 
@@ -41,19 +38,82 @@ pub fn substitute_state_placeholder<State: ReactiveState>(
     state: &State,
     context: &mut ParsingContext<State>,
 ) -> Result<String, String> {
-    let keys: Vec<&str> = property_path.split('.').collect();
-    let result = match get_nested_field(state, keys.as_slice()) {
+    let mut result = match access_field(state, property_path) {
         Some(val) => {
             if let Some(val) = val.as_any().downcast_ref::<String>() {
-                return Ok(val.clone());
+                Ok(val.clone())
             } else {
-                return Err(format!("Property '{}' is not a string", property_path));
+                Err(format!("Property '{}' is not a string", property_path))
             }
         },
         None => {
-            return Err(format!("No property found for '{}'", property_path));
+            Err(format!("No property found for '{}'", property_path))
         },
     };
+    if !result.is_err() {
+        return result;
+    }
+
+    result = find_property_in_for_loop(property_path, state, context);
+    if result.is_err() {
+        println!("Error: {}", result.as_ref().unwrap());
+    }
+
+    result
+}
+
+pub fn find_property_in_for_loop<State: ReactiveState>(
+    property_path: &str,
+    state: &State,
+    context: &ParsingContext<State>,
+) -> Result<String, String> {
+    let result = Err("Property not found".to_string());
+    let mut nested_properties: Vec<&str> = property_path.split('.').collect();
+
+    if context.for_loop_contexts.is_none() {
+        return result;
+    }
+    let for_loop_contexts = context.for_loop_contexts.as_ref().unwrap();
+
+    for for_loop_context in for_loop_contexts.iter() {
+        if for_loop_context.loop_variable != nested_properties[0] {
+            continue;
+        }
+        
+
+        let val = match access_field(state, &for_loop_context.array_name) {
+            Some(val) => val,
+            None => {
+                return Err(format!("No property found for '{}'", for_loop_context.array_name));
+            },
+        };
+
+        let val_as_any = val.as_any();
+        let reflective_array = if let Some(array) = val_as_any.downcast_ref::<Vec<&dyn ReflectiveState>>() {
+            array
+        } else {
+            return Err(format!("Property '{}' is not an array", for_loop_context.array_name));
+        };
+
+        let current_index = 0; // To be replaced with actual index later
+        let current_item = reflective_array[current_index];
+
+        let nested_property = nested_properties.pop().unwrap();
+        let nested_val = match access_field(current_item, nested_property) {
+            Some(val) => val,
+            None => {
+                return Err(format!("No property found for '{}'", nested_property));
+            },
+        };
+
+        let nested_val_str = if let Some(val) = nested_val.as_any().downcast_ref::<String>() {
+            val.clone()
+        } else {
+            return Err(format!("Property '{}' is not a string", nested_property));
+        };
+
+        return Ok(nested_val_str);
+    }
 
     result
 }
