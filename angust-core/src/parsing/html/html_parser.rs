@@ -8,6 +8,8 @@ use kuchiki::traits::TendrilSink;
 use crate::application::angust_configuration::AngustConfiguration;
 use crate::parsing::css::css_parser::merge_styles;
 use crate::parsing::css::stylesheet_parser::Stylesheet;
+use crate::parsing::directive::for_parser::ForLoopContext;
+use crate::parsing::directive::placeholder_parser;
 use crate::parsing::expression::ast::ASTNode;
 use crate::rendering::elements::component::component_state::ReactiveState;
 use crate::rendering::elements::component::functions::component_functions::ComponentFunctions;
@@ -15,8 +17,6 @@ use crate::rendering::elements::element::Element;
 use crate::rendering::elements::styles::Styles;
 use crate::rendering::elements::text::Text;
 
-use super::directive_parser;
-use super::directive_parser::ForLoopContext;
 use super::element_parser;
 
 
@@ -66,7 +66,7 @@ fn process_text_element<State : ReactiveState>(
 
     // Apply state placeholders
     let final_text = match context.component_state {
-        Some(state) => directive_parser::parse_state_placeholder(trimmed_text, state, context)
+        Some(state) => placeholder_parser::parse_state_placeholder(trimmed_text, state, context)
             .unwrap_or_else(|er| {
                 println!("Error parsing state placeholders in text element: {}", er);
                 trimmed_text.to_string()
