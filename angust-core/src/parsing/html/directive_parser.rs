@@ -6,7 +6,7 @@ use crate::{
         html::id_generator::IDGenerator
     }, 
     rendering::elements::component::component_state::{
-        access_field, ReactiveState, ReflectiveState
+        access_field, ReactiveState, 
     }
 };
 
@@ -22,39 +22,39 @@ pub fn parse_state_placeholder<State: ReactiveState>(
     let mut result = text.to_string();
 
     for cap in re.captures_iter(text) {
-        let property_path = match cap.get(1) {
+        let property_access_path = match cap.get(1) {
             Some(m) => m.as_str().trim(),
             None => continue,
         };
 
-        result = substitute_state_placeholder(property_path, state, context)?;
+        result = substitute_state_placeholder(property_access_path, state, context)?;
     }
 
     Ok(result)
 }
 
 pub fn substitute_state_placeholder<State: ReactiveState>(
-    property_path: &str,
+    property_access_path: &str,
     state: &State,
     context: &mut ParsingContext<State>,
 ) -> Result<String, String> {
-    let mut result = match access_field(state, property_path) {
+    let mut result = match access_field(state, property_access_path) {
         Some(val) => {
             if let Some(val) = val.as_any().downcast_ref::<String>() {
                 Ok(val.clone())
             } else {
-                Err(format!("Property '{}' is not a string", property_path))
+                Err(format!("Property '{}' is not a string", property_access_path))
             }
         },
         None => {
-            Err(format!("No property found for '{}'", property_path))
+            Err(format!("No property found for '{}'", property_access_path))
         },
     };
     if !result.is_err() {
         return result;
     }
 
-    result = find_property_in_for_loop(property_path, state, context);
+    result = find_property_in_for_loop(property_access_path, state, context);
     if result.is_err() {
         println!("Error: {}", result.as_ref().unwrap());
     }
@@ -63,23 +63,26 @@ pub fn substitute_state_placeholder<State: ReactiveState>(
 }
 
 pub fn find_property_in_for_loop<State: ReactiveState>(
-    property_path: &str,
+    property_access_path: &str,
     state: &State,
     context: &ParsingContext<State>,
 ) -> Result<String, String> {
-    let result = Err("Property not found".to_string());
-    let mut nested_properties: Vec<&str> = property_path.split('.').collect();
-
     if context.for_loop_contexts.is_none() {
-        return result;
+        return Err("No for loop contexts found".to_string());
     }
     let for_loop_contexts = context.for_loop_contexts.as_ref().unwrap();
 
+    let property_path: Vec<&str> = property_access_path.split('.').collect();
+    let base_property = match property_path.get(0) { 
+        Some(prop) => prop,
+        None => return Err("Invalid property path".to_string()),
+    };
+    let nested_property = property_path.get(1..).unwrap().join(".");
+
     for for_loop_context in for_loop_contexts.iter() {
-        if for_loop_context.loop_variable != nested_properties[0] {
+        if for_loop_context.loop_variable != *base_property {
             continue;
         }
-        
 
         let val = match access_field(state, &for_loop_context.array_name) {
             Some(val) => val,
@@ -88,34 +91,31 @@ pub fn find_property_in_for_loop<State: ReactiveState>(
             },
         };
 
-        let val_as_any = val.as_any();
-        let reflective_array = if let Some(array) = val_as_any.downcast_ref::<Vec<&dyn ReflectiveState>>() {
-            array
-        } else {
-            return Err(format!("Property '{}' is not an array", for_loop_context.array_name));
-        };
+        let current_index = 0;
+        let item_as_reflective = val.get_field(&current_index.to_string()).ok_or_else(|| {
+            format!("Index {} out of bounds for '{}'", current_index, for_loop_context.array_name)
+        })?;
 
-        let current_index = 0; // To be replaced with actual index later
-        let current_item = reflective_array[current_index];
+        if nested_property.is_empty() {
+            let item_as_string = item_as_reflective.as_any().downcast_ref::<String>().ok_or_else(|| {
+                format!("Property '{}' is not a string", nested_property)
+            })?.clone();
 
-        let nested_property = nested_properties.pop().unwrap();
-        let nested_val = match access_field(current_item, nested_property) {
-            Some(val) => val,
-            None => {
-                return Err(format!("No property found for '{}'", nested_property));
-            },
-        };
+            return Ok(item_as_string);
+        }
+        
+        let nested_val = item_as_reflective.get_field(&nested_property).ok_or_else(|| {
+            format!("No property found for '{}'", nested_property)
+        })?;
 
-        let nested_val_str = if let Some(val) = nested_val.as_any().downcast_ref::<String>() {
-            val.clone()
-        } else {
-            return Err(format!("Property '{}' is not a string", nested_property));
-        };
+        let nested_val_str = nested_val.as_any().downcast_ref::<String>().ok_or_else(|| {
+            format!("Property '{}' is not a string", nested_property)
+        })?.clone();
 
         return Ok(nested_val_str);
     }
 
-    result
+    return Err("Property not found".to_string());
 }
 
 // If directive @if="expression"

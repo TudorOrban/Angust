@@ -175,9 +175,10 @@ where
     T: ReflectiveState + Clone + 'static,
 {
     fn get_field(&self, name: &str) -> Option<Box<dyn ReflectiveState>> {
-        match name {
-            "len" => Some(Box::new(self.len())),
-            _ => None,
+        if let Ok(index) = name.parse::<usize>() {
+            self.get(index).map(|item| item.clone_box())
+        } else {
+            None
         }
     }
 
@@ -187,6 +188,32 @@ where
 
     fn get_all_properties(&self) -> Vec<&str> {
         vec!["len"]
+    }
+
+    fn as_any(&self) -> Box<dyn Any> {
+        Box::new(self.clone())
+    }
+
+    fn clone_box(&self) -> Box<dyn ReflectiveState> {
+        Box::new(self.clone())
+    }
+}
+
+impl ReflectiveState for Vec<Box<dyn ReflectiveState>> {
+    fn get_field(&self, name: &str) -> Option<Box<dyn ReflectiveState>> {
+        if let Ok(index) = name.parse::<usize>() {
+            self.get(index).cloned()
+        } else {
+            None
+        }
+    }
+
+    fn set_field(&mut self, _name: &str, _value: Box<dyn Any>) {
+        // Do nothing
+    }
+
+    fn get_all_properties(&self) -> Vec<&str> {
+        vec![]
     }
 
     fn as_any(&self) -> Box<dyn Any> {
