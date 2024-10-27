@@ -16,6 +16,7 @@ use crate::rendering::elements::styles::Styles;
 use crate::rendering::elements::text::Text;
 
 use super::directive_parser;
+use super::directive_parser::ForLoopContext;
 use super::element_parser;
 
 
@@ -65,7 +66,7 @@ fn process_text_element<State : ReactiveState>(
 
     // Apply state placeholders
     let final_text = match context.component_state {
-        Some(state) => directive_parser::parse_state_placeholder(trimmed_text, state)
+        Some(state) => directive_parser::parse_state_placeholder(trimmed_text, state, context)
             .unwrap_or_else(|er| {
                 println!("Error parsing state placeholders in text element: {}", er);
                 trimmed_text.to_string()
@@ -108,7 +109,8 @@ pub struct ParsingContext<'a, State : ReactiveState> {
     pub component_state: Option<&'a State>,
     pub component_functions: Option<&'a ComponentFunctions<State>>,
     pub template_expressions_asts: Option<&'a mut Vec<ASTNode>>,
-    pub template_event_handler_asts: Option<&'a mut HashMap<String, ASTNode>>
+    pub template_event_handler_asts: Option<&'a mut HashMap<String, ASTNode>>,
+    pub for_loop_contexts: Option<Vec<ForLoopContext>>,
 }
 
 impl<'a, State : ReactiveState> Default for ParsingContext<'a, State> {
@@ -120,6 +122,7 @@ impl<'a, State : ReactiveState> Default for ParsingContext<'a, State> {
             component_functions: None,
             template_expressions_asts: None,
             template_event_handler_asts: None,
+            for_loop_contexts: None,
         }
     }
 }
@@ -140,6 +143,7 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
             component_functions,
             template_expressions_asts,
             template_event_handler_asts,
+            for_loop_contexts: None
         }
     }
 
@@ -152,6 +156,14 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
     pub fn add_template_event_handler_ast(&mut self, event_name: String, ast: ASTNode) {
         if let Some(template_event_handler_asts) = &mut self.template_event_handler_asts {
             template_event_handler_asts.insert(event_name, ast);
+        }
+    }
+
+    pub fn add_for_loop_context(&mut self, context: ForLoopContext) {
+        if let Some(for_loop_contexts) = &mut self.for_loop_contexts {
+            for_loop_contexts.push(context);
+        } else {
+            self.for_loop_contexts = Some(vec![context]);
         }
     }
 }

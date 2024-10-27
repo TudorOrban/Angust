@@ -1,3 +1,4 @@
+use glutin::api::egl::context;
 use regex::Regex;
 
 use crate::{
@@ -15,38 +16,46 @@ use crate::{
 use super::html_parser::ParsingContext;
 
 // State placeholders {{ component_state_property }}
-pub fn parse_state_placeholder<State: ReflectiveState>(
+pub fn parse_state_placeholder<State: ReactiveState>(
     text: &str,
     state: &State,
+    context: &mut ParsingContext<State>,
 ) -> Result<String, String> {
     let re = Regex::new(r"\{\{(\s*[^}]+\s*)\}\}").unwrap();
     let mut result = text.to_string();
 
     for cap in re.captures_iter(text) {
-        let full_match = match cap.get(0) {
-            Some(m) => m.as_str(),
-            None => continue,
-        };
-
         let property_path = match cap.get(1) {
             Some(m) => m.as_str().trim(),
             None => continue,
         };
 
-        let keys: Vec<&str> = property_path.split('.').collect();
-        match get_nested_field(state, keys.as_slice()) {
-            Some(val) => {
-                if let Some(val) = val.as_any().downcast_ref::<String>() {
-                    result = result.replace(full_match, val);
-                }
-            },
-            None => {
-                return Err(format!("No property found for '{}'", full_match));
-            },
-        }
+        result = substitute_state_placeholder(property_path, state, context)?;
     }
 
     Ok(result)
+}
+
+pub fn substitute_state_placeholder<State: ReactiveState>(
+    property_path: &str,
+    state: &State,
+    context: &mut ParsingContext<State>,
+) -> Result<String, String> {
+    let keys: Vec<&str> = property_path.split('.').collect();
+    let result = match get_nested_field(state, keys.as_slice()) {
+        Some(val) => {
+            if let Some(val) = val.as_any().downcast_ref::<String>() {
+                return Ok(val.clone());
+            } else {
+                return Err(format!("Property '{}' is not a string", property_path));
+            }
+        },
+        None => {
+            return Err(format!("No property found for '{}'", property_path));
+        },
+    };
+
+    result
 }
 
 // If directive @if="expression"
@@ -143,7 +152,7 @@ pub fn parse_for_expression<State: ReactiveState>(
     let loop_variable = captures.get(1).unwrap().as_str();
     let array_name = captures.get(2).unwrap().as_str();
 
-    let state = context.component_state.as_ref().expect("Component state not found");
+    let state = context.component_state.expect("Component state not found");
     let array_property = match state.get_field(array_name) {
         Some(prop) => prop.as_any(),
         None => return Err(format!("Array '{}' not found in state", array_name)),
@@ -170,7 +179,7 @@ pub fn parse_for_attribute<State: ReactiveState>(
     None
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[allow(dead_code)]
 pub struct ForLoopContext {
     pub is_for_loop: bool,
