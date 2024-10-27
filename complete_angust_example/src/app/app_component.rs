@@ -35,12 +35,12 @@ struct Address {
 #[derive(Clone)]
 struct AppComponentState {
     name: String,
-    age: u8,
     address: Address,
     content: String,
     count: f64,
     zip: f64,
     active_tab: String,
+    items: Vec<String>,
 }
 
 impl AppComponentState {
@@ -69,18 +69,6 @@ impl AppComponentState {
     pub fn set_active_tab(&mut self, tab_name: String) {
         self.active_tab_reactive.set(tab_name);
     }
-
-    pub fn set_active_tab_home(&mut self) {
-        self.active_tab_reactive.set("Home".to_string());
-    }
-
-    pub fn set_active_tab_dashboard(&mut self) {
-        self.active_tab_reactive.set("Dashboard".to_string());
-    }
-
-    pub fn set_active_tab_settings(&mut self) {
-        self.active_tab_reactive.set("Settings".to_string());
-    }
 }
 
 pub struct AppComponent {
@@ -92,7 +80,6 @@ impl AppComponent {
         registry.insert("app-component".to_string(), Box::new(move || {
             let state_factory = || AppComponentState::new(
                 "Alice".to_string(),
-                30,
                 Address::new(
                     "123 Main St".to_string(),
                     90210.0,
@@ -107,6 +94,11 @@ impl AppComponent {
                 0.0,
                 90210.0,
                 "Home".to_string(),
+                vec![
+                    "Item 1".to_string(),
+                    "Item 2".to_string(),
+                    "Item 3".to_string(),
+                ],
             );
 
             let mut component = Component::new(
@@ -124,9 +116,6 @@ impl AppComponent {
                 vec![],
                 vec![
                     ("is_active_tab", wrap_fn!(AppComponentState, AppComponentState::is_active_tab, String, bool)),
-                    // ("set_active_tab_home", wrap_fn!(AppComponentState, AppComponentState::set_active_tab_home)),
-                    // ("set_active_tab_dashboard", wrap_fn!(AppComponentState, AppComponentState::set_active_tab_dashboard)),
-                    // ("set_active_tab_settings", wrap_fn!(AppComponentState, AppComponentState::set_active_tab_settings)),
                 ],
                 vec![
                     ("set_active_tab", wrap_fn_mut!(AppComponentState, AppComponentState::set_active_tab, String)),

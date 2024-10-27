@@ -143,6 +143,7 @@ impl<State: ReactiveState> Component<State> {
 
     fn determine_params(&mut self, params_asts: &Vec<ASTNode>) -> Vec<Box<dyn Any>> {
         let mut param_values: Vec<Box<dyn Any>> = vec![];
+        
         for params_ast in params_asts {
             let param_value = match ast_evaluator::evaluate_ast(&params_ast, &self.state, &self.component_functions) {
                 Ok(value) => value,

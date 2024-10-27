@@ -117,7 +117,7 @@ impl ReflectiveState for u32 {
     }
 }
 
-impl ReflectiveState for u8 {
+impl ReflectiveState for usize {
     fn get_field(&self, _name: &str) -> Option<Box<dyn ReflectiveState>> {
         None
     }
@@ -152,6 +152,34 @@ impl ReflectiveState for f64 {
         vec![]
     }
     
+    fn as_any(&self) -> Box<dyn Any> {
+        Box::new(self.clone())
+    }
+
+    fn clone_box(&self) -> Box<dyn ReflectiveState> {
+        Box::new(self.clone())
+    }
+}
+
+impl<T> ReflectiveState for Vec<T>
+where
+    T: ReflectiveState + Clone + 'static,
+{
+    fn get_field(&self, name: &str) -> Option<Box<dyn ReflectiveState>> {
+        match name {
+            "len" => Some(Box::new(self.len())),
+            _ => None,
+        }
+    }
+
+    fn set_field(&mut self, _name: &str, _value: Box<dyn Any>) {
+        // Do nothing
+    }
+
+    fn get_all_properties(&self) -> Vec<&str> {
+        vec!["len"]
+    }
+
     fn as_any(&self) -> Box<dyn Any> {
         Box::new(self.clone())
     }
