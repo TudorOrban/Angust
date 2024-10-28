@@ -51,7 +51,7 @@ fn process_div_element<State : ReactiveState>(
         println!("Error parsing @for directive: {:?}", for_loop_context.err());
         return Box::new(container) // TODO: Report error
     }
-    let mut for_loop_context = for_loop_context.unwrap();
+    let for_loop_context = for_loop_context.unwrap();
     // println!("For loop context: {:?}", for_loop_context);
 
     let array_length = for_loop_context.array_length;

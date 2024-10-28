@@ -33,6 +33,13 @@ struct Address {
 
 #[component_state]
 #[derive(Clone)]
+struct UIItem {
+    label: String,
+    value: String,
+}
+
+#[component_state]
+#[derive(Clone)]
 struct AppComponentState {
     name: String,
     address: Address,
@@ -41,6 +48,7 @@ struct AppComponentState {
     zip: f64,
     active_tab: String,
     items: Vec<String>,
+    ui_items: Vec<UIItem>,
 }
 
 impl AppComponentState {
@@ -99,6 +107,11 @@ impl AppComponent {
                     "Item 2".to_string(),
                     "Item 3".to_string(),
                 ],
+                vec![
+                    UIItem::new("Label 1".to_string(), "Value 1".to_string()),
+                    UIItem::new("Label 2".to_string(), "Value 2".to_string()),
+                    UIItem::new("Label 3".to_string(), "Value 3".to_string()),
+                ]
             );
 
             let mut component = Component::new(

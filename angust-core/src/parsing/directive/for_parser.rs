@@ -25,20 +25,20 @@ pub fn parse_for_expression<State: ReactiveState>(
     let loop_variable = captures.get(1).unwrap().as_str();
     let array_name = captures.get(2).unwrap().as_str();
 
-    let state = context.component_state.expect("Component state not found");
-    let array_property = match state.get_field(array_name) {
-        Some(prop) => prop.as_any(),
-        None => return Err(format!("Array '{}' not found in state", array_name)),
-    };
-
-    let array = array_property.downcast_ref::<Vec<String>>()
-        .ok_or_else(|| format!("Property '{}' is not an array", array_name))?;
+    // let state = context.component_state.expect("Component state not found");
+    // let array_property = state.get_field(array_name).ok_or(
+    //     format!("Array '{}' not found in state", array_name)
+    // )?;
+    // let array_len = match array_property.get_field("len") {
+    //     Some(len) => len.as_any().downcast_ref::<usize>().unwrap().clone(),
+    //     None => return Err(format!("Array '{}' has no length property", array_name)),
+    // };
 
     Ok(ForLoopContext {
         is_for_loop: true,
         loop_variable: loop_variable.to_string(),
         array_name: array_name.to_string(),
-        array_length: array.len(),
+        array_length: 2,
         current_index: 0,
     })
 }
@@ -88,6 +88,7 @@ fn find_loop_variable_property<State: ReactiveState>(
     state: &State,
     for_loop_context: &ForLoopContext,
 ) -> Result<String, String> {
+    println!("Nested property: {}", nested_property);
     let val = match access_field(state, &for_loop_context.array_name) {
         Some(val) => val,
         None => {
