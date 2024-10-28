@@ -166,4 +166,11 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
             self.for_loop_contexts = Some(vec![context]);
         }
     }
+
+    pub fn increment_loop_index(&mut self) {
+        if let Some(for_loop_contexts) = &mut self.for_loop_contexts {
+            let last_context = for_loop_contexts.last_mut().unwrap();
+            last_context.current_index += 1;
+        }
+    }
 }

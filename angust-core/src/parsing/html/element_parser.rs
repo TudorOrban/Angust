@@ -34,6 +34,9 @@ fn process_div_element<State : ReactiveState>(
     let mut container = Container::new();
     let attributes = elem_data.attributes.borrow();
 
+    let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
+    container.set_styles(styles);
+
     let should_add_to_dom = if_parser::parse_if_expression(&attributes, context);
     if should_add_to_dom.is_err() {
         println!("Error parsing @if directive: {:?}", should_add_to_dom.err());
@@ -47,17 +50,31 @@ fn process_div_element<State : ReactiveState>(
     if for_loop_context.is_err() {
         println!("Error parsing @for directive: {:?}", for_loop_context.err());
         return Box::new(container) // TODO: Report error
-    } else {
-        context.add_for_loop_context(for_loop_context.unwrap());
     }
-    println!("For loop context: {:?}", context.for_loop_contexts.clone().unwrap());
+    let mut for_loop_context = for_loop_context.unwrap();
+    // println!("For loop context: {:?}", for_loop_context);
 
-    let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
-    container.set_styles(styles);
+    let array_length = for_loop_context.array_length;
+    if for_loop_context.is_for_loop {
+        context.add_for_loop_context(for_loop_context.clone());
 
-    node.children()
+        for _ in 0..array_length {
+            let mut child = Container::new();
+            child.set_styles(styles.clone());
+
+            node.children()
+                .filter_map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(&styles), context))
+                .for_each(|child_element| child.add_child(child_element));
+
+            container.add_child(Box::new(child));
+
+            context.increment_loop_index();
+        }
+    } else {
+        node.children()
         .filter_map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(&styles), context))
         .for_each(|child_element| container.add_child(child_element));
+    }
 
     Box::new(container)
 }

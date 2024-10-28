@@ -6,17 +6,14 @@ use crate::{
 };
 
 
-
-
 // For directive @for="for item in array"
-#[allow(dead_code)]
 pub fn parse_for_expression<State: ReactiveState>(
     attributes: &kuchiki::Attributes,
     context: &mut ParsingContext<State>,
 ) -> Result<ForLoopContext, String> {
     let for_expression = match parse_for_attribute::<State>(attributes) {
         Some(expr) => expr,
-        None => return Ok(ForLoopContext::default()),
+        None => return Ok(ForLoopContext::default()), // No for directive found
     };
 
     let re = Regex::new(r"let (\w+) of (\w+)").unwrap();
@@ -42,6 +39,7 @@ pub fn parse_for_expression<State: ReactiveState>(
         loop_variable: loop_variable.to_string(),
         array_name: array_name.to_string(),
         array_length: array.len(),
+        current_index: 0,
     })
 }
 
@@ -97,7 +95,8 @@ fn find_loop_variable_property<State: ReactiveState>(
         },
     };
 
-    let current_index = 0;
+    let current_index = for_loop_context.current_index;
+    println!("Current index: {}", current_index);
     let item_as_reflective = val.get_field(&current_index.to_string()).ok_or_else(|| {
         format!("Index {} out of bounds for '{}'", current_index, for_loop_context.array_name)
     })?;
@@ -129,6 +128,7 @@ pub struct ForLoopContext {
     pub loop_variable: String,
     pub array_name: String,
     pub array_length: usize,
+    pub current_index: usize,
 }
 
 impl Default for ForLoopContext {
@@ -138,6 +138,7 @@ impl Default for ForLoopContext {
             loop_variable: "".to_string(),
             array_name: "".to_string(),
             array_length: 0,
+            current_index: 0,
         }
     }
 }
