@@ -51,7 +51,7 @@ pub fn substitute_state_placeholder<State: ReactiveState>(
         return result;
     }
 
-    result = for_parser::find_property_in_for_loop(property_access_path, state, context);
+    result = for_parser::find_property_in_for_loop_variables(property_access_path, state, context);
     if result.is_err() {
         println!("Error: {}", result.as_ref().unwrap());
     }

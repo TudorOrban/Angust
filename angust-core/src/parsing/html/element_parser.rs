@@ -68,8 +68,10 @@ fn process_div_element<State : ReactiveState>(
 
             container.add_child(Box::new(child));
 
-            context.increment_loop_index();
+            context.increment_loop_index(&for_loop_context.context_id);
         }
+
+        context.remove_loop_context(&for_loop_context.context_id);
     } else {
         node.children()
         .filter_map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(&styles), context))

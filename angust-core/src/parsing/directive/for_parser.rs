@@ -5,6 +5,8 @@ use crate::{
     rendering::elements::component::component_state::{access_field, ReactiveState}
 };
 
+use super::id_generator::IDGenerator;
+
 
 // For directive @for="for item in array"
 pub fn parse_for_expression<State: ReactiveState>(
@@ -33,13 +35,12 @@ pub fn parse_for_expression<State: ReactiveState>(
     //     Some(len) => len.as_any().downcast_ref::<usize>().unwrap().clone(),
     //     None => return Err(format!("Array '{}' has no length property", array_name)),
     // };
-
     Ok(ForLoopContext {
         is_for_loop: true,
         loop_variable: loop_variable.to_string(),
         array_name: array_name.to_string(),
         array_length: 2,
-        current_index: 0,
+        ..Default::default()
     })
 }
 
@@ -55,7 +56,7 @@ pub fn parse_for_attribute<State: ReactiveState>(
 
 
 // Placeholder replacer for for loop context
-pub fn find_property_in_for_loop<State: ReactiveState>(
+pub fn find_property_in_for_loop_variables<State: ReactiveState>(
     property_access_path: &str,
     state: &State,
     context: &ParsingContext<State>,
@@ -88,7 +89,6 @@ fn find_loop_variable_property<State: ReactiveState>(
     state: &State,
     for_loop_context: &ForLoopContext,
 ) -> Result<String, String> {
-    println!("Nested property: {}", nested_property);
     let val = match access_field(state, &for_loop_context.array_name) {
         Some(val) => val,
         None => {
@@ -97,14 +97,13 @@ fn find_loop_variable_property<State: ReactiveState>(
     };
 
     let current_index = for_loop_context.current_index;
-    println!("Current index: {}", current_index);
     let item_as_reflective = val.get_field(&current_index.to_string()).ok_or_else(|| {
         format!("Index {} out of bounds for '{}'", current_index, for_loop_context.array_name)
     })?;
 
     if nested_property.is_empty() { // Cover case where property is just the loop variable
         let item_as_string = item_as_reflective.as_any().downcast_ref::<String>().ok_or_else(|| {
-            format!("Property '{}' is not a string", nested_property)
+            format!("Loop variable is not a string")
         })?.clone();
 
         return Ok(item_as_string);
@@ -123,8 +122,8 @@ fn find_loop_variable_property<State: ReactiveState>(
 
 
 #[derive(Debug, Clone)]
-#[allow(dead_code)]
 pub struct ForLoopContext {
+    pub context_id: String,
     pub is_for_loop: bool,
     pub loop_variable: String,
     pub array_name: String,
@@ -135,6 +134,7 @@ pub struct ForLoopContext {
 impl Default for ForLoopContext {
     fn default() -> Self {
         Self {
+            context_id: IDGenerator::get(),
             is_for_loop: false,
             loop_variable: "".to_string(),
             array_name: "".to_string(),

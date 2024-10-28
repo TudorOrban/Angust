@@ -1,44 +1,40 @@
 <div>
+
+    <div @for="let item of items" style="display: flex; flex-direction: row;">
+        <div style="width: 400px; height: 400px;">
+            {{ item }}
+        </div>
+    </div>
+    
     <div @for="let item of ui_items" style="display: flex; flex-direction: row;">
         <div style="width: 400px; height: 400px;">
             {{ item.label }}
         </div>
     </div>
 
-    <!-- <div @for="let item of items" style="display: flex; flex-direction: row;">
-        <div style="width: 400px; height: 400px;">
-            {{ item }}
+    <!-- <button style="width: 400px; height: 200px; background-color: rgb(255, 0, 255);" @onclick="set_active_tab('Home')">
+
+        <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
+
+        </div>
+    </button>
+
+    <button style="width: 400px; height: 200px; background-color: rgb(255, 255, 0);" @onclick="set_active_tab('Dashboard')">
+
+        <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
+
         </div>
 
-        <div>
-            Test
-        </div> -->
+    </button>
 
+    <button style="width: 400px; height: 200px; background-color: rgb(0, 255, 255);" @onclick="set_active_tab('Settings')">
 
-        <!-- <button style="width: 400px; height: 200px; background-color: rgb(255, 0, 255);" @onclick="set_active_tab('Home')">
+        <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
 
-            <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
+        </div>
+
+    </button> -->
     
-            </div>
-        </button>
-
-        <button style="width: 400px; height: 200px; background-color: rgb(255, 255, 0);" @onclick="set_active_tab('Dashboard')">
-
-            <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
-    
-            </div>
-
-        </button>
-
-        <button style="width: 400px; height: 200px; background-color: rgb(0, 255, 255);" @onclick="set_active_tab('Settings')">
-
-            <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
-    
-            </div>
-
-        </button> -->
-    <!-- </div> -->
-
     <!-- {{ address.location.label }}
 
     <div style="display: flex; flex-direction: row;">
