@@ -3,11 +3,9 @@ use regex::Regex;
 
 use crate::{
     parsing::html::html_parser::ParsingContext, rendering::elements::component::component_state::{
-        access_field, ReactiveState, 
+        access_field, ReactiveState 
     }
 };
-
-use super::for_parser;
 
 // State placeholders {{ component_state_property }}
 pub fn parse_state_placeholder<State: ReactiveState>(
@@ -35,23 +33,10 @@ pub fn substitute_state_placeholder<State: ReactiveState>(
     state: &State,
     context: &mut ParsingContext<State>,
 ) -> Result<String, String> {
-    let mut result = match access_field(state, property_access_path) {
-        Some(val) => {
-            if let Some(val) = val.as_any().downcast_ref::<String>() {
-                Ok(val.clone())
-            } else {
-                Err(format!("Property '{}' is not a string", property_access_path))
-            }
-        },
-        None => {
-            Err(format!("No property found for '{}'", property_access_path))
-        },
-    };
-    if !result.is_err() {
-        return result; // Prevent loop variable lookup if property is already found
+    let property = access_field(state, property_access_path, context)?;
+    if let Some(val) = property.as_any().downcast_ref::<String>() {
+        return Ok(val.clone());
+    } else {
+        return Err(format!("Property '{}' is not a string", property_access_path));
     }
-
-    result = for_parser::find_property_in_for_loop_variables(property_access_path, state, context);
-
-    result
 }

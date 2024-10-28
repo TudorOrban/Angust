@@ -3,9 +3,9 @@
     
     
     <div @for="let ui_item of ui_items" style="display: flex; flex-direction: row;">
-        <div style="width: 400px; height: 400px;">
+        <!-- <div style="width: 400px; height: 400px;">
             {{ ui_item.label }}
-        </div>
+        </div> -->
 
         <div @for="let item of ui_item.items" style="display: flex; flex-direction: row;">
             <div style="width: 400px; height: 400px;">

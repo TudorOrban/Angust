@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use crate::parsing::{directive::for_parser::identify_loop_variable_context, html::html_parser::ParsingContext};
+use crate::parsing::{directive::for_parser::access_loop_field, html::html_parser::ParsingContext};
 
 use super::reactivity::ComponentEvent;
 
@@ -25,13 +25,28 @@ impl Clone for Box<dyn ReflectiveState> {
     }
 }
 
-pub fn access_field(
+pub fn access_field<State: ReactiveState>(
     obj: &dyn ReflectiveState,
-    field: &str
-) -> Option<Box<dyn ReflectiveState>> {
-    let keys: Vec<&str> = field.split('.').collect();
+    field: &str,
+    context: &ParsingContext<State>,
+) -> Result<Box<dyn ReflectiveState>, String> {
+    let property_path: Vec<&str> = field.split('.').collect();
+    let base_property = match property_path.get(0) { 
+        Some(prop) => prop,
+        None => return Err("No property found".to_string()),
+    };
+    let nested_property = property_path.get(1..);
 
-    get_nested_field(obj, &keys)
+    // Check direct property access firstly
+    let property_reflective = get_nested_field(obj, &property_path).ok_or_else(|| {
+        format!("Property not found for '{}'", field)
+    });
+    if !property_reflective.is_err() {
+        return property_reflective;
+    }
+
+    // Check for loop variable secondly
+    access_loop_field(context, field, base_property, nested_property)
 }
 
 pub fn get_nested_field(
@@ -45,45 +60,6 @@ pub fn get_nested_field(
     }
     
     Some(current)
-}
-
-pub fn access_field_new<State: ReactiveState>(
-    obj: &dyn ReflectiveState,
-    field: &str,
-    context: &ParsingContext<State>,
-) -> Result<Box<dyn ReflectiveState>, String> {
-    let property_path: Vec<&str> = field.split('.').collect();
-    let base_property = match property_path.get(0) { 
-        Some(prop) => prop,
-        None => return Err("No property found".to_string()),
-    };
-    let nested_property = property_path.get(1..).unwrap().join(".");
-
-    let property_reflective = get_nested_field(obj, &property_path).ok_or_else(|| {
-        format!("Property not found for '{}'", field)
-    });
-    if !property_reflective.is_err() {
-        return property_reflective; //
-    }
-
-    let loop_variable_context = identify_loop_variable_context(field, context).ok_or_else(|| {
-        format!("Property not found for '{}'", field)
-    })?;
-    let state = context.component_state.expect("Component state not found");
-
-    let val = match get_nested_field(state, &vec![*base_property]) {
-        Some(val) => val,
-        None => {
-            return Err(format!("No property found for '{}'", loop_variable_context.array_name));
-        },
-    };
-
-    let current_index = loop_variable_context.current_index;
-    let item_as_reflective = val.get_field(&current_index.to_string()).ok_or_else(|| {
-        format!("Index {} out of bounds for '{}'", current_index, loop_variable_context.array_name)
-    })?;
-
-    Ok(item_as_reflective)
 }
 
 // Implementations
