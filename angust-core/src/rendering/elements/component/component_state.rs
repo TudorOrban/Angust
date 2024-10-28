@@ -200,18 +200,19 @@ where
 }
 
 impl ReflectiveState for Vec<Box<dyn ReflectiveState>> {
-    fn get_field(&self, name: &str) -> Option<Box<dyn ReflectiveState>> {
-        println!("Getting field: {}", name);
-        if let Ok(index) = name.parse::<usize>() {
-            println!("Index: {}", index);
-            self.get(index).cloned()
-        } else {
-            if name == "len" {
-                Some(Box::new(self.len()))
-            } else {
-                None
-            }
-        }
+    fn get_field(&self, _: &str) -> Option<Box<dyn ReflectiveState>> {
+        // println!("Getting field: {}", name);
+        // if let Ok(index) = name.parse::<usize>() {
+        //     println!("Index: {}", index);
+        //     self.get(index).cloned()
+        // } else {
+        //     if name == "len" {
+        //         Some(Box::new(self.len()))
+        //     } else {
+        //         None
+        //     }
+        // }
+        None
     }
 
     fn set_field(&mut self, _name: &str, _value: Box<dyn Any>) {
