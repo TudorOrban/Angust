@@ -36,6 +36,7 @@ struct Address {
 struct UIItem {
     label: String,
     value: String,
+    items: Vec<String>,
 }
 
 #[component_state]
@@ -47,7 +48,6 @@ struct AppComponentState {
     count: f64,
     zip: f64,
     active_tab: String,
-    items: Vec<String>,
     ui_items: Vec<UIItem>,
 }
 
@@ -103,13 +103,19 @@ impl AppComponent {
                 90210.0,
                 "Home".to_string(),
                 vec![
-                    "Item 1".to_string(),
-                    "Item 2".to_string(),
-                    "Item 3".to_string(),
-                ],
-                vec![
-                    UIItem::new("Label 1".to_string(), "Value 1".to_string()),
-                    UIItem::new("Label 2".to_string(), "Value 2".to_string()),
+                    UIItem::new("Label 1".to_string(), "Value 1".to_string(), 
+                    vec![
+                        "Item 11".to_string(),
+                        "Item 12".to_string(),
+                        "Item 13".to_string(),
+                    ]),
+                    UIItem::new("Label 2".to_string(), "Value 2".to_string(), 
+                    vec![
+                        "Item 21".to_string(),
+                        "Item 22".to_string(),
+                        "Item 23".to_string(),
+                        "Item 24".to_string(),
+                    ]),
                 ]
             );
 

@@ -1,5 +1,6 @@
 use kuchiki::NodeRef;
 
+use crate::parsing::directive::for_parser::ForLoopContext;
 use crate::parsing::directive::{for_parser, if_parser, on_click_parser};
 use crate::{parsing::css::css_parser, rendering::elements::component::component_state::ReactiveState};
 use crate::rendering::elements::button::Button;
@@ -56,22 +57,7 @@ fn process_div_element<State : ReactiveState>(
 
     let array_length = for_loop_context.array_length;
     if for_loop_context.is_for_loop {
-        context.add_for_loop_context(for_loop_context.clone());
-
-        for _ in 0..array_length {
-            let mut child = Container::new();
-            child.set_styles(styles.clone());
-
-            node.children()
-                .filter_map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(&styles), context))
-                .for_each(|child_element| child.add_child(child_element));
-
-            container.add_child(Box::new(child));
-
-            context.increment_loop_index(&for_loop_context.context_id);
-        }
-
-        context.remove_loop_context(&for_loop_context.context_id);
+        parse_for_loop(node, context, &for_loop_context, array_length, &styles, &mut container);
     } else {
         node.children()
         .filter_map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(&styles), context))
@@ -79,6 +65,32 @@ fn process_div_element<State : ReactiveState>(
     }
 
     Box::new(container)
+}
+
+fn parse_for_loop<State: ReactiveState>(
+    node: &NodeRef, 
+    context: &mut ParsingContext<State>,
+    for_loop_context: &ForLoopContext,
+    array_length: usize,
+    styles: &Styles,
+    container: &mut Container,
+) {
+    context.add_for_loop_context(for_loop_context.clone());
+
+    for _ in 0..array_length {
+        let mut child = Container::new();
+        child.set_styles(styles.clone());
+
+        node.children()
+            .filter_map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(&styles), context))
+            .for_each(|child_element| child.add_child(child_element));
+
+        container.add_child(Box::new(child));
+
+        context.increment_loop_index(&for_loop_context.context_id);
+    }
+
+    context.remove_loop_context(&for_loop_context.context_id);
 }
 
 fn process_button_element<State : ReactiveState>(

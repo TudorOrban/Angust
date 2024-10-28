@@ -2,7 +2,7 @@ use regex::Regex;
 
 use crate::{
     parsing::html::html_parser::ParsingContext, 
-    rendering::elements::component::component_state::{access_field, ReactiveState}
+    rendering::elements::component::component_state::{access_field, ReactiveState, ReflectiveState}
 };
 
 use super::id_generator::IDGenerator;
@@ -28,13 +28,31 @@ pub fn parse_for_expression<State: ReactiveState>(
     let array_name = captures.get(2).unwrap().as_str();
 
     let state = context.component_state.expect("Component state not found");
-    let array_property = match access_field(state, &array_name) {
-        Some(val) => val,
-        None => {
-            return Err(format!("No property found for '{}'", array_name));
-        },
+    let mut array_property: Result<Box<dyn ReflectiveState>, String> = match access_field(state, &array_name) {
+        Some(val) => Ok(val),
+        None => Err(format!("No property found for '{}'", array_name)),
     };
-    let array_len = match array_property.get_field("len") {
+    if array_property.is_err() {
+        // Attempt to find property in for loop context
+        let for_loop_context = identify_loop_variable_context(array_name, context);
+        if for_loop_context.is_none() {
+            return Err(format!("No property found for '{}'", array_name));
+        }
+
+        let for_loop_context = for_loop_context.unwrap();
+        
+
+        array_property = match access_field(state, &array_name) {
+            Some(val) => Ok(val),
+            None => Err(format!("No property found for '{}'", array_name)),
+        };
+    }
+    if array_property.is_err() {
+        return Err(array_property.err().unwrap());
+    }
+
+
+    let array_len = match array_property.unwrap().get_field("len") {
         Some(len) => len.as_any().downcast_ref::<usize>().unwrap().clone(),
         None => return Err(format!("Array '{}' has no length property", array_name)),
     };
@@ -68,24 +86,41 @@ pub fn find_property_in_for_loop_variables<State: ReactiveState>(
     if context.for_loop_contexts.is_none() {
         return Err("No for loop contexts found".to_string());
     }
+
+    let property_path: Vec<&str> = property_access_path.split('.').collect();
+    let nested_property = property_path.get(1..).unwrap().join(".");
+
+    let loop_variable_context = identify_loop_variable_context(property_access_path, context).ok_or_else(|| {
+        format!("Property not found for '{}'", property_access_path)
+    })?;
+
+    return find_loop_variable_property(&nested_property, state, &loop_variable_context);
+}
+
+pub fn identify_loop_variable_context<State: ReactiveState>(
+    property_access_path: &str,
+    context: &ParsingContext<State>,
+) -> Option<ForLoopContext> {
+    if context.for_loop_contexts.is_none() {
+        return None;
+    }
     let for_loop_contexts = context.for_loop_contexts.as_ref().unwrap();
 
     let property_path: Vec<&str> = property_access_path.split('.').collect();
     let base_property = match property_path.get(0) { 
         Some(prop) => prop,
-        None => return Err("Invalid property path".to_string()),
+        None => return None,
     };
-    let nested_property = property_path.get(1..).unwrap().join(".");
 
     for for_loop_context in for_loop_contexts.iter() {
         if for_loop_context.loop_variable != *base_property {
             continue;
         }
 
-        return find_loop_variable_property(&nested_property, state, for_loop_context);
+        return Some(for_loop_context.clone());
     }
 
-    return Err("Property not found".to_string());
+    return None;
 }
 
 fn find_loop_variable_property<State: ReactiveState>(
