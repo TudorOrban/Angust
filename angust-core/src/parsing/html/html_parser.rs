@@ -69,7 +69,7 @@ fn process_text_element<State : ReactiveState>(
         Some(state) => placeholder_parser::parse_state_placeholder(trimmed_text, state, context)
             .unwrap_or_else(|er| {
                 println!("Error parsing state placeholders in text element: {}", er);
-                trimmed_text.to_string()
+                trimmed_text.to_string() // Report error in the future
             }),
         None => trimmed_text.to_string(),
     };

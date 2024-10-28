@@ -26,7 +26,7 @@ pub fn parse_for_expression<State: ReactiveState>(
 
     let loop_variable = captures.get(1).unwrap().as_str();
     let array_path = captures.get(2).unwrap().as_str();
-    println!("Array path: {}", array_path);
+
     let state = context.component_state.expect("Component state not found");
     let array_property = access_field(state, array_path, context)?;
 
@@ -38,7 +38,7 @@ pub fn parse_for_expression<State: ReactiveState>(
     Ok(ForLoopContext {
         is_for_loop: true,
         loop_variable: loop_variable.to_string(),
-        array_name: array_path.to_string(),
+        array_access_path: array_path.to_string(),
         array_length: array_len,
         ..Default::default()
     })
@@ -64,17 +64,15 @@ pub fn access_loop_field<State: ReactiveState>(
     let loop_variable_context = identify_loop_variable_context(base_property, context).ok_or_else(|| {
         format!("Property not found for '{}'", field)
     })?;
-    
     let state = context.component_state.expect("Component state not found");
 
-    println!("Base property: {}", base_property);
-    let array_reflective = get_nested_field(state, &[&loop_variable_context.array_name]).ok_or_else(|| {
-        format!("No property found for '{}'", base_property)
-    })?;
+    // Get current loop array
+    let array_reflective = access_field(state, &loop_variable_context.array_access_path, context)?;
 
+    // Get current array item
     let current_index = loop_variable_context.current_index;
     let array_item_as_reflective = array_reflective.get_field(&current_index.to_string()).ok_or_else(|| {
-        format!("Index {} out of bounds for '{}'", current_index, loop_variable_context.array_name)
+        format!("Index {} out of bounds for '{}'", current_index, loop_variable_context.array_access_path)
     })?;
 
     if nested_property.is_some() {
@@ -104,7 +102,7 @@ pub struct ForLoopContext {
     pub context_id: String,
     pub is_for_loop: bool,
     pub loop_variable: String,
-    pub array_name: String,
+    pub array_access_path: String,
     pub array_length: usize,
     pub current_index: usize,
 }
@@ -115,7 +113,7 @@ impl Default for ForLoopContext {
             context_id: IDGenerator::get(),
             is_for_loop: false,
             loop_variable: "".to_string(),
-            array_name: "".to_string(),
+            array_access_path: "".to_string(),
             array_length: 0,
             current_index: 0,
         }

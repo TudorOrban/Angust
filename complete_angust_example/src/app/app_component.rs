@@ -49,6 +49,7 @@ struct AppComponentState {
     zip: f64,
     active_tab: String,
     ui_items: Vec<UIItem>,
+    items: Vec<String>,
 }
 
 impl AppComponentState {
@@ -113,10 +114,13 @@ impl AppComponent {
                     vec![
                         "Item 21".to_string(),
                         "Item 22".to_string(),
-                        "Item 23".to_string(),
-                        "Item 24".to_string(),
                     ]),
-                ]
+                ],
+                vec![
+                    "Item 1".to_string(),
+                    "Item 2".to_string(),
+                    "Item 3".to_string(),
+                ],
             );
 
             let mut component = Component::new(
