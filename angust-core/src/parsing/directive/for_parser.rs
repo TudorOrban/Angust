@@ -26,7 +26,7 @@ pub fn parse_for_expression<State: ReactiveState>(
 
     let loop_variable = captures.get(1).unwrap().as_str();
     let array_name = captures.get(2).unwrap().as_str();
-    println!("Loop variable: {}, Array name: {}", loop_variable, array_name);
+
     let state = context.component_state.expect("Component state not found");
     let array_property = match access_field(state, &array_name) {
         Some(val) => val,
@@ -34,19 +34,11 @@ pub fn parse_for_expression<State: ReactiveState>(
             return Err(format!("No property found for '{}'", array_name));
         },
     };
-    
-    let first_item = match array_property.get_field("0") {
-        Some(item) => item,
-        None => return Err(format!("Array '{}' is empty", array_name)),
+    let array_len = match array_property.get_field("len") {
+        Some(len) => len.as_any().downcast_ref::<usize>().unwrap().clone(),
+        None => return Err(format!("Array '{}' has no length property", array_name)),
     };
-    let first_item_string = first_item.as_any().downcast_ref::<String>().unwrap().clone();
-    println!("First item: {}", first_item_string);
-    
-    // let array_len = match array_property.get_field("len") {
-    //     Some(len) => len.as_any().downcast_ref::<usize>().unwrap().clone(),
-    //     None => return Err(format!("Array '{}' has no length property", array_name)),
-    // };
-    let array_len = 2;
+
     Ok(ForLoopContext {
         is_for_loop: true,
         loop_variable: loop_variable.to_string(),
@@ -101,7 +93,6 @@ fn find_loop_variable_property<State: ReactiveState>(
     state: &State,
     for_loop_context: &ForLoopContext,
 ) -> Result<String, String> {
-    println!("Finding property '{}' in loop variable '{}', array_name: {}", nested_property, for_loop_context.loop_variable,    for_loop_context.array_name);
     let val = match access_field(state, &for_loop_context.array_name) {
         Some(val) => val,
         None => {

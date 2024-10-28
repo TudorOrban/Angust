@@ -178,7 +178,6 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
 
     pub fn remove_loop_context(&mut self, context_id: &str) {
         if let Some(for_loop_contexts) = &mut self.for_loop_contexts {
-            println!("Removing loop context: {}", context_id);
             for_loop_contexts.retain(|context| context.context_id != context_id);
         }
     }

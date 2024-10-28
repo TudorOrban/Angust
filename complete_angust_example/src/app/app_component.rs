@@ -110,7 +110,6 @@ impl AppComponent {
                 vec![
                     UIItem::new("Label 1".to_string(), "Value 1".to_string()),
                     UIItem::new("Label 2".to_string(), "Value 2".to_string()),
-                    UIItem::new("Label 3".to_string(), "Value 3".to_string()),
                 ]
             );
 

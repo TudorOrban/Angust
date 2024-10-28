@@ -178,7 +178,11 @@ where
         if let Ok(index) = name.parse::<usize>() {
             self.get(index).map(|item| item.clone_box())
         } else {
-            None
+            if name == "len" {
+                Some(Box::new(self.len()))
+            } else {
+                None
+            }
         }
     }
 
@@ -200,7 +204,7 @@ where
 }
 
 impl ReflectiveState for Vec<Box<dyn ReflectiveState>> {
-    fn get_field(&self, _: &str) -> Option<Box<dyn ReflectiveState>> {
+    fn get_field(&self, name: &str) -> Option<Box<dyn ReflectiveState>> {
         // println!("Getting field: {}", name);
         // if let Ok(index) = name.parse::<usize>() {
         //     println!("Index: {}", index);
