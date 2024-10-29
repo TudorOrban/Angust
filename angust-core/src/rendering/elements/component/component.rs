@@ -2,7 +2,7 @@ use std::{any::Any, cell::RefCell, collections::HashMap, rc::Rc};
 
 use regex::Regex;
 
-use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::expression::{ast::ASTNode, ast_evaluator}, rendering::{elements::{
+use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::{expression::{ast::ASTNode, ast_evaluator}, html::html_parser::TemplateASTs}, rendering::{elements::{
     common_types::{OptionalSize, Position, Size}, 
     container::Container, 
     element::{Element, ElementType, EventType}, 
@@ -41,6 +41,7 @@ pub struct Component<State: ReactiveState> {
     // Expression evaluation
     pub template_expressions_asts: Vec<ASTNode>,
     pub template_event_handler_asts: HashMap<String, ASTNode>,
+    pub input_expressions_asts: HashMap<String, ASTNode>,
 }
 
 impl<State: ReactiveState> Component<State> {
@@ -60,6 +61,7 @@ impl<State: ReactiveState> Component<State> {
             event_queue: Rc::new(RefCell::new(EventQueue::new())), 
             template_expressions_asts: vec![],
             template_event_handler_asts: HashMap::new(),
+            input_expressions_asts: HashMap::new(),
         }
     }
 

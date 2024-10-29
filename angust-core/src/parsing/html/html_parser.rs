@@ -118,8 +118,7 @@ pub struct ParsingContext<'a, State : ReactiveState> {
     pub stylesheet: Option<Stylesheet>,
     pub component_state: Option<&'a State>,
     pub component_functions: Option<&'a ComponentFunctions<State>>,
-    pub template_expressions_asts: Option<&'a mut Vec<ASTNode>>,
-    pub template_event_handler_asts: Option<&'a mut HashMap<String, ASTNode>>,
+    pub template_asts: Option<TemplateASTs<'a>>,
     pub for_loop_contexts: Option<Vec<ForLoopContext>>,
 }
 
@@ -130,8 +129,7 @@ impl<'a, State : ReactiveState> Default for ParsingContext<'a, State> {
             stylesheet: None,
             component_state: None,
             component_functions: None,
-            template_expressions_asts: None,
-            template_event_handler_asts: None,
+            template_asts: None,
             for_loop_contexts: None,
         }
     }
@@ -145,26 +143,37 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
         component_functions: Option<&'a ComponentFunctions<State>>,
         template_expressions_asts: Option<&'a mut Vec<ASTNode>>,
         template_event_handler_asts: Option<&'a mut HashMap<String, ASTNode>>,
+        input_expressions_asts: Option<&'a mut HashMap<String, ASTNode>>,
     ) -> Self {
+        let template_asts = TemplateASTs::new(template_expressions_asts, template_event_handler_asts, input_expressions_asts);
         ParsingContext {
             angust_config,
             stylesheet,
             component_state,
             component_functions,
-            template_expressions_asts,
-            template_event_handler_asts,
+            template_asts: Some(template_asts),
             for_loop_contexts: None
         }
     }
 
     pub fn add_template_expression_ast(&mut self, ast: ASTNode) {
-        if let Some(template_expressions_asts) = &mut self.template_expressions_asts {
+        if self.template_asts.is_none() {
+            self.template_asts = Some(TemplateASTs::default());
+        }
+        let template_asts = self.template_asts.as_mut().unwrap();
+
+        if let Some(template_expressions_asts) = &mut template_asts.template_expressions_asts {
             template_expressions_asts.push(ast);
         }
     }
 
     pub fn add_template_event_handler_ast(&mut self, event_name: String, ast: ASTNode) {
-        if let Some(template_event_handler_asts) = &mut self.template_event_handler_asts {
+        if self.template_asts.is_none() {
+            self.template_asts = Some(TemplateASTs::default());
+        }
+        let template_asts = self.template_asts.as_mut().unwrap();
+        
+        if let Some(template_event_handler_asts) = &mut template_asts.template_event_handler_asts {
             template_event_handler_asts.insert(event_name, ast);
         }
     }
@@ -189,6 +198,36 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
     pub fn remove_loop_context(&mut self, context_id: &str) {
         if let Some(for_loop_contexts) = &mut self.for_loop_contexts {
             for_loop_contexts.retain(|context| context.context_id != context_id);
+        }
+    }
+}
+
+pub struct TemplateASTs<'a> {
+    pub template_expressions_asts: Option<&'a mut Vec<ASTNode>>,
+    pub template_event_handler_asts: Option<&'a mut HashMap<String, ASTNode>>,
+    pub input_expressions_asts: Option<&'a mut HashMap<String, ASTNode>>,
+}
+
+impl<'a> Default for TemplateASTs<'a> {
+    fn default() -> Self {
+        TemplateASTs {
+            template_expressions_asts: None,
+            template_event_handler_asts: None,
+            input_expressions_asts: None,
+        }
+    }
+}
+
+impl<'a> TemplateASTs<'a> {
+    pub fn new(
+        template_expressions_asts: Option<&'a mut Vec<ASTNode>>,
+        template_event_handler_asts: Option<&'a mut HashMap<String, ASTNode>>,
+        input_expressions_asts: Option<&'a mut HashMap<String, ASTNode>>,
+    ) -> Self {
+        TemplateASTs {
+            template_expressions_asts,
+            template_event_handler_asts,
+            input_expressions_asts,
         }
     }
 }
