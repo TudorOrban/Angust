@@ -13,6 +13,7 @@ use crate::parsing::directive::placeholder_parser;
 use crate::parsing::expression::ast::ASTNode;
 use crate::rendering::elements::component::component_state::ReactiveState;
 use crate::rendering::elements::component::functions::component_functions::ComponentFunctions;
+use crate::rendering::elements::container::Container;
 use crate::rendering::elements::element::Element;
 use crate::rendering::elements::styles::Styles;
 use crate::rendering::elements::text::Text;
@@ -49,9 +50,13 @@ fn process_document_nodes<State : ReactiveState>(
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
 ) -> Result<Box<dyn Element>, ParsingError> {
-    node.children()
-        .filter_map(|child| map_dom_to_elements::<State>(&child, parent_styles, context))
-        .next()
+    let mut container = Container::new();
+    for child in node.children() {
+        let child_element = map_dom_to_elements::<State>(&child, parent_styles, context)?;
+        container.add_child(child_element);
+    }
+
+    Ok(Box::new(container))
 }
 
 
@@ -62,26 +67,24 @@ fn process_text_element<State : ReactiveState>(
 ) -> Result<Box<dyn Element>, ParsingError> {
     let trimmed_text = text.trim();
     if trimmed_text.is_empty() {
-        return None
+        return Ok(Box::new(Container::new()));
     }
 
     // Apply state placeholders
     let final_text = match context.component_state {
-        Some(state) => placeholder_parser::parse_state_placeholder(trimmed_text, state, context)
-            .unwrap_or_else(|er| {
-                println!("Error parsing state placeholders in text element: {}", er);
-                trimmed_text.to_string() // Report error in the future
-            }),
-        None => trimmed_text.to_string(),
-    };
+        Some(state) => placeholder_parser::parse_state_placeholder(trimmed_text, state, context),
+        None => Ok(trimmed_text.to_string()),
+    }?;
 
     let mut text_element = Text::new(final_text);
+
     if let Some(styles) = parent_styles {
         let mut element_styles = Styles::default();
         merge_styles(styles, &mut element_styles);
         text_element.set_styles(element_styles);
     }
-    Some(Box::new(text_element))
+    
+    Ok(Box::new(text_element))
 }
 
 pub fn general_traversal<State : ReactiveState>(
@@ -92,16 +95,16 @@ pub fn general_traversal<State : ReactiveState>(
     let mut root_element: Option<Box<dyn Element>> = None;
 
     for child in node.children() {
-        if let Some(element) = map_dom_to_elements::<State>(&child, parent_styles, context) {
-            if root_element.is_none() {
-                root_element = Some(element);
-            } else {
-                root_element.as_mut().unwrap().add_child(element);
-            }
+        
+        let child_element = map_dom_to_elements::<State>(&child, parent_styles, context)?;
+        if root_element.is_none() {
+            root_element = Some(child_element);
+        } else {
+            root_element.as_mut().unwrap().add_child(child_element);
         }
     }
 
-    root_element
+    Ok(root_element.unwrap_or_else(|| Box::new(Container::new())))
 }
 
 pub struct ParsingContext<'a, State : ReactiveState> {
