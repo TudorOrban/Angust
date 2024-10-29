@@ -18,6 +18,7 @@ use crate::rendering::elements::styles::Styles;
 use crate::rendering::elements::text::Text;
 
 use super::element_parser;
+use super::error::ParsingError;
 
 
 pub fn parse_html_content(html: &str) -> NodeRef {
@@ -31,7 +32,7 @@ pub fn map_dom_to_elements<State : ReactiveState>(
     dom: &NodeRef, 
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
-) -> Option<Box<dyn Element>> {
+) -> Result<Box<dyn Element>, ParsingError> {
     match dom.data() {
         NodeData::Document(_) | NodeData::Doctype(_) => 
             process_document_nodes::<State>(dom, parent_styles, context),
@@ -47,7 +48,7 @@ fn process_document_nodes<State : ReactiveState>(
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
-) -> Option<Box<dyn Element>> {
+) -> Result<Box<dyn Element>, ParsingError> {
     node.children()
         .filter_map(|child| map_dom_to_elements::<State>(&child, parent_styles, context))
         .next()
@@ -58,7 +59,7 @@ fn process_text_element<State : ReactiveState>(
     text: &str,
     parent_styles: Option<&Styles>,
     context: &mut ParsingContext<State>,
-) -> Option<Box<dyn Element>> {
+) -> Result<Box<dyn Element>, ParsingError> {
     let trimmed_text = text.trim();
     if trimmed_text.is_empty() {
         return None
@@ -87,7 +88,7 @@ pub fn general_traversal<State : ReactiveState>(
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
-) -> Option<Box<dyn Element>> {
+) -> Result<Box<dyn Element>, ParsingError> {
     let mut root_element: Option<Box<dyn Element>> = None;
 
     for child in node.children() {
