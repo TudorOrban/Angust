@@ -1,4 +1,4 @@
-use std::{any::Any, borrow::Borrow, cell::RefCell, collections::HashMap, rc::Rc};
+use std::{any::Any, cell::RefCell, collections::HashMap, rc::Rc};
 
 use regex::Regex;
 
@@ -172,6 +172,25 @@ impl<State: ReactiveState> Component<State> {
 
         param_values
     }
+
+    // - Input handling
+    fn update_children_inputs(&mut self) {
+        let input_setters = &self.component_functions.input_setters;
+
+        for (property_name, ast) in self.input_expressions_asts.iter() {
+            let setter_name = format!("set_{}", property_name);
+            let input_setter_opt = input_setters.get(&setter_name);
+            if input_setter_opt.is_none() {
+                println!("No input setter found for property: {}", property_name);
+                continue;
+            }
+            let input_setter = input_setter_opt.unwrap();
+
+            let value = ast_evaluator::evaluate_ast(&ast, &self.state, &self.component_functions).unwrap();
+
+            input_setter(&mut self.state, vec![Box::new(value)]);
+        }
+    }
 }
 
 impl<State: ReactiveState> Element for Component<State> {
@@ -298,6 +317,7 @@ impl<State: ReactiveState> Element for Component<State> {
     fn react_to_state_change(&mut self, component_id: String) {
         if component_id == self.get_id() {
             self.load_component_template(); // Naive approach; to be replaced later
+            self.update_children_inputs();
         }
     }
 }

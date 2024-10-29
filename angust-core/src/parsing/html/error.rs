@@ -13,6 +13,7 @@ pub enum ParsingError {
     InvalidTextElement(String),
 
     ComponentNotFound(String),
+    InputSetterNotFound(String),
 } 
 
 impl std::fmt::Display for ParsingError {
@@ -30,6 +31,7 @@ impl std::fmt::Display for ParsingError {
             ParsingError::InvalidTextElement(msg) => write!(f, "Invalid text element: {}", msg),
 
             ParsingError::ComponentNotFound(msg) => write!(f, "Component not found: {}", msg),
+            ParsingError::InputSetterNotFound(msg) => write!(f, "Input setter not found: {}", msg),
         }
     }
 }

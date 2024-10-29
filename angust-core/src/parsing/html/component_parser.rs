@@ -1,7 +1,9 @@
+use std::borrow::BorrowMut;
+
 use crate::{
     parsing::{css::css_parser, directive::input_parser}, 
     rendering::elements::{
-        component::{component_factory_registry::create_component, state::reactivity::ReactiveState}, 
+        component::{component_factory_registry::create_component, functions::component_functions::ComponentFunctions, state::reactivity::ReactiveState}, 
         element::Element, 
         styles::Styles
     }
@@ -33,11 +35,7 @@ pub fn process_custom_component<State : ReactiveState>(
 
     component_box.set_styles(styles);
 
-    let input_results = input_parser::parse_input_expressions(&attributes, context)?;
-
-    for (property_name, value) in input_results.iter() {
-        // let input_setter_opt = component_box.
-    }
+    input_parser::parse_input_expressions(&attributes, context)?;
 
     Ok(component_box)
 }
