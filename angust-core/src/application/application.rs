@@ -56,7 +56,7 @@ impl<State> Application<State> {
         let mut parsing_context: ParsingContext<NoState> = ParsingContext::new(Some(angust_config.clone()), Some(stylesheet.clone()), None, None, None, None, None);
 
         let ui_body = html_parser::map_dom_to_elements::<NoState>(&dom, None, &mut parsing_context)
-            .expect("Failed to map DOM to elements");
+            .unwrap_or_else(|e| panic!("Failed to map DOM to elements: {:?}", e));
 
         // Initialize renderer and layout
         let mut renderer = Renderer::new(

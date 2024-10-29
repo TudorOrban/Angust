@@ -58,6 +58,7 @@ impl AppComponentState {
 
     pub fn set_active_tab(&mut self, tab_name: String) {
         self.active_tab_reactive.set(tab_name);
+        self.toggle_content();
     }
 }
 

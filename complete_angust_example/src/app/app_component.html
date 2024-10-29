@@ -1,37 +1,31 @@
-<div>
+<div style="display: flex; flex-direction: row; width: 1800px;">
     
-    <header-component
-        [label]="item.label"
-        [value]="item.value"
-    > 
 
-    </header-component>
+    <div style="display: flex; flex-direction: row;">
+        <button style="width: 400px; height: 200px; background-color: rgb(255, 0, 255);" @onclick="set_active_tab('Home')">
 
-    <!-- <button style="width: 400px; height: 200px; background-color: rgb(255, 0, 255);" @onclick="set_active_tab('Home')">
-
-        <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
-
-        </div>
-    </button>
-
-    <button style="width: 400px; height: 200px; background-color: rgb(255, 255, 0);" @onclick="set_active_tab('Dashboard')">
-
-        <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
-
-        </div>
-
-    </button>
-
-    <button style="width: 400px; height: 200px; background-color: rgb(0, 255, 255);" @onclick="set_active_tab('Settings')">
-
-        <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
-
-        </div>
-
-    </button> -->
+            <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
     
-    <!-- {{ address.location.label }}
-
+            </div>
+        </button>
+    
+        <button style="width: 400px; height: 200px; background-color: rgb(255, 255, 0);" @onclick="set_active_tab('Dashboard')">
+    
+            <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
+    
+            </div>
+    
+        </button>
+    
+        <button style="width: 400px; height: 200px; background-color: rgb(0, 255, 255);" @onclick="set_active_tab('Settings')">
+    
+            <div style="width: 100px; height: 100px; background-color: rgb(120, 120, 120);">
+    
+            </div>
+    
+        </button>
+    </div>
+    
     <div style="display: flex; flex-direction: row;">
         <div @if="is_active_tab('Home', true)" style="width: 200px; height: 200px; background-color: rgb(0, 255, 0);">
 
@@ -44,6 +38,13 @@
         <div @if="is_active_tab('Settings', true)" style="width: 200px; height: 200px; background-color: rgb(0, 0, 255);">
 
         </div>
-    </div> -->
+    </div>
+
+    
+    <header-component
+        [content]="content"
+    > 
+
+    </header-component>
 
 </div>

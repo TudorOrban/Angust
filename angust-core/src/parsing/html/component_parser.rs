@@ -1,4 +1,11 @@
-use crate::{parsing::{css::css_parser, directive::input_parser}, rendering::elements::{component::{component_factory_registry::create_component, state::reactivity::ReactiveState}, element::Element, styles::Styles}};
+use crate::{
+    parsing::{css::css_parser, directive::input_parser}, 
+    rendering::elements::{
+        component::{component_factory_registry::create_component, state::reactivity::ReactiveState}, 
+        element::Element, 
+        styles::Styles
+    }
+};
 
 use super::{error::ParsingError, html_parser::{self, ParsingContext}};
 
@@ -26,10 +33,11 @@ pub fn process_custom_component<State : ReactiveState>(
 
     component_box.set_styles(styles);
 
-    // Provide inputs to the component
-    let inputs = input_parser::parse_input_attributes(&attributes);
+    let input_results = input_parser::parse_input_expressions(&attributes, context)?;
 
-
+    for (property_name, value) in input_results.iter() {
+        // let input_setter_opt = component_box.
+    }
 
     Ok(component_box)
 }

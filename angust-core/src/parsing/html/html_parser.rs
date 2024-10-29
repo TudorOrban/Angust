@@ -172,9 +172,20 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
             self.template_asts = Some(TemplateASTs::default());
         }
         let template_asts = self.template_asts.as_mut().unwrap();
-        
+
         if let Some(template_event_handler_asts) = &mut template_asts.template_event_handler_asts {
             template_event_handler_asts.insert(event_name, ast);
+        }
+    }
+
+    pub fn add_input_expression_ast(&mut self, input_name: String, ast: ASTNode) {
+        if self.template_asts.is_none() {
+            self.template_asts = Some(TemplateASTs::default());
+        }
+        let template_asts = self.template_asts.as_mut().unwrap();
+
+        if let Some(input_expressions_asts) = &mut template_asts.input_expressions_asts {
+            input_expressions_asts.insert(input_name, ast);
         }
     }
 

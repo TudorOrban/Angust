@@ -1,6 +1,5 @@
 use std::{any::Any, collections::HashMap};
 
-
 pub struct ComponentFunctions<State> {
     pub event_handlers: HashMap<String, Box<dyn FnMut(&mut State)>>,
     pub boolean_evaluators: HashMap<String, Box<dyn Fn(&State) -> bool>>,

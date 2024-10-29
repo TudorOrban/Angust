@@ -1,15 +1,22 @@
-use std::{any::Any, cell::RefCell, collections::HashMap, rc::Rc};
+use std::{any::Any, borrow::Borrow, cell::RefCell, collections::HashMap, rc::Rc};
 
 use regex::Regex;
 
-use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::{expression::{ast::ASTNode, ast_evaluator}, html::html_parser::TemplateASTs}, rendering::{elements::{
-    common_types::{OptionalSize, Position, Size}, 
-    container::Container, 
-    element::{Element, ElementType, EventType}, 
-    element_id_generator::ElementIDGenerator, 
-    event_propagator, 
-    styles::Styles
-}, layout::effective_size_estimator}};
+use crate::{
+    application::event_loop_proxy::get_event_loop_proxy, 
+    parsing::expression::{ast::ASTNode, ast_evaluator}, 
+    rendering::{
+        elements::{
+            common_types::{OptionalSize, Position, Size}, 
+            container::Container, 
+            element::{Element, ElementType, EventType}, 
+            element_id_generator::ElementIDGenerator, 
+            event_propagator, 
+            styles::Styles
+        },  
+        layout::effective_size_estimator
+    }
+};
 
 use super::{
     functions::component_functions::ComponentFunctions, 
