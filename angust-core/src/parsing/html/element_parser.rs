@@ -3,15 +3,15 @@ use kuchiki::NodeRef;
 use crate::parsing::directive::{for_parser, for_parser::ForLoopContext, if_parser, on_click_parser};
 use crate::parsing::css::css_parser;
 use crate::rendering::elements::{
-    button::Button,
-    component::component_factory_registry::create_component,
-    component::state::reactivity::ReactiveState,
     container::Container,
+    button::Button,
     element::Element,
     image::Image,
     styles::Styles,
+    component::state::reactivity::ReactiveState,
 };
 
+use super::component_parser::process_custom_component;
 use super::error::ParsingError;
 use super::html_parser::{self, ParsingContext};
 
@@ -141,27 +141,4 @@ fn process_image_element<State : ReactiveState>(
         relative_path, src.to_string(), Some(styles)
     );
     Ok(Box::new(image))
-}
-
-fn process_custom_component<State : ReactiveState>(
-    component_name: &str, 
-    elem_data: &kuchiki::ElementData, 
-    node: &NodeRef, 
-    parent_styles: Option<&Styles>, 
-    context: &mut ParsingContext<State>,
-) -> Result<Box<dyn Element>, ParsingError> {
-    let skippable_elements = vec!["!DOCTYPE", "html", "head", "meta", "body", "title", "h1"]; // To be implemented in the future
-    if skippable_elements.contains(&component_name) {
-        return html_parser::general_traversal::<State>(node, parent_styles, context)
-    }
-    
-    let attributes = elem_data.attributes.borrow();
-    let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
-
-    if let Some(mut component_box) = create_component(component_name) {
-        component_box.set_styles(styles);
-        Ok(component_box)
-    } else {
-        return Err(ParsingError::ComponentNotFound(component_name.to_string()));
-    }
 }
