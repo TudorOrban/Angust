@@ -7,6 +7,7 @@ pub struct ComponentFunctions<State> {
     pub array_getters: HashMap<String, Box<dyn Fn(&State) -> Vec<&dyn Any>>>,
     pub dynamic_params_functions: HashMap<String, Box<dyn Fn(&State, Vec<Box<dyn Any>>) -> Box<dyn Any>>>,
     pub dynamic_params_event_handlers: HashMap<String, Box<dyn Fn(&mut State, Vec<Box<dyn Any>>)>>,
+    pub input_setters: HashMap<String, Box<dyn Fn(&mut State, Vec<Box<dyn Any>>)>>,
 }
 
 impl<State> ComponentFunctions<State> {
@@ -16,6 +17,7 @@ impl<State> ComponentFunctions<State> {
         array_getters: Vec<(&str, Box<dyn Fn(&State) -> Vec<&dyn Any>>)>,
         dynamic_params_functions: Vec<(&str, Box<dyn Fn(&State, Vec<Box<dyn Any>>) -> Box<dyn Any>>)>,
         dynamic_params_event_handlers: Vec<(&str, Box<dyn Fn(&mut State, Vec<Box<dyn Any>>)>)>,
+        input_setters: Vec<(&str, Box<dyn Fn(&mut State, Vec<Box<dyn Any>>)>)>,
     ) -> Self {
         let mut functions = Self::default();
 
@@ -34,6 +36,9 @@ impl<State> ComponentFunctions<State> {
         for (handler_name, handler) in dynamic_params_event_handlers {
             functions.dynamic_params_event_handlers.insert(handler_name.to_string(), handler);
         }
+        for (setter_name, setter) in input_setters {
+            functions.input_setters.insert(setter_name.to_string(), setter);
+        }
 
         functions
     }
@@ -47,6 +52,7 @@ impl<State> Default for ComponentFunctions<State> {
             array_getters: HashMap::new(),
             dynamic_params_functions: HashMap::new(),
             dynamic_params_event_handlers: HashMap::new(),
+            input_setters: HashMap::new(),
         }
     }
 }

@@ -15,23 +15,6 @@ use angust_macros::component_state;
 
 #[component_state]
 #[derive(Clone)]
-struct Location {
-    lat: f64,
-    lon: f64,
-    label: String,
-}
-
-#[component_state]
-#[derive(Clone)]
-struct Address {
-    street: String,
-    zip: f64,
-    location: Location,
-    active_tab: String,
-}
-
-#[component_state]
-#[derive(Clone)]
 struct UIItem {
     label: String,
     value: String,
@@ -42,13 +25,12 @@ struct UIItem {
 #[derive(Clone)]
 struct AppComponentState {
     name: String,
-    address: Address,
     content: String,
     count: f64,
-    zip: f64,
     active_tab: String,
     ui_items: Vec<UIItem>,
     items: Vec<String>,
+    item: UIItem,
 }
 
 impl AppComponentState {
@@ -88,19 +70,8 @@ impl AppComponent {
         registry.insert("app-component".to_string(), Box::new(move || {
             let state_factory = || AppComponentState::new(
                 "Alice".to_string(),
-                Address::new(
-                    "123 Main St".to_string(),
-                    90210.0,
-                    Location::new(
-                        34.0522,
-                        -118.2437,
-                        "Los Angeles".to_string()
-                    ),
-                    "Home".to_string(),
-                ),
                 "Hello, App Component!".to_string(),
                 0.0,
-                90210.0,
                 "Home".to_string(),
                 vec![
                     UIItem::new("Label 1".to_string(), "Value 1".to_string(), 
@@ -115,11 +86,13 @@ impl AppComponent {
                         "Item 22".to_string(),
                     ]),
                 ],
+                vec![],
+                UIItem::new("Label 3".to_string(), "Value 3".to_string(),
                 vec![
-                    "Item 1".to_string(),
-                    "Item 2".to_string(),
-                    "Item 3".to_string(),
-                ],
+                    "Item 31".to_string(),
+                    "Item 32".to_string(),
+                    "Item 33".to_string(),
+                ]),
             );
 
             let mut component = Component::new(
@@ -141,6 +114,7 @@ impl AppComponent {
                 vec![
                     ("set_active_tab", wrap_fn_mut!(AppComponentState, AppComponentState::set_active_tab, String)),
                 ],
+                vec![],
             );
             component.add_component_functions(component_functions);
 

@@ -11,6 +11,8 @@ pub enum ParsingError {
 
     InvalidDocument(String),
     InvalidTextElement(String),
+
+    ComponentNotFound(String),
 } 
 
 impl std::fmt::Display for ParsingError {
@@ -26,6 +28,8 @@ impl std::fmt::Display for ParsingError {
 
             ParsingError::InvalidDocument(msg) => write!(f, "Invalid document: {}", msg),
             ParsingError::InvalidTextElement(msg) => write!(f, "Invalid text element: {}", msg),
+
+            ParsingError::ComponentNotFound(msg) => write!(f, "Component not found: {}", msg),
         }
     }
 }

@@ -11,6 +11,7 @@ use super::{component::Component, state::reactivity::ReactiveState};
 
 // Entry point of Component Template parsing
 pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Component<State>) {
+    println!("Loading template for component: {}", component.name);
     // Load template
     let project_root = PathBuf::from(identify_project_root_path());
     let template_path = project_root.join(component.template_relative_path.clone());
@@ -27,10 +28,10 @@ pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Comp
         Some(&component.state), Some(&component.component_functions),
         Some(&mut component.template_expressions_asts), Some(&mut component.template_event_handler_asts)
     );
-    
+
     let element = html_parser::map_dom_to_elements::<State>(&dom, None, &mut parsing_context)
         .unwrap_or_else(|e| panic!("Failed to map DOM to elements: {:?}", e));
-
+    
     container.add_child(element);
 
     component.content = container;

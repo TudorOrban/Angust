@@ -18,11 +18,13 @@ use super::{
 };
 
 pub struct Component<State: ReactiveState> {
+    // Component properties
     _id: String,
     pub name: String,
     pub template_relative_path: String,
     pub content: Box<dyn Element>,
 
+    // General properties
     position: Position,
     size: Size, 
     natural_size: Size,
@@ -38,9 +40,7 @@ pub struct Component<State: ReactiveState> {
 
     // Expression evaluation
     pub template_expressions_asts: Vec<ASTNode>,
-    pub template_event_handler_asts: HashMap<String, ASTNode>
-
-
+    pub template_event_handler_asts: HashMap<String, ASTNode>,
 }
 
 impl<State: ReactiveState> Component<State> {
@@ -59,7 +59,7 @@ impl<State: ReactiveState> Component<State> {
             component_functions: ComponentFunctions::default(),
             event_queue: Rc::new(RefCell::new(EventQueue::new())), 
             template_expressions_asts: vec![],
-            template_event_handler_asts: HashMap::new()
+            template_event_handler_asts: HashMap::new(),
         }
     }
 
@@ -119,7 +119,8 @@ impl<State: ReactiveState> Component<State> {
         }
     }
 
-    // Event handling
+    // Internal
+    // - Event handling
     fn trigger_dynamic_params_event_handler(&mut self, event_name: &String, event_ast: &ASTNode) {
         let params_asts = match event_ast {
             ASTNode::FunctionCall(_, params) => params,

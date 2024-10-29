@@ -24,7 +24,7 @@ pub fn dispatch_element_processing<State : ReactiveState>(
     match elem_data.name.local.as_ref() {
         "div" => process_div_element::<State>(elem_data, node, parent_styles, context),
         "button" => process_button_element::<State>(elem_data, node, parent_styles, context),
-        "img" => process_image_element::<State>(elem_data, node, parent_styles, context),
+        "img" => process_image_element::<State>(elem_data, parent_styles, context),
         component_name => process_custom_component::<State>(component_name, elem_data, node, parent_styles, context),
     }
 }
@@ -115,16 +115,13 @@ fn process_button_element<State : ReactiveState>(
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
 
-    // let on_click_handler_name = directive_parser::parse_on_click_attribute(&attributes, context);
     let (on_click_handler_name, handler_ast) = on_click_parser::parse_on_click_expression(&attributes, context)?;
-        
     context.add_template_event_handler_ast(on_click_handler_name.clone(), handler_ast);
-
-    let mut button = Button::new(Some(on_click_handler_name), None, Some(styles));
-
+    
     let mut child_container = Container::new();
     map_dom_children_to_elements::<State>(node, &mut child_container, context, &styles).unwrap();
         
+    let mut button = Button::new(Some(on_click_handler_name), None, Some(styles));
     button.add_child(Box::new(child_container));
 
     Ok(Box::new(button))
@@ -132,7 +129,6 @@ fn process_button_element<State : ReactiveState>(
 
 fn process_image_element<State : ReactiveState>(
     elem_data: &kuchiki::ElementData, 
-    _: &NodeRef, 
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
 ) -> Result<Box<dyn Element>, ParsingError> {
@@ -166,8 +162,6 @@ fn process_custom_component<State : ReactiveState>(
         component_box.set_styles(styles);
         Ok(component_box)
     } else {
-        // Continue processing children (To be reported as an error in the future)
-        println!("Component not found: {}", component_name);
-        return html_parser::general_traversal::<State>(node, Some(&styles), context)
+        return Err(ParsingError::ComponentNotFound(component_name.to_string()));
     }
 }
