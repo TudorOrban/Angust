@@ -6,7 +6,8 @@ use crate::{
     rendering::elements::{container::Container, element::Element}
 };
 
-use super::{component::Component, component_state::ReactiveState};
+use super::{component::Component, state::reactivity::ReactiveState};
+
 
 // Entry point of Component Template parsing
 pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Component<State>) {

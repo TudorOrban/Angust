@@ -15,7 +15,7 @@ use winit::dpi::LogicalSize;
 use winit::window::{Window, WindowAttributes};
 use winit::event_loop::EventLoop;
 
-use crate::rendering::elements::component::reactivity::ComponentEvent;
+use crate::rendering::elements::component::state::reactivity::ComponentEvent;
 
 pub struct WindowingSystem {
     pub window: Window,

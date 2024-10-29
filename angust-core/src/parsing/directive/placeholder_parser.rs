@@ -2,10 +2,10 @@
 use regex::Regex;
 
 use crate::{
-    parsing::html::{error::ParsingError, html_parser::ParsingContext}, rendering::elements::component::component_state::{
-        access_field, ReactiveState 
-    }
+    parsing::html::{error::ParsingError, html_parser::ParsingContext}, 
+    rendering::elements::component::state::{nested_reflectivity::access_field, reactivity::ReactiveState}
 };
+
 
 // State placeholders {{ component_state_property }}
 pub fn parse_state_placeholder<State: ReactiveState>(

@@ -3,7 +3,7 @@ use crate::{
         expression::ast::{self, ASTNode},
         html::{error::ParsingError, html_parser::ParsingContext}
     }, 
-    rendering::elements::component::component_state::ReactiveState
+    rendering::elements::component::state::reactivity::ReactiveState
 };
 
 use super::id_generator::IDGenerator;

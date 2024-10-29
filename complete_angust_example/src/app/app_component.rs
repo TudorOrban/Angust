@@ -6,9 +6,8 @@ use angust::{
     rendering::elements::component::{
         component::Component, 
         component_factory_registry::ComponentFactory, 
-        component_state::{ReactiveState, ReflectiveState}, 
+        state::{reactivity::{ComponentEvent, ReactiveField, ReactiveState}, reflectivity::ReflectiveState}, 
         functions::component_functions::ComponentFunctions, 
-        reactivity::{ComponentEvent, ReactiveField}
     }, 
     wrap_fn, wrap_fn_mut
 };

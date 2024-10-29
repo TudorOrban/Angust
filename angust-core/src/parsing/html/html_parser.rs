@@ -1,22 +1,28 @@
 use std::collections::HashMap;
 
-use kuchiki::parse_html;
-use kuchiki::NodeData;
-use kuchiki::NodeRef;
-use kuchiki::traits::TendrilSink;
+use kuchiki::{
+    parse_html,
+    NodeData,
+    NodeRef,
+    traits::TendrilSink,
+};
 
 use crate::application::angust_configuration::AngustConfiguration;
-use crate::parsing::css::css_parser::merge_styles;
-use crate::parsing::css::stylesheet_parser::Stylesheet;
-use crate::parsing::directive::for_parser::ForLoopContext;
-use crate::parsing::directive::placeholder_parser;
-use crate::parsing::expression::ast::ASTNode;
-use crate::rendering::elements::component::component_state::ReactiveState;
+use crate::parsing::{
+    css::css_parser::merge_styles,
+    css::stylesheet_parser::Stylesheet,
+    directive::for_parser::ForLoopContext,
+    directive::placeholder_parser,
+    expression::ast::ASTNode,
+};
 use crate::rendering::elements::component::functions::component_functions::ComponentFunctions;
-use crate::rendering::elements::container::Container;
-use crate::rendering::elements::element::Element;
-use crate::rendering::elements::styles::Styles;
-use crate::rendering::elements::text::Text;
+use crate::rendering::elements::{
+    component::state::reactivity::ReactiveState,
+    container::Container,
+    element::Element,
+    styles::Styles,
+    text::Text,
+};
 
 use super::element_parser;
 use super::error::ParsingError;

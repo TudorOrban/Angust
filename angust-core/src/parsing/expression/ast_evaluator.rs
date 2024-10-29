@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use crate::rendering::elements::component::{component_state::{get_nested_field, ReactiveState}, functions::component_functions::ComponentFunctions};
+use crate::rendering::elements::component::{functions::component_functions::ComponentFunctions, state::{nested_reflectivity::get_nested_field, reactivity::ReactiveState}};
 
 use super::ast::{ASTNode, Operator};
 

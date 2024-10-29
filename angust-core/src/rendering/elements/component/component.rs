@@ -11,7 +11,11 @@ use crate::{application::event_loop_proxy::get_event_loop_proxy, parsing::expres
     styles::Styles
 }, layout::effective_size_estimator}};
 
-use super::{functions::component_functions::ComponentFunctions, component_state::ReactiveState, reactivity::{ComponentEvent, EventQueue}, template_loader};
+use super::{
+    functions::component_functions::ComponentFunctions, 
+    state::reactivity::{ComponentEvent, EventQueue, ReactiveState}, 
+    template_loader
+};
 
 pub struct Component<State: ReactiveState> {
     _id: String,
@@ -143,7 +147,7 @@ impl<State: ReactiveState> Component<State> {
 
     fn determine_params(&mut self, params_asts: &Vec<ASTNode>) -> Vec<Box<dyn Any>> {
         let mut param_values: Vec<Box<dyn Any>> = vec![];
-        
+
         for params_ast in params_asts {
             let param_value = match ast_evaluator::evaluate_ast(&params_ast, &self.state, &self.component_functions) {
                 Ok(value) => value,

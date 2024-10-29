@@ -1,5 +1,21 @@
 use std::{fmt::{Debug, Formatter}, ops::{Deref, DerefMut}};
 
+use super::reflectivity::{NoState, ReflectiveState};
+
+
+pub trait ReactiveState : ReflectiveState {
+    fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
+        where
+            F: 'static + FnMut(&ComponentEvent);
+}
+
+impl ReactiveState for NoState {
+    fn subscribe_to_property<F>(&mut self, _property_name: &str, _callback: F)
+    where
+        F: 'static + FnMut(&ComponentEvent),
+    {
+    }
+}
 
 pub struct ReactiveField<T> {
     pub value: T,

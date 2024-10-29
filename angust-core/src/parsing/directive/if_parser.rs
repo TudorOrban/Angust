@@ -3,7 +3,7 @@ use crate::{
         expression::{ast, ast_evaluator}, 
         html::{error::ParsingError, html_parser::ParsingContext}
     }, 
-    rendering::elements::component::component_state::ReactiveState
+    rendering::elements::component::state::reactivity::ReactiveState
 };
 
 

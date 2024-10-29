@@ -1,8 +1,7 @@
 use regex::Regex;
 
 use crate::{
-    parsing::html::{error::ParsingError, html_parser::ParsingContext}, 
-    rendering::elements::component::component_state::{access_field, get_nested_field, ReactiveState, ReflectiveState}
+    parsing::html::{error::ParsingError, html_parser::ParsingContext}, rendering::elements::component::state::{nested_reflectivity::{access_field, get_nested_field}, reactivity::ReactiveState, reflectivity::ReflectiveState}, 
 };
 
 use super::id_generator::IDGenerator;

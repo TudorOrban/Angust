@@ -2,7 +2,8 @@ use once_cell::sync::Lazy;
 use std::sync::Mutex;
 use winit::event_loop::EventLoopProxy;
 
-use crate::rendering::elements::component::reactivity::ComponentEvent;
+use crate::rendering::elements::component::state::reactivity::ComponentEvent;
+
 
 static GLOBAL_PROXY: Lazy<Mutex<Option<EventLoopProxy<ComponentEvent>>>> = Lazy::new(|| Mutex::new(None));
 

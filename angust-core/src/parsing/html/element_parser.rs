@@ -1,14 +1,16 @@
 use kuchiki::NodeRef;
 
-use crate::parsing::directive::for_parser::ForLoopContext;
-use crate::parsing::directive::{for_parser, if_parser, on_click_parser};
-use crate::{parsing::css::css_parser, rendering::elements::component::component_state::ReactiveState};
-use crate::rendering::elements::button::Button;
-use crate::rendering::elements::component::component_factory_registry::create_component;
-use crate::rendering::elements::container::Container;
-use crate::rendering::elements::element::Element;
-use crate::rendering::elements::image::Image;
-use crate::rendering::elements::styles::Styles;
+use crate::parsing::directive::{for_parser, for_parser::ForLoopContext, if_parser, on_click_parser};
+use crate::parsing::css::css_parser;
+use crate::rendering::elements::{
+    button::Button,
+    component::component_factory_registry::create_component,
+    component::state::reactivity::ReactiveState,
+    container::Container,
+    element::Element,
+    image::Image,
+    styles::Styles,
+};
 
 use super::error::ParsingError;
 use super::html_parser::{self, ParsingContext};
