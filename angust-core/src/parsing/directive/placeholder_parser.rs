@@ -2,7 +2,7 @@
 use regex::Regex;
 
 use crate::{
-    parsing::html::html_parser::ParsingContext, rendering::elements::component::component_state::{
+    parsing::html::{error::ParsingError, html_parser::ParsingContext}, rendering::elements::component::component_state::{
         access_field, ReactiveState 
     }
 };
@@ -12,7 +12,7 @@ pub fn parse_state_placeholder<State: ReactiveState>(
     text: &str,
     state: &State,
     context: &mut ParsingContext<State>,
-) -> Result<String, String> {
+) -> Result<String, ParsingError> {
     let re = Regex::new(r"\{\{(\s*[^}]+\s*)\}\}").unwrap();
     let mut result = text.to_string();
 
@@ -28,15 +28,15 @@ pub fn parse_state_placeholder<State: ReactiveState>(
     Ok(result)
 }
 
-pub fn substitute_state_placeholder<State: ReactiveState>(
+fn substitute_state_placeholder<State: ReactiveState>(
     property_access_path: &str,
     state: &State,
     context: &mut ParsingContext<State>,
-) -> Result<String, String> {
+) -> Result<String, ParsingError> {
     let property = access_field(state, property_access_path, context)?;
     if let Some(val) = property.as_any().downcast_ref::<String>() {
         return Ok(val.clone());
     } else {
-        return Err(format!("Property '{}' is not a string", property_access_path));
+        return Err(ParsingError::FieldAccessError(format!("Property '{}' is not a string", property_access_path)));
     }
 }

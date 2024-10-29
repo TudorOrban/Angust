@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use crate::parsing::{directive::for_parser::access_loop_field, html::html_parser::ParsingContext};
+use crate::parsing::{directive::for_parser::access_loop_field, html::{error::ParsingError, html_parser::ParsingContext}};
 
 use super::reactivity::ComponentEvent;
 
@@ -29,17 +29,17 @@ pub fn access_field<State: ReactiveState>(
     obj: &dyn ReflectiveState,
     field: &str,
     context: &ParsingContext<State>,
-) -> Result<Box<dyn ReflectiveState>, String> {
+) -> Result<Box<dyn ReflectiveState>, ParsingError> {
     let property_path: Vec<&str> = field.split('.').collect();
     let base_property = match property_path.get(0) { 
         Some(prop) => prop,
-        None => return Err("No property found".to_string()),
+        None => return Err(ParsingError::FieldAccessError("No property found".to_string())),
     };
     let nested_property = property_path.get(1..);
 
     // Check direct property access firstly
     let property_reflective = get_nested_field(obj, &property_path).ok_or_else(|| {
-        format!("Property not found for '{}'", field)
+        ParsingError::FieldAccessError(format!("Property not found for '{}'", field))
     });
     if !property_reflective.is_err() {
         return property_reflective;

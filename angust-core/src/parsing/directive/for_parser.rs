@@ -1,7 +1,7 @@
 use regex::Regex;
 
 use crate::{
-    parsing::html::html_parser::ParsingContext, 
+    parsing::html::{error::ParsingError, html_parser::ParsingContext}, 
     rendering::elements::component::component_state::{access_field, get_nested_field, ReactiveState, ReflectiveState}
 };
 
@@ -12,7 +12,7 @@ use super::id_generator::IDGenerator;
 pub fn parse_for_expression<State: ReactiveState>(
     attributes: &kuchiki::Attributes,
     context: &mut ParsingContext<State>,
-) -> Result<ForLoopContext, String> {
+) -> Result<ForLoopContext, ParsingError> {
     let for_expression = match parse_for_attribute::<State>(attributes) {
         Some(expr) => expr,
         None => return Ok(ForLoopContext::default()), // No for directive found
@@ -21,7 +21,7 @@ pub fn parse_for_expression<State: ReactiveState>(
     let re = Regex::new(r"let (\w+) of ([\w\.]+)").unwrap();
     let captures = match re.captures(&for_expression) {
         Some(captures) => captures,
-        None => return Err("Invalid for directive".to_string()),
+        None => return Err(ParsingError::InvalidDirectiveSyntax("Invalid @for directive".to_string())),
     };
 
     let loop_variable = captures.get(1).unwrap().as_str();
@@ -32,7 +32,7 @@ pub fn parse_for_expression<State: ReactiveState>(
 
     let array_len = match array_property.get_field("len") {
         Some(len) => len.as_any().downcast_ref::<usize>().unwrap().clone(),
-        None => return Err(format!("Array '{}' has no length property", array_path)),
+        None => return Err(ParsingError::InvalidDirectiveSyntax(format!("Array '{}' has no length property", array_path))),
     };
 
     Ok(ForLoopContext {
@@ -60,24 +60,27 @@ pub fn access_loop_field<State: ReactiveState>(
     field: &str,
     base_property: &str,
     nested_property: Option<&[&str]>,
-) -> Result<Box<dyn ReflectiveState>, String> {
+) -> Result<Box<dyn ReflectiveState>, ParsingError> {
     let loop_variable_context = identify_loop_variable_context(base_property, context).ok_or_else(|| {
-        format!("Property not found for '{}'", field)
+        ParsingError::FieldAccessError(field.to_string())
     })?;
+    let array_access_path = loop_variable_context.array_access_path.clone();
     let state = context.component_state.expect("Component state not found");
 
     // Get current loop array
-    let array_reflective = access_field(state, &loop_variable_context.array_access_path, context)?;
+    let array_reflective = access_field(state, &array_access_path, context).or_else(|_| {
+        Err(ParsingError::FieldAccessError(format!("Array not found for '{}'", array_access_path)))
+    })?;
 
     // Get current array item
     let current_index = loop_variable_context.current_index;
     let array_item_as_reflective = array_reflective.get_field(&current_index.to_string()).ok_or_else(|| {
-        format!("Index {} out of bounds for '{}'", current_index, loop_variable_context.array_access_path)
+        ParsingError::FieldAccessError(format!("Index {} out of bounds for '{}'", current_index, array_access_path))
     })?;
 
     if nested_property.is_some() {
         return get_nested_field(&*array_item_as_reflective, &nested_property.unwrap()).ok_or_else(|| {
-            format!("Property not found for '{}'", field)
+            ParsingError::FieldAccessError(field.to_string())
         });
     } else {
         return Ok(array_item_as_reflective);
