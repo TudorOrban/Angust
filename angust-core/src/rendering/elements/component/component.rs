@@ -291,6 +291,10 @@ impl<State: ReactiveState> Element for Component<State> {
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>> {
         return self.content.get_children_mut();
     }
+    
+    fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
+        Some(self)
+    }
 
     // Layout system
     fn estimate_sizes(&mut self) {
@@ -318,6 +322,21 @@ impl<State: ReactiveState> Element for Component<State> {
         if component_id == self.get_id() {
             self.load_component_template(); // Naive approach; to be replaced later
             self.update_children_inputs();
+        }
+    }
+}
+
+// Experimental
+pub trait ComponentInterface {
+    fn update_input(&mut self, input_name: &str, value: Vec<Box<dyn Any>>);
+    // Add more methods as needed to manipulate the component state
+}
+
+
+impl<State: ReactiveState> ComponentInterface for Component<State> {
+    fn update_input(&mut self, input_name: &str, value: Vec<Box<dyn Any>>) {
+        if let Some(setter) = self.component_functions.input_setters.get(input_name) {
+            setter(&mut self.state, value);
         }
     }
 }

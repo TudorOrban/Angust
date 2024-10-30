@@ -1,6 +1,6 @@
 use skia_safe::{Canvas, Point};
 
-use super::{common_types::{OptionalSize, Position, Size}, styles::Styles};
+use super::{common_types::{OptionalSize, Position, Size}, component::component::ComponentInterface, styles::Styles};
 
 // This is the trait that all Angust elements must implement.
 pub trait Element {
@@ -26,7 +26,8 @@ pub trait Element {
     fn get_styles(&self) -> Styles;
 
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>>;
-    
+    fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface>;
+
     // Layout system
     fn set_natural_size(&mut self, size: Size);
     fn set_requested_size(&mut self, optional_size: OptionalSize);

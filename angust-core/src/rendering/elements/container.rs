@@ -8,7 +8,7 @@ use crate::{application::event_handling::scrollbar_movement_handler::handle_scro
 }};
 
 use super::{
-    common_types::{OptionalSize, Position, ScrollbarState, Size}, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::{Directions, Styles}
+    common_types::{OptionalSize, Position, ScrollbarState, Size}, component::component::ComponentInterface, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::{Directions, Styles}
 };
 
 pub struct Container {
@@ -139,6 +139,10 @@ impl Element for Container {
 
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>> {
         Some(&mut self.children)
+    }
+
+    fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
+        None
     }
 
     // Layout system
