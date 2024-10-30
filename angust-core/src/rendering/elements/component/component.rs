@@ -53,8 +53,11 @@ pub struct Component<State: ReactiveState> {
 
 impl<State: ReactiveState> Component<State> {
     pub fn new(name: String, template_relative_path: String, state: State) -> Self {
+        let id = ElementIDGenerator::get();
+        println!("Component ID: {}", id);
+        println!("Component name: {}", name);
         Self {
-            _id: ElementIDGenerator::get(),
+            _id: id,
             name,
             template_relative_path,
             content: Box::new(Container::new()),
@@ -329,7 +332,7 @@ impl<State: ReactiveState> Element for Component<State> {
 // Experimental
 pub trait ComponentInterface {
     fn update_input(&mut self, input_name: &str, value: Vec<Box<dyn Any>>);
-    // Add more methods as needed to manipulate the component state
+    fn get_input_asts(&self) -> HashMap<String, ASTNode>;
 }
 
 
@@ -338,5 +341,9 @@ impl<State: ReactiveState> ComponentInterface for Component<State> {
         if let Some(setter) = self.component_functions.input_setters.get(input_name) {
             setter(&mut self.state, value);
         }
+    }
+
+    fn get_input_asts(&self) -> HashMap<String, ASTNode> {
+        self.input_expressions_asts.clone()
     }
 }

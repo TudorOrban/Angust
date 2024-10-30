@@ -1,7 +1,7 @@
 use crate::{
-    parsing::{css::css_parser, directive::input_parser}, 
+    parsing::{css::css_parser, directive::input_parser, expression::ast_evaluator}, 
     rendering::elements::{
-        component::{self, component_factory_registry::create_component, state::reactivity::ReactiveState}, 
+        component::{component_factory_registry::create_component, state::reactivity::ReactiveState}, 
         element::{Element, ElementType}, 
         styles::Styles
     }
@@ -35,20 +35,51 @@ pub fn process_custom_component<State : ReactiveState>(
 
     input_parser::parse_input_expressions(&attributes, context)?;
 
+    trigger_input_setters(&mut component_box, context)?;
+
     Ok(component_box)
 }
 
 fn trigger_input_setters<State : ReactiveState>(
     component: &mut Box<dyn Element>,
-    attributes: &kuchiki::Attributes,
-    context: &mut ParsingContext<State>,
+    context: &ParsingContext<State>,
 ) -> Result<(), ParsingError> {
-    for child in component.get_children_mut().unwrap() {
-        if child.get_element_type() == ElementType::CustomComponent {
-            if let Some(comp_interface) = child.get_component_interface() {
-                comp_interface.update_input(input_name, value);
-            }
+    let component_state = match context.component_state {
+        Some(ref state) => *state,
+        None => return Ok(()) // Root context, do nothing
+    };
+    let component_functions = match context.component_functions {
+        Some(ref functions) => functions,
+        None => return Ok(())
+    };
+
+    let mut empty_children: Vec<Box<dyn Element>> = vec![];
+
+    println!("Triggering input setters for component: {:?}", component.get_id());
+    println!("Processing component: {:?}", component.get_element_type());
+
+    for child in component.get_children_mut().unwrap_or(&mut empty_children) {
+        println!("Processing child with ID: {:?} and element type: {:?}", child.get_id(), child.get_element_type()); 
+        if child.get_element_type() != ElementType::CustomComponent {
+            trigger_input_setters(child, context)?;
+            continue;
         }
+
+        let component_interface = child.get_component_interface();
+        if component_interface.is_none() {
+            println!("No component interface found");
+            continue;
+        }
+        let comp_interface = component_interface.unwrap();
+        
+        let input_asts = comp_interface.get_input_asts();
+        
+        println!("Input ASTs: {:?}", input_asts);
+        for (input_name, input_ast) in input_asts.iter() {
+            let input_value = ast_evaluator::evaluate_ast(input_ast, component_state, component_functions)?;
+            comp_interface.update_input(input_name, vec![input_value]);
+        }
+        
     }
 
     Ok(())

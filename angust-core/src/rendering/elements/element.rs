@@ -25,6 +25,7 @@ pub trait Element {
     fn get_size(&self) -> Size;
     fn get_styles(&self) -> Styles;
 
+    // Recursivity methods
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>>;
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface>;
 

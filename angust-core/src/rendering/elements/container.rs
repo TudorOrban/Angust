@@ -144,7 +144,7 @@ impl Element for Container {
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
         None
     }
-
+    
     // Layout system
     fn set_natural_size(&mut self, size: Size) {
         self.natural_size = size;

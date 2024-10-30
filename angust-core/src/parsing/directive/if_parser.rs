@@ -23,8 +23,7 @@ pub fn parse_if_expression<State: ReactiveState>(
 
     let state = context.component_state.expect("Component state not found");
     let functions = context.component_functions.expect("Component functions not found");
-    let evaluation_result = ast_evaluator::evaluate_ast::<State>(&ast, state, functions)
-        .map_err(|e| ParsingError::ASTEvaluationError(e))?;
+    let evaluation_result = ast_evaluator::evaluate_ast::<State>(&ast, state, functions)?;
 
     let is_if_true = evaluation_result
         .downcast_ref::<bool>()

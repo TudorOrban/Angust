@@ -17,7 +17,7 @@ pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Comp
 
     let template_content = std::fs::read_to_string(template_path)
         .expect("Failed to read template file");
-
+    
     // Parse template HTML content
     let dom = html_parser::parse_html_content(&template_content);
 
@@ -37,5 +37,6 @@ pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Comp
     // Add elements to Angust DOM
     container.add_child(element);
 
+    println!("Component template loaded: {:?}", component.template_relative_path);
     component.content = container;
 }
