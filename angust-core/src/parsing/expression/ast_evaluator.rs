@@ -1,13 +1,13 @@
 use std::any::Any;
 
-use crate::{parsing::html::error::ParsingError, rendering::elements::component::{functions::component_functions::ComponentFunctions, state::{nested_reflectivity::get_nested_field, reactivity::ReactiveState}}};
+use crate::{parsing::html::error::ParsingError, rendering::elements::component::{functions::component_functions::ComponentFunctions, state::{nested_reflectivity::get_nested_field, reflectivity::ReflectiveState}}};
 
 use super::ast::{ASTNode, Operator};
 
 
-pub fn evaluate_ast<State: ReactiveState>(
+pub fn evaluate_ast<State: ReflectiveState>(
     node: &ASTNode,
-    state: &State,
+    state: &dyn ReflectiveState,
     functions: &ComponentFunctions<State>,
 ) -> Result<Box<dyn Any>, ParsingError> {
     match node {
@@ -21,7 +21,7 @@ pub fn evaluate_ast<State: ReactiveState>(
             Ok(Box::new(*boolean))
         },
         ASTNode::Identifier(name) => 
-            evaluate_identifier(name, state),
+            evaluate_identifier::<State>(name, state),
         ASTNode::FunctionCall(name, args) =>
             evaluate_component_function(name, args.clone(), state, functions),
         ASTNode::BinaryOperation { operator, left, right } =>
@@ -33,9 +33,9 @@ pub fn evaluate_ast<State: ReactiveState>(
     }
 }
 
-fn evaluate_identifier<State: ReactiveState>(
+fn evaluate_identifier<State: ReflectiveState>(
     name: &str,
-    state: &State,
+    state: &dyn ReflectiveState,
 ) -> Result<Box<dyn Any>, ParsingError> {
     match get_nested_field(state, &[name]) {
         Some(val) => {
@@ -57,27 +57,28 @@ fn evaluate_identifier<State: ReactiveState>(
     }
 }
 
-fn evaluate_component_function<State: ReactiveState>(
+fn evaluate_component_function<State: ReflectiveState>(
     name: &str,
     args: Vec<ASTNode>,
-    state: &State,
+    state: &dyn ReflectiveState,
     functions: &ComponentFunctions<State>,
 ) -> Result<Box<dyn Any>, ParsingError> {
     let arg_values: Result<Vec<Box<dyn Any>>, ParsingError> = args.iter()
         .map(|arg| evaluate_ast(arg, state, functions))
         .collect();
 
-    match functions.dynamic_params_functions.get(name) {
-        Some(func) => Ok(func(state, arg_values?)),
-        None => Err(ParsingError::ASTEvaluationError(format!("Function {} not found in component functions", name))),
-    }
+    // match functions.dynamic_params_functions.get(name) {
+    //     Some(func) => Ok(func(state, arg_values?)),
+    //     None => Err(ParsingError::ASTEvaluationError(format!("Function {} not found in component functions", name))),
+    // }
+    Ok(Box::new(())) // TODO: Implement this
 }
 
-fn evaluate_binary_operation<State: ReactiveState>(
+fn evaluate_binary_operation<State: ReflectiveState>(
     operator: &Operator,
     left: &ASTNode,
     right: &ASTNode,
-    state: &State,
+    state: &dyn ReflectiveState,
     functions: &ComponentFunctions<State>,
 ) -> Result<Box<dyn Any>, ParsingError> {
     let left_val = evaluate_ast(left, state, functions)?;
@@ -100,11 +101,11 @@ fn evaluate_binary_operation<State: ReactiveState>(
     Ok(Box::new(result)) 
 }
 
-fn evaluate_comparison<State: ReactiveState>(
+fn evaluate_comparison<State: ReflectiveState>(
     operator: &Operator,
     left: &ASTNode,
     right: &ASTNode,
-    state: &State,
+    state: &dyn ReflectiveState,
     functions: &ComponentFunctions<State>,
 ) -> Result<Box<dyn Any>, ParsingError> {
     let left_val = evaluate_ast(left, state, functions)?;
@@ -157,11 +158,11 @@ fn compare_values<T: PartialOrd + PartialEq>(
     }
 }
 
-fn evaluate_logical_operation<State: ReactiveState>(
+fn evaluate_logical_operation<State: ReflectiveState>(
     operator: &Operator,
     left: &ASTNode,
     right: &ASTNode,
-    state: &State,
+    state: &dyn ReflectiveState,
     functions: &ComponentFunctions<State>,
 ) -> Result<Box<dyn Any>, ParsingError> {
     let left_val = evaluate_ast(left, state, functions)?;

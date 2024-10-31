@@ -1,6 +1,6 @@
 use skia_safe::{Canvas, Point};
 
-use super::{common_types::{OptionalSize, Position, Size}, component::component::ComponentInterface, styles::Styles};
+use super::{common_types::{OptionalSize, Position, Size}, component::{component::ComponentInterface, state::reflectivity::ReflectiveState}, styles::Styles};
 
 // This is the trait that all Angust elements must implement.
 pub trait Element {
@@ -27,7 +27,9 @@ pub trait Element {
 
     // Recursivity methods
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>>;
+    fn get_children(&self) -> Option<&Vec<Box<dyn Element>>>;
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface>;
+    fn get_state(&self) -> Option<&dyn ReflectiveState>;
 
     // Layout system
     fn set_natural_size(&mut self, size: Size);

@@ -2,7 +2,7 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{layout::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer};
 
-use super::{common_types::{OptionalSize, Position, Size}, component::component::ComponentInterface, container::Container, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, styles::Styles};
+use super::{common_types::{OptionalSize, Position, Size}, component::{component::ComponentInterface, state::reflectivity::ReflectiveState}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, styles::Styles};
 
 
 pub struct Button {
@@ -156,7 +156,15 @@ impl Element for Button {
         self.container.as_mut()
     }
 
+    fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
+        self.container.as_ref()
+    }
+    
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
+        None
+    }
+
+    fn get_state(&self) -> Option<&dyn ReflectiveState> {
         None
     }
 

@@ -2,7 +2,7 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{layout::space_allocation_system::text::size_estimator::{determine_text_element_lines, estimate_text_element_size}, rendering_interface::element_renderer::ElementRenderer};
 
-use super::{common_types::{OptionalSize, Position, Size}, component::component::ComponentInterface, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::{Dimension, Styles, Unit, WhiteSpace}};
+use super::{common_types::{OptionalSize, Position, Size}, component::{component::ComponentInterface, state::reflectivity::ReflectiveState}, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::{Dimension, Styles, Unit, WhiteSpace}};
 
 
 pub struct Text {
@@ -106,7 +106,15 @@ impl Element for Text {
 
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>> { None }
 
+    fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
+        None
+    }
+    
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
+        None
+    }
+
+    fn get_state(&self) -> Option<&dyn ReflectiveState> {
         None
     }
 

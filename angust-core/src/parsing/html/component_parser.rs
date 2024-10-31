@@ -1,7 +1,7 @@
 use crate::{
     parsing::{css::css_parser, directive::input_parser, expression::ast_evaluator}, 
     rendering::elements::{
-        component::{component_factory_registry::create_component, state::reactivity::ReactiveState}, 
+        component::{component_factory_registry::create_component, functions::component_functions::ComponentFunctions, state::{reactivity::ReactiveState, reflectivity::{NoState, ReflectiveState}}}, 
         element::{Element, ElementType}, 
         styles::Styles
     }
@@ -28,7 +28,6 @@ pub fn process_custom_component<State : ReactiveState>(
     }
     let mut component_box = component_optional.unwrap();
 
-
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
     component_box.set_styles(styles);
@@ -44,14 +43,15 @@ fn trigger_input_setters<State : ReactiveState>(
     component: &mut Box<dyn Element>,
     context: &ParsingContext<State>,
 ) -> Result<(), ParsingError> {
-    let component_state = match context.component_state {
+    let component_state = match component.get_state() {
         Some(ref state) => *state,
         None => return Ok(()) // Root context, do nothing
     };
-    let component_functions = match context.component_functions {
-        Some(ref functions) => functions,
-        None => return Ok(())
-    };
+    let component_functions: ComponentFunctions<NoState> = ComponentFunctions::default();
+    // let component_functions = match context.component_functions {
+    //     Some(ref functions) => *functions,
+    //     None => return Ok(())
+    // };
 
     let mut empty_children: Vec<Box<dyn Element>> = vec![];
 
@@ -76,7 +76,7 @@ fn trigger_input_setters<State : ReactiveState>(
         
         println!("Input ASTs: {:?}", input_asts);
         for (input_name, input_ast) in input_asts.iter() {
-            let input_value = ast_evaluator::evaluate_ast(input_ast, component_state, component_functions)?;
+            let input_value = ast_evaluator::evaluate_ast(input_ast, component_state, &component_functions)?;
             comp_interface.update_input(input_name, vec![input_value]);
         }
         

@@ -8,7 +8,7 @@ use crate::{application::event_handling::scrollbar_movement_handler::handle_scro
 }};
 
 use super::{
-    common_types::{OptionalSize, Position, ScrollbarState, Size}, component::component::ComponentInterface, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::{Directions, Styles}
+    common_types::{OptionalSize, Position, ScrollbarState, Size}, component::{component::ComponentInterface, state::reflectivity::ReflectiveState}, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::{Directions, Styles}
 };
 
 pub struct Container {
@@ -141,10 +141,18 @@ impl Element for Container {
         Some(&mut self.children)
     }
 
+    fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
+        Some(&self.children)
+    }
+    
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
         None
     }
-    
+
+    fn get_state(&self) -> Option<&dyn ReflectiveState> {
+        None
+    }
+
     // Layout system
     fn set_natural_size(&mut self, size: Size) {
         self.natural_size = size;

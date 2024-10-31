@@ -20,7 +20,7 @@ use crate::{
 
 use super::{
     functions::component_functions::ComponentFunctions, 
-    state::reactivity::{ComponentEvent, EventQueue, ReactiveState}, 
+    state::{reactivity::{ComponentEvent, EventQueue, ReactiveState}, reflectivity::ReflectiveState}, 
     template_loader
 };
 
@@ -294,9 +294,17 @@ impl<State: ReactiveState> Element for Component<State> {
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>> {
         return self.content.get_children_mut();
     }
+
+    fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
+        return self.content.get_children();
+    }
     
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
         Some(self)
+    }
+
+    fn get_state(&self) -> Option<&dyn ReflectiveState> {
+        Some(&self.state)
     }
 
     // Layout system
