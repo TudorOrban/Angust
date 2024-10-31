@@ -1,7 +1,13 @@
+use std::{borrow::Borrow, cell::RefCell, collections::HashMap};
+
 use crate::{
-    parsing::{css::css_parser, directive::input_parser, expression::ast_evaluator}, 
+    parsing::{css::css_parser, directive::input_parser, expression::{ast::ASTNode, ast_evaluator}}, 
     rendering::elements::{
-        component::{component_factory_registry::create_component, functions::component_functions::ComponentFunctions, state::{reactivity::ReactiveState, reflectivity::{NoState, ReflectiveState}}}, 
+        component::{
+            component_factory_registry::create_component, 
+            functions::component_functions::ComponentFunctions, 
+            state::reactivity::ReactiveState
+        },
         element::{Element, ElementType}, 
         styles::Styles
     }
@@ -22,46 +28,45 @@ pub fn process_custom_component<State : ReactiveState>(
         return html_parser::general_traversal::<State>(node, parent_styles, context)
     }
 
+    let attributes = elem_data.attributes.borrow();
+    input_parser::parse_input_expressions(&attributes, context)?;
+
     let component_optional = create_component(component_name);
     if component_optional.is_none() {
         return Err(ParsingError::ComponentNotFound(component_name.to_string()));
     }
     let mut component_box = component_optional.unwrap();
 
-    let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
     component_box.set_styles(styles);
-
-    input_parser::parse_input_expressions(&attributes, context)?;
-
-    trigger_input_setters(&mut component_box, context)?;
 
     Ok(component_box)
 }
 
-fn trigger_input_setters<State : ReactiveState>(
-    component: &mut Box<dyn Element>,
+pub fn trigger_input_setters<State : ReactiveState>(
+    element: &mut Box<dyn Element>,
+    state: &State,
+    component_functions: &ComponentFunctions<State>,
     context: &ParsingContext<State>,
 ) -> Result<(), ParsingError> {
-    let component_state = match component.get_state() {
-        Some(ref state) => *state,
-        None => return Ok(()) // Root context, do nothing
-    };
-    let component_functions: ComponentFunctions<NoState> = ComponentFunctions::default();
-    // let component_functions = match context.component_functions {
-    //     Some(ref functions) => *functions,
-    //     None => return Ok(())
-    // };
-
     let mut empty_children: Vec<Box<dyn Element>> = vec![];
 
-    println!("Triggering input setters for component: {:?}", component.get_id());
-    println!("Processing component: {:?}", component.get_element_type());
+    let mut default_input_asts: HashMap<String, ASTNode> = HashMap::new();
+    let reference = &mut default_input_asts;
+    let input_asts = context.template_asts
+        .as_ref()
+        .and_then(|asts| asts.input_expressions_asts.as_ref())
+        .unwrap_or(&reference);
 
-    for child in component.get_children_mut().unwrap_or(&mut empty_children) {
+
+
+    println!("Triggering input setters for element: {:?}", element.get_id());
+    println!("Processing element: {:?}", element.get_element_type());
+
+    for child in element.get_children_mut().unwrap_or(&mut empty_children) {
         println!("Processing child with ID: {:?} and element type: {:?}", child.get_id(), child.get_element_type()); 
         if child.get_element_type() != ElementType::CustomComponent {
-            trigger_input_setters(child, context)?;
+            trigger_input_setters(child, state, component_functions, context)?;
             continue;
         }
 
@@ -72,14 +77,12 @@ fn trigger_input_setters<State : ReactiveState>(
         }
         let comp_interface = component_interface.unwrap();
         
-        let input_asts = comp_interface.get_input_asts();
         
         println!("Input ASTs: {:?}", input_asts);
         for (input_name, input_ast) in input_asts.iter() {
-            let input_value = ast_evaluator::evaluate_ast(input_ast, component_state, &component_functions)?;
+            let input_value = ast_evaluator::evaluate_ast(input_ast, state, &component_functions)?;
             comp_interface.update_input(input_name, vec![input_value]);
         }
-        
     }
 
     Ok(())

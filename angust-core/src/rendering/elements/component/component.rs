@@ -346,7 +346,10 @@ pub trait ComponentInterface {
 
 impl<State: ReactiveState> ComponentInterface for Component<State> {
     fn update_input(&mut self, input_name: &str, value: Vec<Box<dyn Any>>) {
-        if let Some(setter) = self.component_functions.input_setters.get(input_name) {
+        println!("Updating input: {}", input_name);
+        println!("Input setter keys: {:?}", self.component_functions.input_setters.keys());
+        let setter_name = format!("set_{}", input_name);
+        if let Some(setter) = self.component_functions.input_setters.get(&setter_name) {
             setter(&mut self.state, value);
         }
     }
