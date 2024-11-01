@@ -23,12 +23,7 @@ pub struct HeaderComponent {
 impl HeaderComponentState {
 
     fn set_content(&mut self, content: String) {
-        println!("Setting content to: {}", content);
-        self.content = content.clone();
-        self.content_reactive.set(content.clone());
-        self.content_reactive.value = content;
-        println!("Content set to: {}", self.content);
-        println!("Content 2 set to: {}", self.content_reactive.value);
+        self.content = content;
     }
 }
 

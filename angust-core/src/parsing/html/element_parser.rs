@@ -115,9 +115,11 @@ fn process_button_element<State : ReactiveState>(
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
 
+    // Parse on_click event handler into context AST
     let (on_click_handler_name, handler_ast) = on_click_parser::parse_on_click_expression(&attributes, context)?;
     context.add_template_event_handler_ast(on_click_handler_name.clone(), handler_ast);
     
+    // Parse children
     let mut child_container = Container::new();
     map_dom_children_to_elements::<State>(node, &mut child_container, context, &styles).unwrap();
         

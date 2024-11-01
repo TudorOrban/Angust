@@ -28,8 +28,6 @@ fn scan_dom_for_inputs(
     inputs_map: &mut HashMap<(String, String), ASTNode>,
 ) -> Result<(), ParsingError> {
     match dom.data() {
-        // NodeData::Document(_) | NodeData::Doctype(_) => 
-        //     scan_node_children_for_inputs(dom, inputs_map),
         NodeData::Element(ref elem_data) => {
             match elem_data.name.local.as_ref() {
                 "div" | "button" | "img" => scan_node_children_for_inputs(dom, inputs_map),
@@ -68,8 +66,6 @@ fn scan_component_inputs(
     for (property_name, bound_value) in inputs.iter() {
         let ast = ast::parse_string_to_ast(bound_value.to_string())
             .map_err(|e| ParsingError::ASTParsingError(format!("{:?}", e)))?;
-
-        println!("Input AST: {:?}", ast);
 
         inputs_map.insert((component_name.to_string(), property_name.clone()), ast);
     }
