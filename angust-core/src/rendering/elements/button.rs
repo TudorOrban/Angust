@@ -1,3 +1,5 @@
+use std::{any::Any, collections::HashMap};
+
 use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{layout::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer};
@@ -140,6 +142,10 @@ impl Element for Button {
         ElementType::Button
     }
 
+    fn get_name(&self) -> String {
+        "button".to_string()
+    }
+
     fn get_position(&self) -> Position {
         self.position
     }
@@ -159,13 +165,17 @@ impl Element for Button {
     fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
         self.container.as_ref()
     }
-    
+
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
         None
     }
 
     fn get_state(&self) -> Option<&dyn ReflectiveState> {
         None
+    }
+
+    fn initialize(&mut self, _: HashMap<String, Box<dyn Any>>) {
+        // Nothing for now (implemented for components only)
     }
 
     // Layout system

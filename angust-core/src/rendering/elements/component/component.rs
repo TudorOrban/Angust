@@ -54,8 +54,6 @@ pub struct Component<State: ReactiveState> {
 impl<State: ReactiveState> Component<State> {
     pub fn new(name: String, template_relative_path: String, state: State) -> Self {
         let id = ElementIDGenerator::get();
-        println!("Component ID: {}", id);
-        println!("Component name: {}", name);
         Self {
             _id: id,
             name,
@@ -76,13 +74,13 @@ impl<State: ReactiveState> Component<State> {
     }
 
     // Initialization
-    pub fn initialize(&mut self) {
+    fn initialize(&mut self, inputs: HashMap<String, Box<dyn Any>>) {
         self.setup_listeners();
-        self.load_component_template();
+        self.load_component_template(inputs);
     }
 
-    fn load_component_template(&mut self) {
-        template_loader::load_component_template(self);
+    fn load_component_template(&mut self, inputs: HashMap<String, Box<dyn Any>>) {
+        template_loader::load_component_template(self, inputs);
     }
 
     fn setup_listeners(&mut self) {
@@ -267,6 +265,10 @@ impl<State: ReactiveState> Element for Component<State> {
         ElementType::CustomComponent
     }
     
+    fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
     fn get_position(&self) -> Position {
         self.position
     }
@@ -307,6 +309,10 @@ impl<State: ReactiveState> Element for Component<State> {
         Some(&self.state)
     }
 
+    fn initialize(&mut self, inputs: HashMap<String, Box<dyn Any>>) {
+        self.initialize(inputs);
+    }
+
     // Layout system
     fn estimate_sizes(&mut self) {
         self.content.estimate_sizes();
@@ -331,7 +337,7 @@ impl<State: ReactiveState> Element for Component<State> {
     // Reactivity
     fn react_to_state_change(&mut self, component_id: String) {
         if component_id == self.get_id() {
-            self.load_component_template(); // Naive approach; to be replaced later
+            self.load_component_template(HashMap::new()); // Naive approach; to be replaced later
             self.update_children_inputs();
         }
     }

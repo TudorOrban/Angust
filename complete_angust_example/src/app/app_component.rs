@@ -119,8 +119,6 @@ impl AppComponent {
             );
             component.add_component_functions(component_functions);
 
-            component.initialize();
-
             Box::new(component)
         }));
     }

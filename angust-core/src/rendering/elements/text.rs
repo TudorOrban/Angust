@@ -1,3 +1,5 @@
+use std::{any::Any, collections::HashMap};
+
 use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{layout::space_allocation_system::text::size_estimator::{determine_text_element_lines, estimate_text_element_size}, rendering_interface::element_renderer::ElementRenderer};
@@ -92,6 +94,10 @@ impl Element for Text {
         ElementType::Text
     }
 
+    fn get_name(&self) -> String {
+        "text".to_string()
+    }
+
     fn get_position(&self) -> Position {
         self.position
     }
@@ -109,13 +115,17 @@ impl Element for Text {
     fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
         None
     }
-    
+
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
         None
     }
 
     fn get_state(&self) -> Option<&dyn ReflectiveState> {
         None
+    }
+    
+    fn initialize(&mut self, _: HashMap<String, Box<dyn Any>>) {
+        // Nothing for now (implemented for components only)
     }
 
     // Layout system

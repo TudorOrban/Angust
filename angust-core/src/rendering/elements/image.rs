@@ -1,3 +1,5 @@
+use std::{any::Any, collections::HashMap};
+
 use image::DynamicImage;
 use skia_safe::{Canvas, Point};
 
@@ -91,6 +93,10 @@ impl Element for Image {
         ElementType::Image
     }
 
+    fn get_name(&self) -> String {
+        "img".to_string()
+    }
+
     fn get_position(&self) -> Position {
         self.position
     }
@@ -115,6 +121,10 @@ impl Element for Image {
 
     fn get_state(&self) -> Option<&dyn ReflectiveState> {
         None
+    }
+
+    fn initialize(&mut self, _: HashMap<String, Box<dyn Any>>) {
+        // Nothing for now (implemented for components only)
     }
 
     // Layout system

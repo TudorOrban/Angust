@@ -1,3 +1,5 @@
+use std::{any::Any, collections::HashMap};
+
 use skia_safe::{Canvas, Color, Point};
 
 use crate::{application::event_handling::scrollbar_movement_handler::handle_scrollbar_movement, rendering::{
@@ -125,6 +127,10 @@ impl Element for Container {
         ElementType::Container
     }
 
+    fn get_name(&self) -> String {
+        "div".to_string()
+    }
+
     fn get_position(&self) -> Position {
         self.position
     }
@@ -144,13 +150,17 @@ impl Element for Container {
     fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
         Some(&self.children)
     }
-    
+
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
         None
     }
 
     fn get_state(&self) -> Option<&dyn ReflectiveState> {
         None
+    }
+
+    fn initialize(&mut self, _: HashMap<String, Box<dyn Any>>) {
+        // Nothing for now (implemented for components only)
     }
 
     // Layout system

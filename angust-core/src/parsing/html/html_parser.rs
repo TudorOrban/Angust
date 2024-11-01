@@ -120,6 +120,7 @@ pub struct ParsingContext<'a, State : ReactiveState> {
     pub component_functions: Option<&'a ComponentFunctions<State>>,
     pub template_asts: Option<TemplateASTs<'a>>,
     pub for_loop_contexts: Option<Vec<ForLoopContext>>,
+    pub scanned_inputs: Option<HashMap<(String, String), ASTNode>>,
 }
 
 impl<'a, State : ReactiveState> Default for ParsingContext<'a, State> {
@@ -131,6 +132,7 @@ impl<'a, State : ReactiveState> Default for ParsingContext<'a, State> {
             component_functions: None,
             template_asts: None,
             for_loop_contexts: None,
+            scanned_inputs: None,
         }
     }
 }
@@ -144,6 +146,7 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
         template_expressions_asts: Option<&'a mut Vec<ASTNode>>,
         template_event_handler_asts: Option<&'a mut HashMap<String, ASTNode>>,
         input_expressions_asts: Option<&'a mut HashMap<String, ASTNode>>,
+        scanned_inputs: Option<HashMap<(String, String), ASTNode>>,
     ) -> Self {
         let template_asts = TemplateASTs::new(template_expressions_asts, template_event_handler_asts, input_expressions_asts);
         ParsingContext {
@@ -152,7 +155,8 @@ impl<'a, State : ReactiveState> ParsingContext<'a, State> {
             component_state,
             component_functions,
             template_asts: Some(template_asts),
-            for_loop_contexts: None
+            for_loop_contexts: None,
+            scanned_inputs
         }
     }
 

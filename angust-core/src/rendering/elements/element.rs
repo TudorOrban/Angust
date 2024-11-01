@@ -1,3 +1,5 @@
+use std::{any::Any, collections::HashMap};
+
 use skia_safe::{Canvas, Point};
 
 use super::{common_types::{OptionalSize, Position, Size}, component::{component::ComponentInterface, state::reflectivity::ReflectiveState}, styles::Styles};
@@ -21,6 +23,7 @@ pub trait Element {
 
     fn get_id(&self) -> String;
     fn get_element_type(&self) -> ElementType;
+    fn get_name(&self) -> String;
     fn get_position(&self) -> Position;
     fn get_size(&self) -> Size;
     fn get_styles(&self) -> Styles;
@@ -30,6 +33,7 @@ pub trait Element {
     fn get_children(&self) -> Option<&Vec<Box<dyn Element>>>;
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface>;
     fn get_state(&self) -> Option<&dyn ReflectiveState>;
+    fn initialize(&mut self, inputs: HashMap<String, Box<dyn Any>>);
 
     // Layout system
     fn set_natural_size(&mut self, size: Size);
