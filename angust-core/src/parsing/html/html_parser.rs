@@ -51,7 +51,7 @@ pub fn map_dom_to_elements<State : ReactiveState>(
     }
 }
 
-fn process_document_nodes<State : ReactiveState>(
+pub fn process_document_nodes<State : ReactiveState>(
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,

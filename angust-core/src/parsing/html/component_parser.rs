@@ -1,4 +1,4 @@
-use std::{borrow::Borrow, cell::RefCell, collections::HashMap};
+use std::collections::HashMap;
 
 use crate::{
     parsing::{css::css_parser, directive::input_parser, expression::{ast::ASTNode, ast_evaluator}}, 
@@ -58,11 +58,6 @@ pub fn trigger_input_setters<State : ReactiveState>(
         .and_then(|asts| asts.input_expressions_asts.as_ref())
         .unwrap_or(&reference);
 
-
-
-    println!("Triggering input setters for element: {:?}", element.get_id());
-    println!("Processing element: {:?}", element.get_element_type());
-
     for child in element.get_children_mut().unwrap_or(&mut empty_children) {
         println!("Processing child with ID: {:?} and element type: {:?}", child.get_id(), child.get_element_type()); 
         if child.get_element_type() != ElementType::CustomComponent {
@@ -76,7 +71,6 @@ pub fn trigger_input_setters<State : ReactiveState>(
             continue;
         }
         let comp_interface = component_interface.unwrap();
-        
         
         println!("Input ASTs: {:?}", input_asts);
         for (input_name, input_ast) in input_asts.iter() {
