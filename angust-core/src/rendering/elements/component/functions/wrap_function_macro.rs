@@ -28,12 +28,10 @@ macro_rules! wrap_fn_mut {
             let result = $func(
                 state,
                 $(
-                    arg_iter.next()
+                    *arg_iter.next()
                         .expect("Missing argument")
                         .downcast::<$t>()
-                        .expect("Type mismatch in argument downcasting")
-                        .as_ref()
-                        .clone(),
+                        .expect(&format!("Type mismatch in argument downcasting for {}", stringify!($t)))
                 )*
             );
         })

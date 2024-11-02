@@ -47,7 +47,7 @@ impl HeaderComponent {
             UIItem::new(
                 String::from("Label"),
                 String::from("Value"),
-                vec![],
+                // vec![],
             ),
         );
 
@@ -63,7 +63,7 @@ impl HeaderComponent {
                 vec![
                     ("set_content", wrap_fn_mut!(HeaderComponentState, HeaderComponentState::set_content, String)),
                     ("set_count", wrap_fn_mut!(HeaderComponentState, HeaderComponentState::set_count, f64)),
-                    // ("set_item", wrap_fn_mut!(HeaderComponentState, HeaderComponentState::set_item, UIItem)),
+                    ("set_item", wrap_fn_mut!(HeaderComponentState, HeaderComponentState::set_item, UIItem)),
                 ],
             );
             component.add_component_functions(component_functions);

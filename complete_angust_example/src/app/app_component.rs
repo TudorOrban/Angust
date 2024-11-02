@@ -18,7 +18,7 @@ use angust_macros::component_state;
 struct UIItem {
     label: String,
     value: String,
-    items: Vec<String>,
+    // items: Vec<String>,
 }
 
 #[component_state]
@@ -75,25 +75,25 @@ impl AppComponent {
                 0.0,
                 "Home".to_string(),
                 vec![
-                    UIItem::new("Label 1".to_string(), "Value 1".to_string(), 
-                    vec![
-                        "Item 11".to_string(),
-                        "Item 12".to_string(),
-                        "Item 13".to_string(),
-                    ]),
-                    UIItem::new("Label 2".to_string(), "Value 2".to_string(), 
-                    vec![
-                        "Item 21".to_string(),
-                        "Item 22".to_string(),
-                    ]),
+                    UIItem::new("Label 1".to_string(), "Value 1".to_string()) 
+                    // vec![
+                    //     "Item 11".to_string(),
+                    //     "Item 12".to_string(),
+                    //     "Item 13".to_string(),
+                    // ]),
+                    // UIItem::new("Label 2".to_string(), "Value 2".to_string(), 
+                    // vec![
+                    //     "Item 21".to_string(),
+                    //     "Item 22".to_string(),
+                    // ]),
                 ],
                 vec![],
-                UIItem::new("Label 3".to_string(), "Value 3".to_string(),
-                vec![
-                    "Item 31".to_string(),
-                    "Item 32".to_string(),
-                    "Item 33".to_string(),
-                ]),
+                UIItem::new("Label 3".to_string(), "Value 3".to_string(),)
+                // vec![
+                //     "Item 31".to_string(),
+                //     "Item 32".to_string(),
+                //     "Item 33".to_string(),
+                // ]),
             );
 
             let mut component = Component::new(

@@ -51,7 +51,7 @@ fn evaluate_identifier<State: ReflectiveState>(
             if let Some(boolean) = val.as_any().downcast_ref::<bool>() {
                 return Ok(Box::new(*boolean));
             }
-            Ok(Box::new(val.as_any()))
+            Ok(val.as_any())
         }
         None => Err(ParsingError::ASTEvaluationError(format!("Field {} not found", name))),
     }
