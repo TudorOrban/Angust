@@ -15,7 +15,7 @@ use winit::dpi::LogicalSize;
 use winit::window::{Window, WindowAttributes};
 use winit::event_loop::EventLoop;
 
-use crate::rendering::elements::component::state::reactivity::ComponentEvent;
+use crate::application::event_loop_proxy::ApplicationEvent;
 
 pub struct WindowingSystem {
     pub window: Window,
@@ -26,7 +26,7 @@ pub struct WindowingSystem {
 }
 
 impl WindowingSystem {
-    pub fn new(event_loop: &EventLoop<ComponentEvent>, app_title: String) -> Self {
+    pub fn new(event_loop: &EventLoop<ApplicationEvent>, app_title: String) -> Self {
         let window_attributes = WindowAttributes::default()
             .with_title(app_title)
             .with_inner_size(LogicalSize::new(1200, 800));

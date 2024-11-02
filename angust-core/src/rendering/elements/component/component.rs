@@ -3,7 +3,7 @@ use std::{any::Any, cell::RefCell, collections::HashMap, rc::Rc};
 use regex::Regex;
 
 use crate::{
-    application::event_loop_proxy::get_event_loop_proxy, 
+    application::event_loop_proxy::{get_event_loop_proxy, ApplicationEvent}, 
     parsing::expression::{ast::ASTNode, ast_evaluator}, 
     rendering::{
         elements::{
@@ -20,7 +20,7 @@ use crate::{
 
 use super::{
     functions::component_functions::ComponentFunctions, 
-    state::{reactivity::{ComponentEvent, EventQueue, ReactiveState}, reflectivity::ReflectiveState}, 
+    state::{reactivity::{EventQueue, ReactiveState}, reflectivity::ReflectiveState}, 
     template_loader
 };
 
@@ -107,10 +107,10 @@ impl<State: ReactiveState> Component<State> {
             let property_name_clone = property_name.clone(); 
             let component_id_clone = component_id.clone(); 
             let event_proxy_clone = event_proxy.clone();
-            self.state.subscribe_to_property(&property_name_clone, move |event: &ComponentEvent| {
+            self.state.subscribe_to_property(&property_name_clone, move |event: &ApplicationEvent| {
                 match event {
-                    ComponentEvent::StateChange(_) => {
-                        event_proxy_clone.send_event(ComponentEvent::StateChange(component_id_clone.clone()))
+                    ApplicationEvent::StateChange(_) => {
+                        event_proxy_clone.send_event(ApplicationEvent::StateChange(component_id_clone.clone()))
                             .expect("Failed to send event");
                     }
                 }

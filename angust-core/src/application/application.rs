@@ -10,14 +10,23 @@ use glutin::{config::GlConfig, display::GetGlDisplay, prelude::GlDisplay, surfac
 use std::{ffi::CString, num::NonZeroU32};
 
 use crate::{
-    parsing::{css::stylesheet_parser::{self, Stylesheet}, html::html_parser::{self, ParsingContext}}, 
+    parsing::{
+        css::stylesheet_parser::{self, Stylesheet}, 
+        html::html_parser::{self, ParsingContext}
+    }, 
     rendering::{
-        elements::{component::state::{reactivity::ComponentEvent, reflectivity::NoState}, element::EventType}, 
+        elements::{component::state::reflectivity::NoState, element::EventType}, 
         renderer::Renderer
     }, 
-    window::WindowingSystem};
+    window::WindowingSystem
+};
 
-use super::{angust_configuration::AngustConfiguration, event_loop_proxy::set_event_loop_proxy, resource_loader::configuration_loader::load_angust_configuration, ui_initializer::load_resources};
+use super::{
+    angust_configuration::AngustConfiguration, 
+    event_loop_proxy::{set_event_loop_proxy, ApplicationEvent}, 
+    resource_loader::configuration_loader::load_angust_configuration, 
+    ui_initializer::load_resources
+};
 
 
 pub struct Application<State> {
@@ -30,7 +39,7 @@ pub struct Application<State> {
 
     windowing_system: WindowingSystem,
     fb_info: FramebufferInfo,
-    event_loop: Option<EventLoop<ComponentEvent>>,
+    event_loop: Option<EventLoop<ApplicationEvent>>,
     modifiers: Modifiers,
 
     mouse_position: Option<Point>,
@@ -40,7 +49,7 @@ pub struct Application<State> {
 impl<State> Application<State> {
     // Initialization
     pub fn new(initial_state: State, app_title: String) -> Self {
-        let event_loop = EventLoop::<ComponentEvent>::with_user_event().build()
+        let event_loop = EventLoop::<ApplicationEvent>::with_user_event().build()
             .expect("Failed to create event loop");
         let event_loop_proxy = event_loop.create_proxy();
         set_event_loop_proxy(event_loop_proxy);
@@ -83,7 +92,7 @@ impl<State> Application<State> {
         }
     }
     
-    fn init_windowing_system(event_loop: &EventLoop<ComponentEvent>, app_title: String) -> WindowingSystem {
+    fn init_windowing_system(event_loop: &EventLoop<ApplicationEvent>, app_title: String) -> WindowingSystem {
         let windowing_system = WindowingSystem::new(event_loop, app_title);
     
         gl::load_with(|s| windowing_system
@@ -143,7 +152,7 @@ impl<State> Application<State> {
     }
 }
 
-impl<State> ApplicationHandler<ComponentEvent> for Application<State> {
+impl<State> ApplicationHandler<ApplicationEvent> for Application<State> {
     fn resumed(&mut self, _event_loop: &ActiveEventLoop) {
         self.windowing_system.window.request_redraw();
     }
@@ -228,9 +237,9 @@ impl<State> ApplicationHandler<ComponentEvent> for Application<State> {
         event_loop.set_control_flow(ControlFlow::Wait);
     }
 
-    fn user_event(&mut self, _: &ActiveEventLoop, event: ComponentEvent) {
+    fn user_event(&mut self, _: &ActiveEventLoop, event: ApplicationEvent) {
         match event {
-            ComponentEvent::StateChange(component_id) => {
+            ApplicationEvent::StateChange(component_id) => {
                 self.renderer.react_to_state_change(component_id);
                 self.renderer.layout();
                 self.windowing_system.window.request_redraw();

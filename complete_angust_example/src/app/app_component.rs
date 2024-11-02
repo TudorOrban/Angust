@@ -3,14 +3,24 @@
 use std::{collections::HashMap, any::Any};
 
 use angust::{
-    rendering::elements::component::{
-        component::Component, component_factory_registry::ComponentFactory, functions::component_functions::ComponentFunctions, service_container::get_global_service, state::{reactivity::{ComponentEvent, ReactiveField, ReactiveState}, reflectivity::ReflectiveState} 
+    rendering::elements::{
+        component::{
+            component::Component, 
+            component_factory_registry::ComponentFactory, 
+            functions::component_functions::ComponentFunctions, 
+            state::{
+                reactivity::{ReactiveField, ReactiveState}, 
+                reflectivity::ReflectiveState
+            } 
+        }, 
+        service::service_container::get_global_service
     }, 
-    wrap_fn, wrap_fn_mut, wrap_init_mut
+    wrap_fn, wrap_fn_mut, wrap_init_mut,
+    application::event_loop_proxy::ApplicationEvent
 };
 use angust_macros::component_state;
 
-use crate::ProductService;
+use crate::app::core::services::product_service::ProductService;
 
 #[component_state]
 #[derive(Clone)]
@@ -63,7 +73,6 @@ impl AppComponentState {
     pub fn init(&mut self) {
         println!("AppComponentState initialized!");
         self.active_tab_reactive.set("Home".to_string());
-
             
         if let Some(product_service) = get_global_service::<ProductService>("ProductService") {
             let products = product_service.get_products();

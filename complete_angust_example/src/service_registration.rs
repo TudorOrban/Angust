@@ -1,6 +1,7 @@
-use angust::rendering::elements::component::service_container::{initialize_service_registry, ServiceContainer};
 
-use crate::ProductService;
+use angust::rendering::elements::service::service_container::{initialize_service_registry, ServiceContainer};
+
+use crate::app::core::services::product_service::ProductService;
 
 
 pub fn register_services() {

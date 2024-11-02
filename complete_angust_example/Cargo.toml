@@ -7,6 +7,9 @@ edition = "2021"
 angust = { path = "../angust-core/" } 
 angust_macros = { path = "../angust_macros/" }
 
+tokio = "1.41.0"
+
 [[bin]]
 name = "complete_angust_example"
 path = "src/main.rs"
+

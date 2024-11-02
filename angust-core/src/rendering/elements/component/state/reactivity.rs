@@ -1,31 +1,29 @@
 use std::{fmt::{Debug, Formatter}, ops::{Deref, DerefMut}};
 
+use crate::application::event_loop_proxy::ApplicationEvent;
+
 use super::reflectivity::{NoState, ReflectiveState};
 
 
 pub trait ReactiveState : ReflectiveState {
     fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
         where
-            F: 'static + FnMut(&ComponentEvent);
+            F: 'static + FnMut(&ApplicationEvent);
 }
 
 impl ReactiveState for NoState {
     fn subscribe_to_property<F>(&mut self, _property_name: &str, _callback: F)
     where
-        F: 'static + FnMut(&ComponentEvent),
+        F: 'static + FnMut(&ApplicationEvent),
     {
     }
 }
 
 pub struct ReactiveField<T> {
     pub value: T,
-    listeners: Vec<Box<dyn FnMut(&ComponentEvent)>>,
+    listeners: Vec<Box<dyn FnMut(&ApplicationEvent)>>,
 }
 
-#[derive(Debug)]
-pub enum ComponentEvent {
-    StateChange(String),
-}
 
 impl<T> Debug for ReactiveField<T>
 where
@@ -56,17 +54,17 @@ impl<T> ReactiveField<T> {
     // Subscribe to property changes
     pub fn subscribe<F>(&mut self, callback: F)
     where
-        F: 'static + FnMut(&ComponentEvent),
+        F: 'static + FnMut(&ApplicationEvent),
     {
         self.listeners.push(Box::new(callback));
     }
 
     pub fn set(&mut self, new_value: T) {
         self.value = new_value;
-        self.notify_listeners(&ComponentEvent::StateChange(String::from("placeholder_id")));
+        self.notify_listeners(&ApplicationEvent::StateChange(String::from("placeholder_id")));
     }
 
-    fn notify_listeners(&mut self, event: &ComponentEvent) {
+    fn notify_listeners(&mut self, event: &ApplicationEvent) {
         for callback in self.listeners.iter_mut() {
             callback(event);
         }
@@ -90,7 +88,7 @@ impl<T> DerefMut for ReactiveField<T> {
 
 
 pub struct EventQueue {
-    events: Vec<ComponentEvent>,
+    events: Vec<ApplicationEvent>,
 }
 
 impl EventQueue {
@@ -100,11 +98,11 @@ impl EventQueue {
         }
     }
 
-    pub fn push(&mut self, event: ComponentEvent) {
+    pub fn push(&mut self, event: ApplicationEvent) {
         self.events.push(event);
     }
 
-    pub fn drain(&mut self) -> Vec<ComponentEvent> {
+    pub fn drain(&mut self) -> Vec<ApplicationEvent> {
         std::mem::take(&mut self.events)
     }
 }

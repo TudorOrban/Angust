@@ -128,7 +128,7 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
         impl ReactiveState for #struct_name {
             fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
-            where F: 'static + FnMut(&ComponentEvent) {
+            where F: 'static + FnMut(&ApplicationEvent) {
                 match property_name {
                     #(#reactive_field_subscriptions)*
                     _ => {},
