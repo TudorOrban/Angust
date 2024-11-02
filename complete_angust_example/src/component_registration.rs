@@ -1,7 +1,7 @@
 
 use std::collections::HashMap;
 
-use angust::rendering::elements::component::component_factory_registry::initialize_registry;
+use angust::rendering::elements::component::component_factory_registry::initialize_component_registry;
 
 use crate::app::app_component::AppComponent;
 use crate::app::core::header_component::header_component::HeaderComponent;
@@ -17,6 +17,6 @@ pub fn register_components() {
     HeaderComponent::register(&mut registry);
     MainMenuComponent::register(&mut registry);
 
-    initialize_registry(registry);
+    initialize_component_registry(registry);
 
 }

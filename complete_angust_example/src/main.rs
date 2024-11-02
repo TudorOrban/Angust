@@ -1,10 +1,11 @@
 
 extern crate angust;
 
-use angust::{application::application::Application, rendering::elements::component::service_container::ServiceContainer};
+use angust::application::application::Application;
 
 pub mod app;
 pub mod component_registration;
+pub mod service_registration;
 
 
 pub struct AppGlobalState {
@@ -45,19 +46,7 @@ fn main() {
     };
 
     component_registration::register_components();    
-
-    let mut service_container = ServiceContainer::new();
-    service_container.add_service("ProductService", ProductService::new());
-
-    
-    if let Some(product_service) = service_container.get_service::<ProductService>("ProductService") {
-        let products = product_service.get_products();
-        for product in products {
-            println!("Product: {:?}", product);
-        }
-    } else {
-        println!("ProductService not found!");
-    }
+    service_registration::register_services();
 
     let mut app = Application::new(initial_state, String::from("New Angust App"));
     

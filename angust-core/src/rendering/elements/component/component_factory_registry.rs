@@ -11,7 +11,7 @@ use crate::rendering::elements::element::Element;
 pub type ComponentFactory = Box<dyn Fn() -> Box<dyn Element> + Send + Sync>;
 static COMPONENT_REGISTRY: OnceCell<Arc<HashMap<String, ComponentFactory>>> = OnceCell::new();
 
-pub fn initialize_registry(registry: HashMap<String, ComponentFactory>) {
+pub fn initialize_component_registry(registry: HashMap<String, ComponentFactory>) {
     let immutable_registry = Arc::new(registry);
     let _ = COMPONENT_REGISTRY.set(immutable_registry);
 }
