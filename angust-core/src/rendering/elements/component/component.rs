@@ -112,7 +112,8 @@ impl<State: ReactiveState> Component<State> {
                     ApplicationEvent::StateChange(_) => {
                         event_proxy_clone.send_event(ApplicationEvent::StateChange(component_id_clone.clone()))
                             .expect("Failed to send event");
-                    }
+                    },
+                    _ => ()
                 }
             });
         }

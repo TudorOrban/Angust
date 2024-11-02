@@ -20,7 +20,7 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
         let ty = &f.ty;
         let reactive_field_name = format_ident!("{}_reactive", name);
         quote! {
-            pub #reactive_field_name: ReactiveField<#ty>,
+            pub #reactive_field_name: angust::rendering::elements::component::state::reactivity::ReactiveField<#ty>,
             pub #name: #ty,
         }
     });
@@ -37,7 +37,7 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
         let name = f.ident.as_ref().unwrap();
         let reactive_field_name = format_ident!("{}_reactive", name);
         quote! {
-            #reactive_field_name: ReactiveField::new(#name.clone()), // Clone values to avoid moves
+            #reactive_field_name: angust::rendering::elements::component::state::reactivity::ReactiveField::new(#name.clone()), // Clone values to avoid moves
             #name: #name,
         }
     });
@@ -96,8 +96,8 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        impl ReflectiveState for #struct_name {
-            fn get_field(&self, name: &str) -> Option<Box<dyn ReflectiveState>> {
+        impl angust::rendering::elements::component::state::reflectivity::ReflectiveState for #struct_name {
+            fn get_field(&self, name: &str) -> Option<Box<dyn angust::rendering::elements::component::state::reflectivity::ReflectiveState>> {
                 match name {
                     #(#get_field_arms)*
                     _ => None,
@@ -121,14 +121,14 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 Box::new(self.clone())
             }
 
-            fn clone_box(&self) -> Box<dyn ReflectiveState> {
+            fn clone_box(&self) -> Box<dyn angust::rendering::elements::component::state::reflectivity::ReflectiveState> {
                 Box::new(self.clone())
             }
         }
 
-        impl ReactiveState for #struct_name {
+        impl angust::rendering::elements::component::state::reactivity::ReactiveState for #struct_name {
             fn subscribe_to_property<F>(&mut self, property_name: &str, callback: F)
-            where F: 'static + FnMut(&ApplicationEvent) {
+            where F: 'static + FnMut(&angust::application::event_loop_proxy::ApplicationEvent) {
                 match property_name {
                     #(#reactive_field_subscriptions)*
                     _ => {},

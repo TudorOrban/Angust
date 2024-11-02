@@ -23,5 +23,10 @@ impl ProductService {
     pub fn get_products(&self) -> Vec<Product> {
         self.products.clone()
     }
+    
+    pub async fn fetch_products_async(&self) -> Vec<Product> {
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        self.products.clone()  // Simulating a fetch operation
+    }
 }
 

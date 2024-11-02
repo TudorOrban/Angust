@@ -244,6 +244,12 @@ impl<State> ApplicationHandler<ApplicationEvent> for Application<State> {
                 self.renderer.layout();
                 self.windowing_system.window.request_redraw();
             },
+            ApplicationEvent::ExecuteTask(executor) => {
+                println!("Executing task");
+                executor.execute();
+                println!("Task executed");
+            },
+            _ => ()
         }
     }
 }

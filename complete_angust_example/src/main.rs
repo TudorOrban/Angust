@@ -12,8 +12,8 @@ pub struct AppGlobalState {
     pub message: String,
 }
 
-
-fn main() {
+#[tokio::main]
+async fn main() {
     let initial_state = AppGlobalState {
         message: "Hello, Angust user!".to_string(),
     };

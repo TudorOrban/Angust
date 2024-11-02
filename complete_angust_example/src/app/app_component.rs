@@ -3,20 +3,14 @@
 use std::{collections::HashMap, any::Any};
 
 use angust::{
-    rendering::elements::{
+    application::event_loop_proxy::FutureExt, rendering::elements::{
         component::{
             component::Component, 
             component_factory_registry::ComponentFactory, 
             functions::component_functions::ComponentFunctions, 
-            state::{
-                reactivity::{ReactiveField, ReactiveState}, 
-                reflectivity::ReflectiveState
-            } 
         }, 
         service::service_container::get_global_service
-    }, 
-    wrap_fn, wrap_fn_mut, wrap_init_mut,
-    application::event_loop_proxy::ApplicationEvent
+    }, wrap_fn, wrap_fn_mut, wrap_init_mut
 };
 use angust_macros::component_state;
 
@@ -74,14 +68,17 @@ impl AppComponentState {
         println!("AppComponentState initialized!");
         self.active_tab_reactive.set("Home".to_string());
             
-        if let Some(product_service) = get_global_service::<ProductService>("ProductService") {
-            let products = product_service.get_products();
-            for product in products {
-                println!("Product: {:?}", product);
-            }
-        } else {
-            println!("ProductService not found!");
+        let product_service = get_global_service::<ProductService>("ProductService").unwrap();
+        let products = product_service.get_products();
+        for product in products {
+            println!("Product: {:?}", product);
         }
+
+        product_service.fetch_products_async()
+                .post_to_gui_thread(move |products| {
+                    println!("Fetched products: {:?}", products);
+                });
+
     }
 
 }
