@@ -4,12 +4,9 @@ use std::{collections::HashMap, any::Any};
 
 use angust::{
     rendering::elements::component::{
-        component::Component, 
-        component_factory_registry::ComponentFactory, 
-        state::{reactivity::{ComponentEvent, ReactiveField, ReactiveState}, reflectivity::ReflectiveState}, 
-        functions::component_functions::ComponentFunctions, 
+        component::Component, component_factory_registry::ComponentFactory, functions::component_functions::ComponentFunctions, state::{reactivity::{ComponentEvent, ReactiveField, ReactiveState}, reflectivity::ReflectiveState} 
     }, 
-    wrap_fn, wrap_fn_mut
+    wrap_fn, wrap_fn_mut, wrap_init_mut
 };
 use angust_macros::component_state;
 
@@ -60,6 +57,12 @@ impl AppComponentState {
         self.active_tab_reactive.set(tab_name);
         self.toggle_content();
     }
+
+    pub fn init(&mut self) {
+        println!("AppComponentState initialized!");
+        self.active_tab_reactive.set("Home".to_string());
+    }
+
 }
 
 pub struct AppComponent {
@@ -88,7 +91,7 @@ impl AppComponent {
                     // ]),
                 ],
                 vec![],
-                UIItem::new("Label 3".to_string(), "Value 3".to_string(),)
+                UIItem::new("Label 3".to_string(), "Value 3".to_string(),),
                 // vec![
                 //     "Item 31".to_string(),
                 //     "Item 32".to_string(),
@@ -116,6 +119,7 @@ impl AppComponent {
                     ("set_active_tab", wrap_fn_mut!(AppComponentState, AppComponentState::set_active_tab, String)),
                 ],
                 vec![],
+                Some(wrap_init_mut!(AppComponentState, AppComponentState::init)),
             );
             component.add_component_functions(component_functions);
 

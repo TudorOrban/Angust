@@ -65,6 +65,7 @@ impl HeaderComponent {
                     ("set_count", wrap_fn_mut!(HeaderComponentState, HeaderComponentState::set_count, f64)),
                     ("set_item", wrap_fn_mut!(HeaderComponentState, HeaderComponentState::set_item, UIItem)),
                 ],
+                None
             );
             component.add_component_functions(component_functions);
 

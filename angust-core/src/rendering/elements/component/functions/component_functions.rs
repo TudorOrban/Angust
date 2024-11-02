@@ -7,6 +7,7 @@ pub struct ComponentFunctions<State> {
     pub dynamic_params_functions: HashMap<String, Box<dyn Fn(&State, Vec<Box<dyn Any>>) -> Box<dyn Any>>>,
     pub dynamic_params_event_handlers: HashMap<String, Box<dyn Fn(&mut State, Vec<Box<dyn Any>>)>>,
     pub input_setters: HashMap<String, Box<dyn Fn(&mut State, Vec<Box<dyn Any>>)>>,
+    pub initialization_function: Option<Box<dyn Fn(&mut State) -> ()>>,
 }
 
 impl<State> ComponentFunctions<State> {
@@ -17,6 +18,7 @@ impl<State> ComponentFunctions<State> {
         dynamic_params_functions: Vec<(&str, Box<dyn Fn(&State, Vec<Box<dyn Any>>) -> Box<dyn Any>>)>,
         dynamic_params_event_handlers: Vec<(&str, Box<dyn Fn(&mut State, Vec<Box<dyn Any>>)>)>,
         input_setters: Vec<(&str, Box<dyn Fn(&mut State, Vec<Box<dyn Any>>)>)>,
+        initialization_function: Option<Box<dyn Fn(&mut State) -> ()>>,
     ) -> Self {
         let mut functions = Self::default();
 
@@ -39,6 +41,8 @@ impl<State> ComponentFunctions<State> {
             functions.input_setters.insert(setter_name.to_string(), setter);
         }
 
+        functions.initialization_function = initialization_function;
+
         functions
     }
 }
@@ -52,6 +56,7 @@ impl<State> Default for ComponentFunctions<State> {
             dynamic_params_functions: HashMap::new(),
             dynamic_params_event_handlers: HashMap::new(),
             input_setters: HashMap::new(),
+            initialization_function: None,
         }
     }
 }

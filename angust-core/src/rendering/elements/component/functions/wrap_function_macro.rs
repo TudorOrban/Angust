@@ -37,3 +37,12 @@ macro_rules! wrap_fn_mut {
         })
     };
 }
+
+#[macro_export]
+macro_rules! wrap_init_mut {
+    ($state:ty, $func:path) => {
+        Box::new(move |state: &mut $state| {
+            let result = $func(state);
+        })
+    };
+}

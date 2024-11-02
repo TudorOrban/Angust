@@ -45,6 +45,7 @@ impl MainMenuComponent {
                 vec![
                     ("set_content", wrap_fn_mut!(MainMenuComponentState, MainMenuComponentState::set_content, String)),
                 ],
+                None
             );
             component.add_component_functions(component_functions);
 
