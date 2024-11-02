@@ -16,7 +16,7 @@ use crate::{
     }, 
     rendering::{
         elements::{component::state::reflectivity::NoState, element::EventType}, 
-        renderer::Renderer
+        renderer::Renderer,
     }, 
     window::WindowingSystem
 };
@@ -247,6 +247,9 @@ impl<State> ApplicationHandler<ApplicationEvent> for Application<State> {
             ApplicationEvent::ExecuteTask(executor) => {
                 executor.execute();
             },
+            ApplicationEvent::RouteChange(route, component_name) => {
+                println!("Route change: {} -> {}", route, component_name);
+            }
         }
     }
 }

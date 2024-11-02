@@ -23,4 +23,5 @@ pub fn get_event_loop_proxy() -> Option<EventLoopProxy<ApplicationEvent>> {
 pub enum ApplicationEvent {
     StateChange(String),
     ExecuteTask(ClosureExecutor),
+    RouteChange(String, String),
 }
