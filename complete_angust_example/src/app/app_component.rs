@@ -10,6 +10,8 @@ use angust::{
 };
 use angust_macros::component_state;
 
+use crate::ProductService;
+
 #[component_state]
 #[derive(Clone)]
 struct UIItem {
@@ -98,6 +100,8 @@ impl AppComponent {
                 //     "Item 33".to_string(),
                 // ]),
             );
+
+            
 
             let mut component = Component::new(
                 "app-component".to_string(),
