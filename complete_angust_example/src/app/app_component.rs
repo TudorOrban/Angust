@@ -3,14 +3,15 @@
 use std::{collections::HashMap, any::Any};
 
 use angust::{
-    application::event_loop_proxy::FutureExt, rendering::elements::{
+    rendering::elements::{
         component::{
             component::Component, 
             component_factory_registry::ComponentFactory, 
             functions::component_functions::ComponentFunctions, 
         }, 
-        service::service_container::get_global_service
-    }, wrap_fn, wrap_fn_mut, wrap_init_mut
+        service::{async_manager::FutureExt, service_container::get_global_service}
+    }, 
+    wrap_fn, wrap_fn_mut, wrap_init_mut
 };
 use angust_macros::component_state;
 
@@ -21,7 +22,6 @@ use crate::app::core::services::product_service::ProductService;
 struct UIItem {
     label: String,
     value: String,
-    // items: Vec<String>,
 }
 
 #[component_state]
@@ -65,20 +65,14 @@ impl AppComponentState {
     }
 
     pub fn init(&mut self) {
-        println!("AppComponentState initialized!");
         self.active_tab_reactive.set("Home".to_string());
             
         let product_service = get_global_service::<ProductService>("ProductService").unwrap();
-        let products = product_service.get_products();
-        for product in products {
-            println!("Product: {:?}", product);
-        }
 
         product_service.fetch_products_async()
                 .post_to_gui_thread(move |products| {
                     println!("Fetched products: {:?}", products);
                 });
-
     }
 
 }
@@ -97,27 +91,10 @@ impl AppComponent {
                 "Home".to_string(),
                 vec![
                     UIItem::new("Label 1".to_string(), "Value 1".to_string()) 
-                    // vec![
-                    //     "Item 11".to_string(),
-                    //     "Item 12".to_string(),
-                    //     "Item 13".to_string(),
-                    // ]),
-                    // UIItem::new("Label 2".to_string(), "Value 2".to_string(), 
-                    // vec![
-                    //     "Item 21".to_string(),
-                    //     "Item 22".to_string(),
-                    // ]),
                 ],
                 vec![],
                 UIItem::new("Label 3".to_string(), "Value 3".to_string(),),
-                // vec![
-                //     "Item 31".to_string(),
-                //     "Item 32".to_string(),
-                //     "Item 33".to_string(),
-                // ]),
             );
-
-            
 
             let mut component = Component::new(
                 "app-component".to_string(),
