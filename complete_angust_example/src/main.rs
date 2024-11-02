@@ -3,9 +3,10 @@ extern crate angust;
 
 use angust::application::application::Application;
 
-pub mod app;
-pub mod component_registration;
-pub mod service_registration;
+mod app;
+mod component_registration;
+mod service_registration;
+mod routes;
 
 
 pub struct AppGlobalState {
@@ -20,6 +21,7 @@ async fn main() {
 
     component_registration::register_components();    
     service_registration::register_services();
+    routes::register_routes();
 
     let mut app = Application::new(initial_state, String::from("New Angust App"));
     

@@ -3,14 +3,14 @@
 use std::{collections::HashMap, any::Any};
 
 use angust::{
-    rendering::elements::{
+    rendering::{elements::{
         component::{
             component::Component, 
             component_factory_registry::ComponentFactory, 
             functions::component_functions::ComponentFunctions, 
         }, 
         service::{async_manager::FutureExt, service_container::get_global_service}
-    }, 
+    }, router::angust_router::navigate}, 
     wrap_fn, wrap_fn_mut, wrap_init_mut
 };
 use angust_macros::component_state;
@@ -95,6 +95,8 @@ impl AppComponent {
                 vec![],
                 UIItem::new("Label 3".to_string(), "Value 3".to_string(),),
             );
+
+            navigate("/home");
 
             let mut component = Component::new(
                 "app-component".to_string(),
