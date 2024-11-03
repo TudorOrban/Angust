@@ -1,47 +1,9 @@
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
-use once_cell::sync::Lazy;
+use std::{collections::HashMap, sync::Arc};
 
-
-static GLOBAL_ROUTER: Lazy<Mutex<Router>> = Lazy::new(|| {
-    Mutex::new(Router::new(HashMap::new()))
-});
-
-pub fn init_global_router(routes: HashMap<String, String>) {
-    let mut router = GLOBAL_ROUTER.lock().unwrap();
-    *router = Router::new(routes);
-}
-
-pub fn navigate(route: &str) {
-    let mut router = GLOBAL_ROUTER.lock().unwrap();
-    router.navigate_to(route);
-}
-
-pub fn subscribe_to_current_route(callback: RouteChangeCallback) {
-    let mut router = GLOBAL_ROUTER.lock().unwrap();
-    router.subscribe(callback);
-}
-
-pub fn get_current_route() -> String {
-    let router = GLOBAL_ROUTER.lock().unwrap();
-    router.current_route.clone()
-}
-
-pub fn get_current_component_name() -> Option<String> {
-    let router = GLOBAL_ROUTER.lock().unwrap();
-    let comp_name_opt = router.routes.get(&router.current_route);
-    if comp_name_opt.is_none() {
-        return None;
-    }
-
-    Some(comp_name_opt.unwrap().clone())
-}
-
-type RouteChangeCallback = Arc<dyn Fn(&str, &str) + Send + Sync>;
 
 pub struct Router {
-    routes: HashMap<String, String>,
-    current_route: String,
+    pub routes: HashMap<String, String>,
+    pub current_route: String,
     #[allow(dead_code)]
     current_params: HashMap<String, String>,
     history: Vec<String>,
@@ -49,7 +11,7 @@ pub struct Router {
 }
 
 impl Router {
-    fn new(routes: HashMap<String, String>) -> Self {
+    pub fn new(routes: HashMap<String, String>) -> Self {
         Router {
             routes,
             ..Default::default()
@@ -79,6 +41,8 @@ impl Router {
         }
     }
 }
+
+pub type RouteChangeCallback = Arc<dyn Fn(&str, &str) + Send + Sync>;
 
 impl Default for Router {
     fn default() -> Self {

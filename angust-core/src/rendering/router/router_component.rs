@@ -15,7 +15,7 @@ use crate::{
     }
 };
 
-use super::angust_router::{get_current_component_name, subscribe_to_current_route};
+use super::router_proxy::{get_router, RouterProxy};
 
 
 pub struct RouterComponent {
@@ -27,6 +27,7 @@ pub struct RouterComponent {
     styles: Styles,
 
     current_component: Box<dyn Element>,
+    router: RouterProxy,
 }
 
 impl RouterComponent {
@@ -40,10 +41,11 @@ impl RouterComponent {
             requested_size: OptionalSize::default(),
             styles: Styles::default(),
             current_component: Box::new(Container::new()),
+            router: get_router(),
         };
 
         let callback = component.get_route_change_callback();
-        subscribe_to_current_route(callback);
+        component.router.subscribe_to_current_route(callback); // TODO: Fix this. Right now, template reloading will cause multiple subscriptions
 
         component
     }
@@ -173,7 +175,7 @@ impl Element for RouterComponent {
     }
 
     fn initialize(&mut self, inputs: HashMap<String, Box<dyn Any>>) {
-        let component_name_opt = get_current_component_name();
+        let component_name_opt = self.router.get_current_component_name();
         if component_name_opt.is_none() {
             return;
         }

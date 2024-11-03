@@ -3,14 +3,17 @@
 use std::{collections::HashMap, any::Any};
 
 use angust::{
-    rendering::{elements::{
-        component::{
-            component::Component, 
-            component_factory_registry::ComponentFactory, 
-            functions::component_functions::ComponentFunctions, 
+    rendering::{
+        elements::{
+            component::{
+                component::Component, 
+                component_factory_registry::ComponentFactory, 
+                functions::component_functions::ComponentFunctions, 
+            }, 
+            service::{async_manager::FutureExt, service_container::get_global_service}
         }, 
-        service::{async_manager::FutureExt, service_container::get_global_service}
-    }, router::{angust_router::navigate, router_component::RouterComponent}}, 
+        router::router_proxy::get_router
+    }, 
     wrap_fn, wrap_fn_mut, wrap_init_mut
 };
 use angust_macros::component_state;
@@ -74,7 +77,8 @@ impl AppComponentState {
     }
 
     pub fn change_route(&mut self, route: String) {
-        navigate(&route);
+        let router = get_router();
+        router.navigate(&route);
     }
 
 }

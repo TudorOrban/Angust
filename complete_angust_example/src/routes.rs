@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use angust::rendering::router::angust_router::init_global_router;
+use angust::rendering::router::router_proxy::init_global_router;
 
 
 pub fn register_routes() {
