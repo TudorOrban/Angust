@@ -1,19 +1,26 @@
 use kuchiki::NodeRef;
 
-use crate::parsing::directive::{for_parser, for_parser::ForLoopContext, if_parser, on_click_parser};
-use crate::parsing::css::css_parser;
-use crate::rendering::elements::{
-    container::Container,
-    button::Button,
-    element::Element,
-    image::Image,
-    styles::Styles,
-    component::state::reactivity::ReactiveState,
+use crate::{
+    parsing::{
+        directive::{for_parser, for_parser::ForLoopContext, if_parser, on_click_parser},
+        css::css_parser,
+    },
+    rendering::elements::{
+        container::Container,
+        button::Button,
+        element::Element,
+        image::Image,
+        styles::Styles,
+        component::state::reactivity::ReactiveState,
+    }
 };
 
-use super::component_parser::process_custom_component;
-use super::error::ParsingError;
-use super::html_parser::{self, ParsingContext};
+use super::{
+    component_parser::process_custom_component,
+    error::ParsingError,
+    html_parser::{self, ParsingContext},
+};
+
 
 pub fn dispatch_element_processing<State : ReactiveState>(
     elem_data: &kuchiki::ElementData, 

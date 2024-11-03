@@ -77,18 +77,7 @@ impl<State: ReactiveState> Component<State> {
     fn initialize(&mut self, inputs: HashMap<String, Box<dyn Any>>) {
         self.setup_listeners();
         self.load_component_template(inputs);
-
-        let user_defined_init_optional = self.component_functions.initialization_function.as_ref();
-        if user_defined_init_optional.is_none() {
-            return;
-        }
-        let user_defined_init = user_defined_init_optional.unwrap();
-        
-        user_defined_init(&mut self.state);
-    }
-
-    fn load_component_template(&mut self, inputs: HashMap<String, Box<dyn Any>>) {
-        template_loader::load_component_template(self, inputs);
+        self.trigger_user_defined_init();
     }
 
     fn setup_listeners(&mut self) {
@@ -117,6 +106,20 @@ impl<State: ReactiveState> Component<State> {
                 }
             });
         }
+    }
+    
+    fn load_component_template(&mut self, inputs: HashMap<String, Box<dyn Any>>) {
+        template_loader::load_component_template(self, inputs);
+    }
+
+    fn trigger_user_defined_init(&mut self) {
+        let user_defined_init_optional = self.component_functions.initialization_function.as_ref();
+        if user_defined_init_optional.is_none() {
+            return;
+        }
+        let user_defined_init = user_defined_init_optional.unwrap();
+        
+        user_defined_init(&mut self.state);
     }
 
     // Setters

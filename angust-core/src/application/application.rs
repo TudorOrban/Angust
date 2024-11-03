@@ -63,7 +63,7 @@ impl<State> Application<State> {
         let (dom, stylesheets) = load_resources(&angust_config);
         let stylesheet = stylesheet_parser::parse_stylesheet(&stylesheets);
         let mut parsing_context: ParsingContext<NoState> = ParsingContext::new(Some(angust_config.clone()), Some(stylesheet.clone()), None, None, None, None, None, None);
-
+        
         let ui_body = html_parser::map_dom_to_elements::<NoState>(&dom, None, &mut parsing_context)
             .unwrap_or_else(|e| panic!("Failed to map DOM to elements: {:?}", e));
 
@@ -223,7 +223,7 @@ impl<State> ApplicationHandler<ApplicationEvent> for Application<State> {
                 }
             },
             WindowEvent::KeyboardInput {
-                event: KeyEvent { logical_key, .. },
+                event: KeyEvent { logical_key, .. }, 
                 ..
             } => {
                 if self.modifiers.state().super_key() && logical_key == "q" {

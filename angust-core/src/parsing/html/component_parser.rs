@@ -2,11 +2,14 @@ use std::collections::HashMap;
 
 use crate::{
     parsing::{css::css_parser, directive::input::input_evaluator}, 
-    rendering::{elements::{
-        component::{component_factory_registry::create_component, state::reactivity::ReactiveState},
-        element::Element, 
-        styles::Styles
-    }, router::router_component::RouterComponent}
+    rendering::{
+        elements::{
+            component::{component_factory_registry::create_component, state::reactivity::ReactiveState},
+            element::Element, 
+            styles::Styles
+        }, 
+        router::router_component::RouterComponent
+    }
 };
 
 use super::{error::ParsingError, html_parser::{self, ParsingContext}};

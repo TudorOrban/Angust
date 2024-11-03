@@ -28,11 +28,10 @@ pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Comp
     let scanned_inputs = input_scanner::scan_inputs(&dom)
         .unwrap_or_else(|e| panic!("Failed to scan inputs: {:?}", e));
 
-    // Trigger setters for inputs from parent component
+    // Trigger setters for inputs from parent component *before* mapping DOM to elements
     input_setter::trigger_input_setters(component, inputs);
 
     // Map Kuchiki DOM to elements
-    let mut container = Box::new(Container::new());
     let mut parsing_context: ParsingContext<'a, State> = html_parser::ParsingContext::new(
         None, None, 
         Some(&component.state), Some(&component.component_functions),
@@ -46,6 +45,7 @@ pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Comp
         .unwrap_or_else(|e| panic!("Failed to map DOM to elements: {:?}", e));
     
     // Add elements to Angust DOM
+    let mut container = Box::new(Container::new());
     container.add_child(element);
 
     component.content = container;

@@ -65,8 +65,6 @@ impl AppComponentState {
     }
 
     pub fn init(&mut self) {
-        self.active_tab_reactive.set("Home".to_string());
-            
         let product_service = get_global_service::<ProductService>("ProductService").unwrap();
 
         product_service.fetch_products_async()
@@ -99,10 +97,6 @@ impl AppComponent {
                 vec![],
                 UIItem::new("Label 3".to_string(), "Value 3".to_string(),),
             );
-
-            let _c = RouterComponent::new();
-
-            navigate("/home");
 
             let mut component = Component::new(
                 "app-component".to_string(),

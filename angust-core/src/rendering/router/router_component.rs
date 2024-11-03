@@ -15,7 +15,7 @@ use crate::{
     }
 };
 
-use super::angust_router::subscribe_to_current_route;
+use super::angust_router::{get_current_component_name, subscribe_to_current_route};
 
 
 pub struct RouterComponent {
@@ -60,6 +60,19 @@ impl RouterComponent {
             event_proxy.send_event(ApplicationEvent::RouteChange(route.to_string(), component_name.to_string()))
                 .expect("Failed to send event to GUI thread");
         })
+    }
+
+    fn update_current_component(&mut self, component_name: &String, inputs: HashMap<String, Box<dyn Any>>) {
+        let component_optional = create_component(component_name);
+        if component_optional.is_none() {
+            println!("Component not found: {}", component_name);
+            return;
+        }
+        let mut component_box = component_optional.unwrap();
+        
+        component_box.initialize(inputs);
+
+        self.current_component = component_box;
     }
 }
 
@@ -160,19 +173,17 @@ impl Element for RouterComponent {
     }
 
     fn initialize(&mut self, inputs: HashMap<String, Box<dyn Any>>) {
-        self.current_component.initialize(inputs);
+        let component_name_opt = get_current_component_name();
+        if component_name_opt.is_none() {
+            return;
+        }
+        let component_name = component_name_opt.unwrap();
+
+        self.update_current_component(&component_name, inputs);
     }
 
     fn handle_route_change(&mut self, _: &String, component_name: &String) {
-        let component_optional = create_component(component_name);
-        if component_optional.is_none() {
-            println!("Component not found: {}", component_name);
-        }
-        let mut component_box = component_optional.unwrap();
-        
-        component_box.initialize(HashMap::new());
-
-        self.current_component = component_box;
+        self.update_current_component(component_name, HashMap::new());
     }
 
     // Layout system

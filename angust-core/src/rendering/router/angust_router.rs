@@ -22,6 +22,21 @@ pub fn subscribe_to_current_route(callback: RouteChangeCallback) {
     router.subscribe(callback);
 }
 
+pub fn get_current_route() -> String {
+    let router = GLOBAL_ROUTER.lock().unwrap();
+    router.current_route.clone()
+}
+
+pub fn get_current_component_name() -> Option<String> {
+    let router = GLOBAL_ROUTER.lock().unwrap();
+    let comp_name_opt = router.routes.get(&router.current_route);
+    if comp_name_opt.is_none() {
+        return None;
+    }
+
+    Some(comp_name_opt.unwrap().clone())
+}
+
 type RouteChangeCallback = Arc<dyn Fn(&str, &str) + Send + Sync>;
 
 pub struct Router {
