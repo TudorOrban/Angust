@@ -28,6 +28,8 @@ pub struct RouterComponent {
 
     current_component: Box<dyn Element>,
     router: RouterProxy,
+
+    cached_routes: HashMap<String, Box<dyn Element>>,
 }
 
 impl RouterComponent {
@@ -42,6 +44,7 @@ impl RouterComponent {
             styles: Styles::default(),
             current_component: Box::new(Container::new()),
             router: get_router(),
+            cached_routes: HashMap::new(),
         };
 
         let callback = component.get_route_change_callback();
@@ -65,6 +68,11 @@ impl RouterComponent {
     }
 
     fn update_current_component(&mut self, component_name: &String, inputs: HashMap<String, Box<dyn Any>>) {
+        if self.cached_routes.contains_key(component_name) {
+            // self.current_component = self.cached_routes.get(component_name).unwrap().clone();
+            return;
+        }
+
         let component_optional = create_component(component_name);
         if component_optional.is_none() {
             println!("Component not found: {}", component_name);

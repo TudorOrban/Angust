@@ -78,7 +78,17 @@ impl AppComponentState {
 
     pub fn change_route(&mut self, route: String) {
         let router = get_router();
-        router.navigate(&route);
+        router.navigate_to(&route);
+    }
+
+    pub fn go_back(&mut self, smth: String) {
+        let router = get_router();
+        router.go_back();
+    }
+
+    pub fn go_forward(&mut self, smth: String) {
+        let router = get_router();
+        router.go_forward();
     }
 
 }
@@ -121,6 +131,8 @@ impl AppComponent {
                 vec![
                     ("set_active_tab", wrap_fn_mut!(AppComponentState, AppComponentState::set_active_tab, String)),
                     ("change_route", wrap_fn_mut!(AppComponentState, AppComponentState::change_route, String)),
+                    ("go_back", wrap_fn_mut!(AppComponentState, AppComponentState::go_back, String)),
+                    ("go_forward", wrap_fn_mut!(AppComponentState, AppComponentState::go_forward, String)),
                 ],
                 vec![],
                 Some(wrap_init_mut!(AppComponentState, AppComponentState::init)),

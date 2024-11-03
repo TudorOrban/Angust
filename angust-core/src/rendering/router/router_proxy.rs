@@ -38,9 +38,19 @@ impl RouterProxy {
         router.subscribe(callback);
     }
 
-    pub fn navigate(&self, route: &str) {
+    pub fn navigate_to(&self, route: &str) {
         let mut router = GLOBAL_ROUTER.lock().unwrap();
         router.navigate_to(route);
+    }
+
+    pub fn go_back(&self) {
+        let mut router = GLOBAL_ROUTER.lock().unwrap();
+        router.go_back();
+    }
+
+    pub fn go_forward(&self) {
+        let mut router = GLOBAL_ROUTER.lock().unwrap();
+        router.go_forward();
     }
 }
 
@@ -48,6 +58,7 @@ impl RouterProxy {
 pub struct RouteConfiguration {
     pub routes: HashMap<String, String>,
     pub initial_route: Option<String>,
+    pub cache_pages: bool,
 }
 
 impl Default for RouteConfiguration {
@@ -55,6 +66,7 @@ impl Default for RouteConfiguration {
         RouteConfiguration {
             routes: HashMap::new(),
             initial_route: None,
+            cache_pages: false,
         }
     }
 }

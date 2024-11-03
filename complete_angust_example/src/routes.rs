@@ -12,6 +12,7 @@ pub fn register_routes() {
     let route_config = RouteConfiguration {
         routes,
         initial_route: Some(String::from("/header")),
+        cache_pages: true,
     };
 
     init_global_router(route_config);

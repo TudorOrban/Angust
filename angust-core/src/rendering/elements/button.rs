@@ -12,7 +12,6 @@ use super::{
     styles::Styles
 };
 
-
 pub struct Button {
     _id: String,
 
@@ -164,11 +163,10 @@ impl Element for Button {
         self.styles
     }
 
-
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>> { 
         self.container.as_mut()
     }
-
+    
     // Custom component
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
         None

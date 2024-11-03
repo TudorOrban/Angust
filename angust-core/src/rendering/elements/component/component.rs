@@ -352,17 +352,13 @@ impl<State: ReactiveState> Element for Component<State> {
     }
 }
 
-// Experimental
 pub trait ComponentInterface {
     fn update_input(&mut self, input_name: &str, value: Vec<Box<dyn Any>>);
     fn get_input_asts(&self) -> HashMap<String, ASTNode>;
 }
 
-
 impl<State: ReactiveState> ComponentInterface for Component<State> {
     fn update_input(&mut self, input_name: &str, value: Vec<Box<dyn Any>>) {
-        println!("Updating input: {}", input_name);
-        println!("Input setter keys: {:?}", self.component_functions.input_setters.keys());
         let setter_name = format!("set_{}", input_name);
         if let Some(setter) = self.component_functions.input_setters.get(&setter_name) {
             setter(&mut self.state, value);

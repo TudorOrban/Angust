@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::{HashMap, VecDeque}, sync::Arc};
 
 use super::router_proxy::RouteConfiguration;
 
@@ -8,7 +8,8 @@ pub struct Router {
     pub current_route: String,
     #[allow(dead_code)]
     current_params: HashMap<String, String>,
-    history: Vec<String>,
+    history: VecDeque<String>,
+    forward_stack: VecDeque<String>,  
     subscribers: Vec<RouteChangeCallback>,
 }
 
@@ -29,12 +30,40 @@ impl Router {
         }
         let component_name = component_name_opt.unwrap();
 
-        self.history.push(route.to_string());
+        self.forward_stack.clear();
+        if !self.current_route.is_empty() {
+            self.history.push_back(self.current_route.clone());
+        }
+
         self.current_route = route.to_string();
 
         self.notify_subscribers(route, component_name);
     }
 
+    pub fn go_back(&mut self) {
+        let previous_route = match self.history.pop_back() {
+            Some(route) => route,
+            None => return,
+        };
+        self.forward_stack.push_front(self.current_route.clone());
+        self.current_route = previous_route;
+        if let Some(component_name) = self.route_config.routes.get(&self.current_route) {
+            self.notify_subscribers(&self.current_route, component_name);
+        }
+    }
+    
+    pub fn go_forward(&mut self) {
+        let next_route = match self.forward_stack.pop_front() {
+            Some(route) => route,
+            None => return,
+        };
+        self.history.push_back(self.current_route.clone());
+        self.current_route = next_route;
+        if let Some(component_name) = self.route_config.routes.get(&self.current_route) {
+            self.notify_subscribers(&self.current_route, component_name);
+        }
+    }
+    
     pub fn subscribe(&mut self, callback: RouteChangeCallback) {
         self.subscribers.push(callback);
     }
@@ -54,7 +83,8 @@ impl Default for Router {
             route_config: RouteConfiguration::default(),
             current_route: String::from(""),
             current_params: HashMap::new(),
-            history: Vec::new(),
+            history: VecDeque::new(),
+            forward_stack: VecDeque::new(),
             subscribers: Vec::new(),
         }
     }
