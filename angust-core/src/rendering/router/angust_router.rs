@@ -29,10 +29,10 @@ impl Router {
         }
         let (component_name, params) = component_name_opt.unwrap();
 
-        self.forward_stack.clear();
         if !self.current_route.is_empty() {
-            self.history.push_back((self.current_route.clone(), params.clone()));
+            self.history.push_back((self.current_route.clone(), self.current_params.clone()));
         }
+        self.forward_stack.clear();
 
         self.current_route = route.to_string();
         self.current_params = params;
@@ -40,38 +40,34 @@ impl Router {
         self.notify_subscribers(route, component_name);
     }
 
-    pub fn get_current_params(&self) -> HashMap<String, String> {
-        self.current_params.clone()
-    }
-
     pub fn go_back(&mut self) {
-        let previous_route = match self.history.pop_back() {
+        let (previous_route, previous_params) = match self.history.pop_back() {
             Some(route) => route,
             None => return,
         };
+
         self.forward_stack.push_front((self.current_route.clone(), self.current_params.clone()));
-        self.current_route = previous_route.0;
-        self.current_params = previous_route.1;
-        if let Some(component_name) = self.route_config.routes.get(&self.current_route) {
+        self.current_route = previous_route;
+        self.current_params = previous_params;
+
+        if let Some((component_name, _)) = self.route_config.match_route(&self.current_route) {
             self.notify_subscribers(&self.current_route, component_name);
         }
     }
     
     pub fn go_forward(&mut self) {
-        let next_route = match self.forward_stack.pop_front() {
+        let (next_route, next_params) = match self.forward_stack.pop_front() {
             Some(route) => route,
             None => return,
         };
+
         self.history.push_back((self.current_route.clone(), self.current_params.clone()));
-        self.current_route = next_route.0;
-        self.current_params = next_route.1;
-        if let Some(component_name) = self.route_config.routes.get(&self.current_route) {
+        self.current_route = next_route;
+        self.current_params = next_params;
+
+        if let Some((component_name, _)) = self.route_config.match_route(&self.current_route) {
             self.notify_subscribers(&self.current_route, component_name);
         }
-    }
-
-    pub fn get_history(&self) -> VecDeque<(String, HashMap<String, String>)> {
-        self.history.clone()
     }
 
     pub fn subscribe(&mut self, callback: RouteChangeCallback) {
@@ -82,6 +78,15 @@ impl Router {
         for subscriber in &self.subscribers {
             subscriber(route, component_name);
         }
+    }
+
+    // Getters
+    pub fn get_current_params(&self) -> HashMap<String, String> {
+        self.current_params.clone()
+    }
+
+    pub fn get_history(&self) -> VecDeque<(String, HashMap<String, String>)> {
+        self.history.clone()
     }
 
 }
