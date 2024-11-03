@@ -10,7 +10,12 @@ use crate::{application::event_handling::scrollbar_movement_handler::handle_scro
 }};
 
 use super::{
-    common_types::{OptionalSize, Position, ScrollbarState, Size}, component::{component::ComponentInterface, state::reflectivity::ReflectiveState}, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::{Directions, Styles}
+    common_types::{OptionalSize, Position, ScrollbarState, Size}, 
+    component::component::ComponentInterface, 
+    element::{Element, ElementType, EventType}, 
+    element_id_generator::ElementIDGenerator, 
+    event_propagator, 
+    styles::{Directions, Styles}
 };
 
 pub struct Container {
@@ -147,20 +152,19 @@ impl Element for Container {
         Some(&mut self.children)
     }
 
-    fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
-        Some(&self.children)
-    }
-
+    // Custom component
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
-        None
-    }
-
-    fn get_state(&self) -> Option<&dyn ReflectiveState> {
         None
     }
 
     fn initialize(&mut self, _: HashMap<String, Box<dyn Any>>) {
         // Nothing for now (implemented for components only)
+    }
+    
+    fn handle_route_change(&mut self, route: &String, component_name: &String) {
+        for child in &mut self.children {
+            child.handle_route_change(route, component_name);
+        }
     }
 
     // Layout system

@@ -2,7 +2,11 @@ use std::{any::Any, collections::HashMap};
 
 use skia_safe::{Canvas, Point};
 
-use super::{common_types::{OptionalSize, Position, Size}, component::{component::ComponentInterface, state::reflectivity::ReflectiveState}, styles::Styles};
+use super::{
+    common_types::{OptionalSize, Position, Size}, 
+    component::component::ComponentInterface, 
+    styles::Styles
+};
 
 // This is the trait that all Angust elements must implement.
 pub trait Element {
@@ -28,12 +32,12 @@ pub trait Element {
     fn get_size(&self) -> Size;
     fn get_styles(&self) -> Styles;
 
-    // Recursivity methods
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>>;
-    fn get_children(&self) -> Option<&Vec<Box<dyn Element>>>;
+
+    // Custom components
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface>;
-    fn get_state(&self) -> Option<&dyn ReflectiveState>;
     fn initialize(&mut self, inputs: HashMap<String, Box<dyn Any>>);
+    fn handle_route_change(&mut self, route: &String, component_name: &String);
 
     // Layout system
     fn set_natural_size(&mut self, size: Size);

@@ -4,7 +4,13 @@ use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{layout::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer};
 
-use super::{common_types::{OptionalSize, Position, Size}, component::{component::ComponentInterface, state::reflectivity::ReflectiveState}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, styles::Styles};
+use super::{
+    common_types::{OptionalSize, Position, Size}, 
+    component::component::ComponentInterface, 
+    container::Container, element::{Element, ElementType, EventType}, 
+    element_id_generator::ElementIDGenerator, 
+    styles::Styles
+};
 
 
 pub struct Button {
@@ -158,24 +164,29 @@ impl Element for Button {
         self.styles
     }
 
+
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>> { 
         self.container.as_mut()
     }
 
-    fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
-        self.container.as_ref()
-    }
-
+    // Custom component
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
-        None
-    }
-
-    fn get_state(&self) -> Option<&dyn ReflectiveState> {
         None
     }
 
     fn initialize(&mut self, _: HashMap<String, Box<dyn Any>>) {
         // Nothing for now (implemented for components only)
+    }
+
+    fn handle_route_change(&mut self, route: &String, component_name: &String) {
+        if let Some(child_container) = self.get_children_mut() {
+            if child_container.len() != 1 {
+                return;
+            }
+            if let Some(child_element) = child_container.get_mut(0) {
+                child_element.handle_route_change(route, component_name);
+            }
+        }
     }
 
     // Layout system

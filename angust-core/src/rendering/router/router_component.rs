@@ -2,7 +2,17 @@ use std::{any::Any, collections::HashMap, sync::Arc};
 
 use crate::{
     application::event_loop_proxy::{get_event_loop_proxy, ApplicationEvent},
-    rendering::{elements::{common_types::{OptionalSize, Position, Size}, component::{component::ComponentInterface, state::reflectivity::ReflectiveState}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, styles::Styles}, layout::effective_size_estimator}
+    rendering::{
+        elements::{
+            common_types::{OptionalSize, Position, Size}, 
+            component::{component::ComponentInterface, component_factory_registry::create_component}, 
+            container::Container, 
+            element::{Element, ElementType, EventType}, 
+            element_id_generator::ElementIDGenerator, 
+            styles::Styles
+        }, 
+        layout::effective_size_estimator
+    }
 };
 
 use super::angust_router::subscribe_to_current_route;
@@ -44,17 +54,6 @@ impl RouterComponent {
 
             event_proxy.send_event(ApplicationEvent::RouteChange(route.to_string(), component_name.to_string()))
                 .expect("Failed to send event to GUI thread");
-            
-            // let component_optional = create_component(component_name);
-            // if component_optional.is_none() {
-            //     println!("Component not found: {}", component_name);
-            // }
-            // let mut component_box = component_optional.unwrap();
-            
-            // println!("Component found: {}", component_name);
-            // component_box.initialize(HashMap::new());
-
-            // component.current_component = Some(component_box);
         });
         subscribe_to_current_route(callback);
 
@@ -153,20 +152,26 @@ impl Element for RouterComponent {
         return self.current_component.get_children_mut();
     }
 
-    fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
-        return self.current_component.get_children();
-    }
-    
+    // Custom component
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
-        None
-    }
-
-    fn get_state(&self) -> Option<&dyn ReflectiveState> {
         None
     }
 
     fn initialize(&mut self, inputs: HashMap<String, Box<dyn Any>>) {
         self.current_component.initialize(inputs);
+    }
+
+    fn handle_route_change(&mut self, _: &String, component_name: &String) {
+        let component_optional = create_component(component_name);
+        if component_optional.is_none() {
+            println!("Component not found: {}", component_name);
+        }
+        let mut component_box = component_optional.unwrap();
+        
+        println!("Component found: {}", component_name);
+        component_box.initialize(HashMap::new());
+
+        self.current_component = component_box;
     }
 
     // Layout system

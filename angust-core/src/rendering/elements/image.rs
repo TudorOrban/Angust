@@ -3,9 +3,21 @@ use std::{any::Any, collections::HashMap};
 use image::DynamicImage;
 use skia_safe::{Canvas, Point};
 
-use crate::{application::resource_loader::image_loader, rendering::{layout::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer}};
+use crate::{
+    application::resource_loader::image_loader, 
+    rendering::{
+        layout::effective_size_estimator, 
+        rendering_interface::element_renderer::ElementRenderer
+    }
+};
 
-use super::{common_types::{OptionalSize, Position, Size}, component::{component::ComponentInterface, state::reflectivity::ReflectiveState}, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::Styles};
+use super::{
+    common_types::{OptionalSize, Position, Size}, 
+    component::component::ComponentInterface, 
+    element::{Element, ElementType, EventType}, 
+    element_id_generator::ElementIDGenerator, event_propagator, 
+    styles::Styles
+};
 
 
 pub struct Image {
@@ -110,20 +122,17 @@ impl Element for Image {
     }
 
     fn get_children_mut(&mut self) -> Option<&mut Vec<Box<dyn Element>>> { None }
-
-    fn get_children(&self) -> Option<&Vec<Box<dyn Element>>> {
-        None
-    }
     
+    // Custom component
     fn get_component_interface(&mut self) -> Option<&mut dyn ComponentInterface> {
         None
     }
 
-    fn get_state(&self) -> Option<&dyn ReflectiveState> {
-        None
+    fn initialize(&mut self, _: HashMap<String, Box<dyn Any>>) {
+        // Nothing for now (implemented for components only)
     }
 
-    fn initialize(&mut self, _: HashMap<String, Box<dyn Any>>) {
+    fn handle_route_change(&mut self, _: &String, _: &String) {
         // Nothing for now (implemented for components only)
     }
 

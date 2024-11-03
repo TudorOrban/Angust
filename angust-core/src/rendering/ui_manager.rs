@@ -33,4 +33,8 @@ impl UIManager {
     pub fn react_to_state_change(&mut self, component_id: String) {
         self.root_element.react_to_state_change(component_id);
     }
+
+    pub fn handle_route_change(&mut self, route: &String, component_name: &String) {
+        self.root_element.handle_route_change(route, component_name);
+    }
 }
