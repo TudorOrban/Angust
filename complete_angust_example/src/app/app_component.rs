@@ -75,6 +75,10 @@ impl AppComponentState {
                 });
     }
 
+    pub fn change_route(&mut self, route: String) {
+        navigate(&route);
+    }
+
 }
 
 pub struct AppComponent {
@@ -118,6 +122,7 @@ impl AppComponent {
                 ],
                 vec![
                     ("set_active_tab", wrap_fn_mut!(AppComponentState, AppComponentState::set_active_tab, String)),
+                    ("change_route", wrap_fn_mut!(AppComponentState, AppComponentState::change_route, String)),
                 ],
                 vec![],
                 Some(wrap_init_mut!(AppComponentState, AppComponentState::init)),

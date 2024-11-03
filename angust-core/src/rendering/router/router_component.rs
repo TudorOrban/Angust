@@ -42,9 +42,14 @@ impl RouterComponent {
             current_component: Box::new(Container::new()),
         };
 
-        let callback = Arc::new(move |route: &str, component_name: &str| {
-            println!("Route changed to: {}, loading component: {}", route, component_name);
-            
+        let callback = component.get_route_change_callback();
+        subscribe_to_current_route(callback);
+
+        component
+    }
+
+    fn get_route_change_callback(&self) -> Arc<dyn Fn(&str, &str) + Send + Sync + 'static> {
+        Arc::new(move |route: &str, component_name: &str| {
             let event_proxy_option = get_event_loop_proxy();
             if event_proxy_option.is_none() {
                 println!("Event proxy is None");
@@ -54,10 +59,7 @@ impl RouterComponent {
 
             event_proxy.send_event(ApplicationEvent::RouteChange(route.to_string(), component_name.to_string()))
                 .expect("Failed to send event to GUI thread");
-        });
-        subscribe_to_current_route(callback);
-
-        component
+        })
     }
 }
 
@@ -168,7 +170,6 @@ impl Element for RouterComponent {
         }
         let mut component_box = component_optional.unwrap();
         
-        println!("Component found: {}", component_name);
         component_box.initialize(HashMap::new());
 
         self.current_component = component_box;

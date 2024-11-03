@@ -1,12 +1,25 @@
 <div style="display: flex; flex-direction: row; width: 1800px;">
     
+    <button style="display: flex; flex-direction: row; background-color: rgb(255, 0, 0); width: 400px; height: 200px;" @onclick="change_route('/header')">
+        <div style="display: flex; flex-direction: row; background-color: rgb(255, 0, 0); width: 400px; height: 200px;">
+
+        </div>
+    </button>
+
+    <button style="display: flex; flex-direction: row; background-color: rgb(0, 255, 0); width: 400px; height: 200px;" @onclick="change_route('/main-menu')">
+        <div style="display: flex; flex-direction: row; background-color: rgb(0, 255, 0); width: 400px; height: 200px;">
+
+        </div>
+    </button>
 
 
-    
+    <router-component></router-component>
+
+<!--     
     <header-component
         [item]="item"
     > 
 
-    </header-component>
+    </header-component> -->
 
 </div>

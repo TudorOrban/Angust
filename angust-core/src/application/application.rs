@@ -248,8 +248,9 @@ impl<State> ApplicationHandler<ApplicationEvent> for Application<State> {
                 executor.execute();
             },
             ApplicationEvent::RouteChange(route, component_name) => {
-                println!("Route change: {} -> {}", route, component_name);
                 self.renderer.handle_route_change(&route, &component_name);
+                self.renderer.layout();
+                self.windowing_system.window.request_redraw();
             }
         }
     }
