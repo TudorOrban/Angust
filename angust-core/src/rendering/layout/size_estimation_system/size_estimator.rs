@@ -4,7 +4,8 @@ use super::effective_size_estimator;
 
 
 /*
- * Determine the *natural* and *requested* size of the container 
+ * Module used in first pass of layout algorithm;
+ * Determines the *natural* and *requested* size of the container 
  * based on the children's *effective* sizes (i.e. requested if specified, natural otherwise).
  */
 pub fn estimate_parent_container_sizes(container: &mut Container) {

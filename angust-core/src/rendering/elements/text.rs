@@ -3,7 +3,7 @@ use std::{any::Any, collections::HashMap};
 use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{
-    layout::space_allocation_system::text::text_size_estimator::{determine_text_element_lines, estimate_text_element_size}, 
+    layout::size_estimation_system::text_size_estimator, 
     rendering_interface::element_renderer::ElementRenderer
 };
 
@@ -153,7 +153,7 @@ impl Element for Text {
     fn is_text_wrapper(&self) -> bool { false }
 
     fn estimate_sizes(&mut self) {
-        let estimated_text_size = estimate_text_element_size(self);
+        let estimated_text_size = text_size_estimator::estimate_text_element_size(self);
         self.set_natural_size(estimated_text_size);
     }
 
@@ -168,7 +168,7 @@ impl Element for Text {
         self.size = allocated_size;
         
         if self.get_styles().white_space.unwrap_or_default() == WhiteSpace::Normal {
-            self.lines = determine_text_element_lines(self);
+            self.lines = text_size_estimator::determine_text_element_lines(self);
         } else {
             self.lines = vec![self.content.clone()];
         }

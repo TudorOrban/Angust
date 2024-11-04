@@ -1,6 +1,6 @@
 use crate::rendering::{
     elements::{common_types::{Position, Size}, container::Container, element::Element}, 
-    layout::size_estimation_system::effective_size_estimator, 
+    layout::size_estimation_system::parent_size_estimator, 
 };
 
 use super::{position_allocator, size_allocator, utils};
@@ -21,7 +21,7 @@ pub fn allocate_space_to_row_flex_wrap(
 
     for line in children_lines {
         let (line_max_height, line_max_height_child_margin) = 
-            effective_size_estimator::get_max_height_child_properties(container, &line.children_indices);
+            parent_size_estimator::get_max_height_child_properties(container, &line.children_indices);
 
         for &child_index in &line.children_indices {
             let child = &mut container.children[child_index];

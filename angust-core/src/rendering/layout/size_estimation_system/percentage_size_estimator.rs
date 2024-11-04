@@ -6,7 +6,8 @@ use crate::rendering::elements::{
 
 
 /* 
- * Estimate requested size of children with percentage width in layout algorithm second pass
+ * Module used in layout algorithm second pass;
+ * Estimates requested size of children with percentage width
  */
 pub fn estimate_percentage_width_sizes(container: &mut Container, allocated_width: f32) {
     let scale_factor = find_scale_factor(container);
