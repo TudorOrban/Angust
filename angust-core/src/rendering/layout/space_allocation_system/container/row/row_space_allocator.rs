@@ -51,13 +51,13 @@ pub fn allocate_space_to_children_row_flex(
         let child_effective_size = child.get_effective_size();
         let child_margin = child.get_styles().margin.unwrap_or_default();
 
-        let child_allocated_position = position_allocator::determine_allocated_position(
+        let child_allocated_position = position_allocator::determine_allocated_position_row(
             flex_wrap, overflow, align_items, spacing, justify_content_spacing,
             cursor_position, child_effective_size, index,
             children_max_height, max_height_child_margin, child_margin,
         );
         
-        let child_allocated_size = size_allocator::determine_allocated_size(
+        let child_allocated_size = size_allocator::determine_allocated_size_row(
             flex_wrap, overflow,
             child_effective_size, allocated_size,
         );

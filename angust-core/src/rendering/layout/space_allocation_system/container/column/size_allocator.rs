@@ -2,7 +2,7 @@ use crate::rendering::elements::{common_types::Size, styles::{FlexWrap, Overflow
 
 
 
-pub fn determine_allocated_size_row(
+pub fn determine_allocated_size_column(
     flex_wrap: FlexWrap,
     overflow: Overflow,
     child_effective_size: Size,
@@ -16,10 +16,10 @@ pub fn determine_allocated_size_row(
         return child_effective_size; // No need to clip
     }
 
-    let clipped_width = child_effective_size.width.min(allocated_size.width);
+    let clipped_height = child_effective_size.height.min(allocated_size.height);
     
     Size {
-        width: clipped_width,
-        height: child_effective_size.height,
+        width: child_effective_size.width,
+        height: clipped_height,
     }
 }

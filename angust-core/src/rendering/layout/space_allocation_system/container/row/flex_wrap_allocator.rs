@@ -35,7 +35,7 @@ pub fn allocate_space_to_row_flex_wrap(
                 )
             };
 
-            let child_allocated_size = size_allocator::determine_allocated_size(
+            let child_allocated_size = size_allocator::determine_allocated_size_row(
                 flex_wrap, overflow, child_effective_size, allocated_size
             );
 
