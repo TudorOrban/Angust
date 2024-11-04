@@ -1,7 +1,7 @@
 use crate::rendering::elements::{common_types::Size, styles::{FlexWrap, Overflow}};
 
 
-
+#[allow(dead_code)]
 pub fn determine_allocated_size_column(
     flex_wrap: FlexWrap,
     overflow: Overflow,

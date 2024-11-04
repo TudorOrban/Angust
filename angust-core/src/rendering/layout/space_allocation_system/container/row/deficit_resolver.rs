@@ -8,8 +8,11 @@ use crate::rendering::{
     layout::size_estimation_system::parent_size_estimator, 
 };
 
-
-pub fn resolve_deficits(
+/*
+ * Function to resolve horizontal space deficits in a flex row container,
+ * by applying flex shrink, shrinking text wrappers, and handling overflow.
+ */
+pub fn resolve_deficits_row(
     container: &mut Container,
     allocated_size: Size,
     requested_width: f32,
@@ -21,7 +24,7 @@ pub fn resolve_deficits(
 
     let effective_horizontal_space = allocated_size.width - container.get_styles().padding.unwrap_or_default().horizontal();
     
-    apply_flex_shrink(container, deficit);
+    apply_flex_shrink_width(container, deficit);
 
     let mut new_requested_width = parent_size_estimator::precompute_requested_children_width(container);
     let updated_deficit = requested_width - new_requested_width;
@@ -41,7 +44,7 @@ pub fn resolve_deficits(
 /*
  * Function to apply flex shrink to children to resolve horizontal space deficits.
  */
-fn apply_flex_shrink(container: &mut Container, deficit: &mut f32) {
+fn apply_flex_shrink_width(container: &mut Container, deficit: &mut f32) {
     let total_flex_shrink: f32 = container.children.iter()
         .map(|child| child.get_styles().flex_shrink.unwrap_or(0.0) * child.get_effective_size().width)
         .sum();

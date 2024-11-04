@@ -1,7 +1,7 @@
 use crate::rendering::elements::{common_types::Position, container::Container, element::Element, styles::JustifyContent};
 
 
-pub fn resolve_space_surplus(container: &Container, initial_position: Position, horizontal_surplus: f32) -> (Position, f32) {
+pub fn resolve_horizontal_space_surplus(container: &Container, initial_position: Position, horizontal_surplus: f32) -> (Position, f32) {
     let padding = container.get_styles().padding.unwrap_or_default();
     let num_children = container.children.len() as f32;
     let mut start_x = initial_position.x + padding.left.value;

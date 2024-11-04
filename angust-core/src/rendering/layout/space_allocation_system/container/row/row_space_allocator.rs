@@ -31,12 +31,12 @@ pub fn allocate_space_to_children_row_flex(
     }
 
     let mut horizontal_deficit = requested_width - allocated_size.width;
-    let scrollbar_offset = deficit_resolver::resolve_deficits(
+    let scrollbar_offset = deficit_resolver::resolve_deficits_row(
         container, allocated_size, requested_width, &mut horizontal_deficit
     );
 
     // Identify and resolve horizontal surplus according to justify-content
-    let (mut cursor_position, justify_content_spacing) = surplus_resolver::resolve_space_surplus(container, allocated_position, - horizontal_deficit);
+    let (mut cursor_position, justify_content_spacing) = surplus_resolver::resolve_horizontal_space_surplus(container, allocated_position, - horizontal_deficit);
     
     if overflow == Overflow::Auto {
         cursor_position.x -= scrollbar_offset;

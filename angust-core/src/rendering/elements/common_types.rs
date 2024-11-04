@@ -73,6 +73,7 @@ impl Default for OptionalSize {
 #[derive(Clone, Copy, Debug)]
 pub struct ScrollbarState {
     pub thumb_scrollbar_width_ratio: f32,
+    pub thumb_scrollbar_height_ratio: f32,
     pub is_overflowing: Directions,
     pub current_scroll_position: Position,
     pub is_dragging: bool,
@@ -85,6 +86,7 @@ impl Default for ScrollbarState {
     fn default() -> Self {
         Self {
             thumb_scrollbar_width_ratio: 1.0,
+            thumb_scrollbar_height_ratio: 1.0,
             is_overflowing: Directions {
                 horizontal: false,
                 vertical: false,
