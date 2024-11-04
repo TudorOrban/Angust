@@ -123,7 +123,7 @@ pub enum AlignItems {
 
 impl Default for AlignItems {
     fn default() -> Self {
-        Self::Stretch
+        Self::FlexStart
     }
 }
 

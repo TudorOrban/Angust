@@ -12,14 +12,14 @@ pub fn determine_allocated_position_column(
     child_effective_size: Size,
     index: usize,
 
-    children_max_height: f32, 
-    max_height_child_margin: Margin,
+    children_max_width: f32, 
+    max_width_child_margin: Margin,
     child_margin: Margin,
 ) -> Position {
     let child_x_position = compute_child_x_position(
         align_items, 
         cursor_position, child_effective_size, 
-        children_max_height, max_height_child_margin, child_margin
+        children_max_width, max_width_child_margin, child_margin
     );
     let child_y_position = compute_child_y_position(
         flex_wrap, overflow, spacing, justify_content_spacing, 

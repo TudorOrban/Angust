@@ -4,4 +4,3 @@ mod size_allocator;
 mod deficit_resolver;
 mod surplus_resolver;
 mod flex_wrap_allocator;
-mod utils;

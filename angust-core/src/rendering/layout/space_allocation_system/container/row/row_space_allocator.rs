@@ -7,7 +7,7 @@ use crate::rendering::{
     }, 
     layout::{
         size_estimation_system::{parent_size_estimator, percentage_size_estimator}, 
-        space_allocation_system::container::row::{flex_wrap_allocator, utils}
+        space_allocation_system::container::{row::flex_wrap_allocator, utils}
     }
 };
 

@@ -1,63 +1,69 @@
-use crate::rendering::elements::{common_types::{Position, Size}, container::Container, element::Element, styles::{AlignItems, Margin}};
+use crate::rendering::{
+    elements::{
+        common_types::{Position, Size},
+        container::Container,
+        element::Element,
+        styles::{FlexWrap, Overflow},
+    }, 
+    layout::{
+        size_estimation_system::{parent_size_estimator, percentage_size_estimator}, 
+        space_allocation_system::container::{column::flex_wrap_allocator, utils}
+    }
+};
 
-pub fn allocate_space_to_children_column_flex(container: &mut Container, allocated_position: Position, allocated_size: Size) {
-    let padding = container.get_styles().padding.unwrap_or_default();
-    let max_width = get_max_child_width(container) - padding.left.value - padding.right.value;
-    let align_items = container.get_styles().align_items.unwrap_or_default();
+use super::{deficit_resolver, position_allocator, size_allocator, surplus_resolver};
 
-    let mut current_position = Position {
-        x: allocated_position.x + padding.left.value,
-        y: allocated_position.y + padding.top.value,
-    };
+pub fn allocate_space_to_children_column_flex(
+    container: &mut Container,
+    allocated_position: Position,
+    allocated_size: Size,
+) {
+    let (spacing, align_items, flex_wrap, overflow) = utils::unwrap_container_styles(container);
 
-    for child in &mut container.children {
+    // Compute percentage width children effective sizes as allocated_size.width is now known in the second pass
+    percentage_size_estimator::estimate_percentage_height_sizes(container, allocated_size.height);
+
+    // Identify and resolve vertical deficits
+    let requested_height = parent_size_estimator::precompute_requested_children_height(container);
+    if requested_height > allocated_size.height && container.get_styles().flex_wrap.unwrap_or_default() != FlexWrap::NoWrap {
+        flex_wrap_allocator::allocate_space_to_column_flex_wrap(container, allocated_position, allocated_size);
+        return;
+    }
+
+    let mut vertical_deficit = requested_height - allocated_size.height;
+    let scrollbar_offset = deficit_resolver::resolve_deficits_column(
+        container, allocated_size, requested_height, &mut vertical_deficit
+    );
+
+    // Identify and resolve horizontal surplus according to justify-content
+    let (mut cursor_position, justify_content_spacing) = surplus_resolver::resolve_vertical_space_surplus(container, allocated_position, - vertical_deficit);
+    
+    if overflow == Overflow::Auto {
+        cursor_position.y -= scrollbar_offset;
+    }
+    
+    // Prepare AlignItems y computations
+    let all_indices: Vec<usize> = (0..container.children.len()).collect();
+    let (children_max_width, max_width_child_margin) = 
+        parent_size_estimator::get_max_width_child_properties(container, &all_indices);
+
+    for (index, child) in container.children.iter_mut().enumerate() {
         let child_effective_size = child.get_effective_size();
-        let margin = child.get_styles().margin.unwrap_or_default();
+        let child_margin = child.get_styles().margin.unwrap_or_default();
 
-        let child_position = compute_child_position_column(
-            child_effective_size, margin, align_items, max_width, current_position, allocated_size
+        let child_allocated_position = position_allocator::determine_allocated_position_column(
+            flex_wrap, overflow, align_items, spacing, justify_content_spacing,
+            cursor_position, child_effective_size, index,
+            children_max_width, max_width_child_margin, child_margin,
+        );
+        
+        let child_allocated_size = size_allocator::determine_allocated_size_column(
+            flex_wrap, overflow,
+            child_effective_size, allocated_size,
         );
 
-        child.allocate_space(child_position, child_effective_size);
+        child.allocate_space(child_allocated_position, child_allocated_size);
 
-        current_position.y += margin.top.value + child_effective_size.height + margin.bottom.value;
+        cursor_position.y = child_allocated_position.y + child_allocated_size.height + child_margin.bottom.value;
     }
-}
-
-fn compute_child_position_column(
-    child_effective_size: Size,
-    margin: Margin,
-    align_items: AlignItems, 
-    max_width: f32, 
-    current_position: Position,
-    parent_allocated_size: Size
-) -> Position {
-    let x_offset = get_x_offset_based_on_align_items(align_items, max_width, child_effective_size, margin);
-    Position {
-        x: (current_position.x + x_offset).min(parent_allocated_size.width),
-        y: (current_position.y + margin.top.value).min(parent_allocated_size.height),
-    }
-}
-
-fn get_x_offset_based_on_align_items(
-    align_items: AlignItems,
-    max_width: f32,
-    child_effective_size: Size,
-    margin: Margin
-) -> f32 {
-    match align_items {
-        AlignItems::FlexStart => margin.left.value,
-        AlignItems::FlexEnd => max_width - child_effective_size.width - margin.right.value,
-        AlignItems::Center => (max_width - child_effective_size.width) / 2.0 + margin.left.value,
-        AlignItems::Stretch | AlignItems::Baseline => margin.left.value, // Simplified; Baseline needs additional logic
-    }
-}
-
-fn get_max_child_width(container: &Container) -> f32 {
-    container.children.iter().fold(0.0, |acc, child| {
-        let margin = child.get_styles().margin.unwrap_or_default();
-        let child_effective_size = child.get_effective_size();
-        let total_child_width = margin.left.value + child_effective_size.width + margin.right.value;
-        f32::max(acc, total_child_width)
-    }) + container.get_styles().padding.unwrap_or_default().horizontal()
 }

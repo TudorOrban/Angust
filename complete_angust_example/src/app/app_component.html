@@ -1,27 +1,27 @@
-<div style="display: flex; flex-direction: row; width: 1800px;">
+<div style="width: 1800px; height: 1200px;">
     
-    <router-component></router-component>
-    
-    <button style="display: flex; flex-direction: row; background-color: rgb(255, 0, 0); width: 400px; height: 200px;" @onclick="change_route('/header')">
-        <div style="display: flex; flex-direction: row; background-color: rgb(255, 0, 0); width: 400px; height: 200px;">
+    <!-- <router-component></router-component> -->
+
+    <button style="background-color: rgb(255, 0, 0); width: 400px; height: 200px;" @onclick="change_route('/header')">
+        <div style="background-color: rgb(255, 0, 0); width: 400px; height: 200px;">
 
         </div>
     </button>
 
-    <button style="display: flex; flex-direction: row; background-color: rgb(0, 255, 0); width: 400px; height: 200px;" @onclick="change_route('/main-menu/1')">
-        <div style="display: flex; flex-direction: row; background-color: rgb(0, 255, 0); width: 400px; height: 200px;">
+    <button style="background-color: rgb(0, 255, 0); width: 600px; height: 200px;" @onclick="change_route('/main-menu/1')">
+        <div style="background-color: rgb(0, 255, 0); width: 600px; height: 200px;">
 
         </div>
     </button>
 
-    <button style="display: flex; flex-direction: row; background-color: rgb(0, 0, 255); width: 400px; height: 200px;" @onclick="go_back('/router')">
-        <div style="display: flex; flex-direction: row; background-color: rgb(0, 0, 255); width: 400px; height: 200px;">
+    <button style="background-color: rgb(0, 0, 255); width: 400px; height: 200px;" @onclick="go_back('/router')">
+        <div style="background-color: rgb(0, 0, 255); width: 400px; height: 200px;">
 
         </div>
     </button>
 
-    <button style="display: flex; flex-direction: row; background-color: rgb(255, 255, 0); width: 400px; height: 200px;" @onclick="go_forward('/header')">
-        <div style="display: flex; flex-direction: row; background-color: rgb(255, 255, 0); width: 400px; height: 200px;">
+    <button style="background-color: rgb(255, 255, 0); width: 400px; height: 200px;" @onclick="go_forward('/header')">
+        <div style="background-color: rgb(255, 255, 0); width: 400px; height: 200px;">
 
         </div>
     </button>
