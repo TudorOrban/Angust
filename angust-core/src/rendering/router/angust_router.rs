@@ -5,7 +5,7 @@ use super::router_proxy::RouteConfiguration;
 
 pub struct Router {
     pub route_config: RouteConfiguration,
-    pub current_route: String,
+    current_route: String,
     current_params: HashMap<String, String>,
     history: VecDeque<(String, HashMap<String, String>)>,
     forward_stack: VecDeque<(String, HashMap<String, String>)>,  
@@ -81,6 +81,10 @@ impl Router {
     }
 
     // Getters
+    pub fn get_current_route(&self) -> String {
+        self.current_route.clone()
+    }
+    
     pub fn get_current_params(&self) -> HashMap<String, String> {
         self.current_params.clone()
     }

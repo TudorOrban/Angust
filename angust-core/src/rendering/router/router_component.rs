@@ -10,8 +10,7 @@ use crate::{
             element::{Element, ElementType, EventType}, 
             element_id_generator::ElementIDGenerator, 
             styles::Styles
-        }, 
-        layout::effective_size_estimator
+        }, layout::size_estimation_system::effective_size_estimator, 
     }
 };
 

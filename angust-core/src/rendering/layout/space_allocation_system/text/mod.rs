@@ -1,1 +1,1 @@
-pub mod size_estimator;
+pub mod text_size_estimator;

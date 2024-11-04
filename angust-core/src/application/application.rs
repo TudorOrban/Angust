@@ -241,7 +241,7 @@ impl<State> ApplicationHandler<ApplicationEvent> for Application<State> {
         match event {
             ApplicationEvent::StateChange(component_id) => {
                 self.renderer.react_to_state_change(component_id);
-                self.renderer.layout();
+                self.renderer.layout(); // Naive approach for now, should be optimized
                 self.windowing_system.window.request_redraw();
             },
             ApplicationEvent::ExecuteTask(executor) => {

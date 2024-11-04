@@ -2,7 +2,7 @@ use std::{any::Any, collections::HashMap};
 
 use skia_safe::{Canvas, Color, Point};
 
-use crate::rendering::{layout::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer};
+use crate::rendering::{layout::size_estimation_system::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer};
 
 use super::{
     common_types::{OptionalSize, Position, Size}, 

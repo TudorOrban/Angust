@@ -1,9 +1,15 @@
-use crate::rendering::{elements::{
-    common_types::{Position, Size},
-    container::Container,
-    element::Element,
-    styles::{FlexWrap, Overflow},
-}, layout::{effective_size_estimator, space_allocation_system::container::row::{flex_wrap_allocator, utils}}};
+use crate::rendering::{
+    elements::{
+        common_types::{Position, Size},
+        container::Container,
+        element::Element,
+        styles::{FlexWrap, Overflow},
+    }, 
+    layout::{
+        size_estimation_system::{effective_size_estimator, percentage_size_estimator}, 
+        space_allocation_system::container::row::{flex_wrap_allocator, utils}
+    }
+};
 
 use super::{deficit_resolver, position_allocator, size_allocator, surplus_resolver};
 
@@ -15,7 +21,7 @@ pub fn allocate_space_to_children_row_flex(
     let (spacing, align_items, flex_wrap, overflow) = utils::unwrap_container_styles(container);
 
     // Compute percentage width children effective sizes as allocated_size.width is now known in the second pass
-    effective_size_estimator::estimate_percentage_width_sizes(container, allocated_size.width);
+    percentage_size_estimator::estimate_percentage_width_sizes(container, allocated_size.width);
 
     // Identify and resolve horizontal deficits
     let requested_width = effective_size_estimator::precompute_requested_children_width(container);

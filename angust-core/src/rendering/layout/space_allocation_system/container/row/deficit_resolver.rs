@@ -1,4 +1,12 @@
-use crate::rendering::{elements::{common_types::{OptionalSize, Size}, container::Container, element::Element, styles::{Dimension, Directions, Overflow, Unit, WhiteSpace}}, layout::effective_size_estimator};
+use crate::rendering::{
+    elements::{
+        common_types::{OptionalSize, Size}, 
+        container::Container, 
+        element::Element, 
+        styles::{Dimension, Directions, Overflow, Unit, WhiteSpace}
+    }, 
+    layout::size_estimation_system::effective_size_estimator, 
+};
 
 
 pub fn resolve_deficits(

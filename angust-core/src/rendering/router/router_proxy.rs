@@ -23,16 +23,6 @@ pub fn get_router() -> RouterProxy {
 pub struct RouterProxy;
 
 impl RouterProxy {
-    pub fn get_current_route(&self) -> String {
-        let router = GLOBAL_ROUTER.lock().unwrap();
-        router.current_route.clone()
-    }
-
-    pub fn get_current_component_name(&self) -> Option<String> {
-        let router = GLOBAL_ROUTER.lock().unwrap();
-        router.route_config.routes.get(&router.current_route).cloned()
-    }
-
     pub fn subscribe_to_current_route(&self, callback: RouteChangeCallback) {
         let mut router = GLOBAL_ROUTER.lock().unwrap();
         router.subscribe(callback);
@@ -56,6 +46,17 @@ impl RouterProxy {
     pub fn go_forward(&self) {
         let mut router = GLOBAL_ROUTER.lock().unwrap();
         router.go_forward();
+    }
+
+    // Getters
+    pub fn get_current_route(&self) -> String {
+        let router = GLOBAL_ROUTER.lock().unwrap();
+        router.get_current_route().clone()
+    }
+
+    pub fn get_current_component_name(&self) -> Option<String> {
+        let router = GLOBAL_ROUTER.lock().unwrap();
+        router.route_config.routes.get(&router.get_current_route()).cloned()
     }
 
     pub fn get_history(&self) -> Vec<(String, HashMap<String, String>)> {

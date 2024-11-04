@@ -3,7 +3,7 @@ use std::{any::Any, collections::HashMap};
 use skia_safe::{Canvas, Color, Point};
 
 use crate::rendering::{
-    layout::space_allocation_system::text::size_estimator::{determine_text_element_lines, estimate_text_element_size}, 
+    layout::space_allocation_system::text::text_size_estimator::{determine_text_element_lines, estimate_text_element_size}, 
     rendering_interface::element_renderer::ElementRenderer
 };
 

@@ -2,12 +2,16 @@ use std::{any::Any, collections::HashMap};
 
 use skia_safe::{Canvas, Color, Point};
 
-use crate::{application::event_handling::scrollbar_movement_handler::handle_scrollbar_movement, rendering::{
-    layout::{
-        effective_size_estimator, size_estimator, space_allocation_system::container::container_space_allocator
-    },
-    rendering_interface::element_renderer::ElementRenderer,
-}};
+use crate::{
+    application::event_handling::scrollbar_movement_handler::handle_scrollbar_movement, 
+    rendering::{
+        layout::{
+            size_estimation_system::{effective_size_estimator, size_estimator}, 
+            space_allocation_system::container::container_space_allocator
+        },
+        rendering_interface::element_renderer::ElementRenderer,
+    }
+};
 
 use super::{
     common_types::{OptionalSize, Position, ScrollbarState, Size}, 

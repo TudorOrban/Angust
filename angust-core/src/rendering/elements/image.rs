@@ -6,8 +6,7 @@ use skia_safe::{Canvas, Point};
 use crate::{
     application::resource_loader::image_loader, 
     rendering::{
-        layout::effective_size_estimator, 
-        rendering_interface::element_renderer::ElementRenderer
+        layout::size_estimation_system::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer
     }
 };
 

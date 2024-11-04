@@ -13,8 +13,7 @@ use crate::{
             element_id_generator::ElementIDGenerator, 
             event_propagator, 
             styles::Styles
-        },  
-        layout::effective_size_estimator
+        }, layout::size_estimation_system::effective_size_estimator,  
     }
 };
 

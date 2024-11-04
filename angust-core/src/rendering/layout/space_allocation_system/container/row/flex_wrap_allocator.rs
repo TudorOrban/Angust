@@ -1,4 +1,7 @@
-use crate::rendering::{elements::{common_types::{Position, Size}, container::Container, element::Element}, layout::effective_size_estimator};
+use crate::rendering::{
+    elements::{common_types::{Position, Size}, container::Container, element::Element}, 
+    layout::size_estimation_system::effective_size_estimator, 
+};
 
 use super::{position_allocator, size_allocator, utils};
 
