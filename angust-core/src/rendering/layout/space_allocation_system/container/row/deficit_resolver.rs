@@ -112,7 +112,7 @@ fn shrink_text_wrapper_children(
     }
 
     let min_width_per_text_wrapper = 100.0;
-    let reduction_ratio = determine_reduction_ratio(container, deficit.clone(), min_width_per_text_wrapper);    
+    let reduction_ratio = determine_reduction_ratio(container, deficit.clone(), min_width_per_text_wrapper);  
 
     for child in &mut container.children {
         if !is_text_wrapper_shrinkable(child) {
@@ -122,6 +122,7 @@ fn shrink_text_wrapper_children(
         let current_size = child.get_effective_size();
         let reducible_amount = current_size.width - min_width_per_text_wrapper;
         let reduction = reducible_amount * reduction_ratio;
+        println!("Reduction: {:?}", reduction);
         let new_width = current_size.width - reduction;
 
         child.set_natural_size(Size {
@@ -162,4 +163,71 @@ fn is_text_wrapper_shrinkable(
     child: &Box<dyn Element>,
 ) -> bool {
     child.is_text_wrapper() && child.get_styles().white_space.unwrap_or_default() == WhiteSpace::Normal
+}
+
+
+// Tests
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::rendering::elements::{common_types::OptionalSize, styles::{Dimension, Margin, Padding, Styles, Unit, WhiteSpace}, text::Text};
+
+    #[test]
+    fn test_shrink_text_wrapper_children() {
+        // Arrange
+        let mut container = Container::new();
+        container.set_styles(Styles {
+            padding: Some(Padding {
+                left: Dimension { value: 10.0, unit: Unit::Px },
+                right: Dimension { value: 10.0, unit: Unit::Px },
+                ..Default::default()
+            }),
+            ..Default::default()
+        });
+
+        let mut first_child = Container::new();
+        first_child.set_requested_size(OptionalSize {
+            width: Some(Dimension { value: 600.0, unit: Unit::Px }),
+            height: Some(Dimension { value: 50.0, unit: Unit::Px })
+        });
+        first_child.set_styles(Styles {
+            margin: Some(Margin {
+                left: Dimension { value: 5.0, unit: Unit::Px },
+                right: Dimension { value: 5.0, unit: Unit::Px },
+                ..Default::default()
+            }),
+            white_space: Some(WhiteSpace::Normal),
+            ..Default::default()
+        });
+        first_child.add_child(Box::new(Text::new("Some content".to_string())));
+
+        let mut second_child = Container::new();
+        second_child.set_requested_size(OptionalSize {
+            width: Some(Dimension { value: 900.0, unit: Unit::Px }),
+            height: Some(Dimension { value: 50.0, unit: Unit::Px })
+        });
+        second_child.set_styles(Styles {
+            margin: Some(Margin {
+                left: Dimension { value: 5.0, unit: Unit::Px },
+                right: Dimension { value: 5.0, unit: Unit::Px },
+                ..Default::default()
+            }),
+            white_space: Some(WhiteSpace::Normal),
+            ..Default::default()
+        });
+        second_child.add_child(Box::new(Text::new("Some more content".to_string())));
+
+        container.add_child(Box::new(first_child));
+        container.add_child(Box::new(second_child));
+
+        let mut deficit = 200.0;
+
+        // Act
+        shrink_text_wrapper_children(&mut container, &mut deficit);
+
+        // Assert
+        assert!(container.children[0].get_natural_size().width < 600.0);
+        assert!(container.children[1].get_natural_size().width < 900.0);
+        assert!(deficit < 150.0);  // Deficit should be reduced
+    }
 }
