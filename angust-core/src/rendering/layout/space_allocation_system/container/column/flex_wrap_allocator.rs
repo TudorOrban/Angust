@@ -5,7 +5,6 @@ use crate::rendering::{
 
 use super::{position_allocator, size_allocator};
 
-#[allow(dead_code)]
 pub fn allocate_space_to_column_flex_wrap(
     container: &mut Container,
     allocated_position: Position,

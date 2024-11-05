@@ -13,7 +13,6 @@ use crate::rendering::{
  * Function to resolve horizontal space deficits in a flex column container,
  * by applying flex shrink, shrinking text wrappers, and handling overflow.
  */
-#[allow(dead_code)]
 pub fn resolve_deficits_column(
     container: &mut Container,
     allocated_size: Size,

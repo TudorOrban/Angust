@@ -13,6 +13,10 @@ use crate::rendering::{
 
 use super::{deficit_resolver, position_allocator, size_allocator, surplus_resolver};
 
+
+/*
+ * Function to allocate space to children in a flex row container.
+ */
 pub fn allocate_space_to_children_row_flex(
     container: &mut Container,
     allocated_position: Position,

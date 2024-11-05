@@ -1,6 +1,5 @@
 use crate::rendering::elements::{common_types::Position, container::Container, element::Element, styles::JustifyContent};
 
-#[allow(dead_code)]
 pub fn resolve_vertical_space_surplus(container: &Container, initial_position: Position, vertical_surplus: f32) -> (Position, f32) {
     let padding = container.get_styles().padding.unwrap_or_default();
     let num_children = container.children.len() as f32;

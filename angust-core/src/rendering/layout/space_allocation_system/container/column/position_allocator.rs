@@ -1,6 +1,5 @@
 use crate::rendering::elements::{common_types::{Position, Size}, styles::{AlignItems, FlexWrap, Margin, Overflow, Spacing}};
 
-#[allow(dead_code)]
 pub fn determine_allocated_position_column(
     flex_wrap: FlexWrap,
     overflow: Overflow,
