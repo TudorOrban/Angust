@@ -5,7 +5,7 @@ use crate::rendering::{
         element::Element, 
         styles::{Dimension, Directions, Overflow, Unit, WhiteSpace}
     }, 
-    layout::size_estimation_system::parent_size_estimator, 
+    layout::size_estimation_system::child_size_estimator, 
 };
 
 /*
@@ -26,7 +26,7 @@ pub fn resolve_deficits_row(
     
     apply_flex_shrink_width(container, deficit);
 
-    let mut new_requested_width = parent_size_estimator::precompute_requested_children_width(container);
+    let mut new_requested_width = child_size_estimator::precompute_requested_children_width(container);
     let updated_deficit = requested_width - new_requested_width;
     *deficit = updated_deficit.max(0.0);
 
@@ -84,7 +84,7 @@ fn handle_overflow(
         Overflow::Auto | Overflow::Scroll => {
             shrink_text_wrapper_children(container, deficit);
             // Recompute requested width after shrinking text wrappers
-            *new_requested_width = parent_size_estimator::precompute_requested_children_width(container);
+            *new_requested_width = child_size_estimator::precompute_requested_children_width(container);
             
             container.scrollbar_state.thumb_scrollbar_width_ratio =
                 effective_horizontal_space / new_requested_width.clone();

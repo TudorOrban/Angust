@@ -5,7 +5,7 @@ use crate::rendering::{
         element::Element, 
         styles::{Dimension, Directions, Overflow, Unit}
     }, 
-    layout::size_estimation_system::parent_size_estimator, 
+    layout::size_estimation_system::child_size_estimator, 
 };
 
 
@@ -28,7 +28,7 @@ pub fn resolve_deficits_column(
     
     apply_flex_shrink_height(container, deficit);
 
-    let mut new_requested_height = parent_size_estimator::precompute_requested_children_height(container);
+    let mut new_requested_height = child_size_estimator::precompute_requested_children_height(container);
     let updated_deficit = requested_height - new_requested_height;
     *deficit = updated_deficit.max(0.0);
 

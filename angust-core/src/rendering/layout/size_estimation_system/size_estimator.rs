@@ -82,3 +82,70 @@ pub fn estimate_leaf_container_sizes(container: &mut Container) {
         container.set_requested_size(estimated_requested_size);
     }
 }
+
+
+// Tests
+#[cfg(test)]
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::rendering::elements::{common_types::OptionalSize, styles::{Dimension, Margin, Padding, Spacing, Styles, Unit}};
+
+    #[test]
+    fn test_estimate_row_parent_natural_size() {
+        // Arrange
+        let mut container = Container::new();
+        container.set_styles(Styles {
+            padding: Some(Padding {
+                left: Dimension { value: 10.0, unit: Unit::Px }, 
+                right: Dimension { value: 10.0, unit: Unit::Px },
+                top: Dimension { value: 5.0, unit: Unit::Px },
+                bottom: Dimension { value: 5.0, unit: Unit::Px }
+            }),
+            spacing: Some(Spacing { spacing_x: Dimension { value: 5.0, unit: Unit::Px }, ..Default::default() }),
+            ..Default::default()
+        });
+
+        let mut first_child = Container::new();
+        first_child.set_styles(Styles {
+            margin: Some(Margin {
+                left: Dimension { value: 3.0, unit: Unit::Px },
+                right: Dimension { value: 3.0, unit: Unit::Px },
+                top: Dimension { value: 2.0, unit: Unit::Px },
+                bottom: Dimension { value: 2.0, unit: Unit::Px }
+            }),
+            ..Default::default()
+        });
+        first_child.set_requested_size(OptionalSize {
+            width: Some(Dimension { value: 100.0, unit: Unit::Px }),
+            height: Some(Dimension { value: 50.0, unit: Unit::Px })
+        });
+
+        let mut second_child = Container::new();
+        second_child.set_styles(Styles {
+            margin: Some(Margin {
+                left: Dimension { value: 2.0, unit: Unit::Px },
+                right: Dimension { value: 2.0, unit: Unit::Px },
+                top: Dimension { value: 1.0, unit: Unit::Px },
+                bottom: Dimension { value: 1.0, unit: Unit::Px }
+            }),
+            ..Default::default()
+        });
+        second_child.set_requested_size(OptionalSize {
+            width: Some(Dimension { value: 150.0, unit: Unit::Px }),
+            height: Some(Dimension { value: 60.0, unit: Unit::Px })
+        });
+
+        container.add_child(Box::new(first_child));
+        container.add_child(Box::new(second_child));
+
+        // Act
+        let size = estimate_row_parent_natural_size(&mut container);
+
+        // Assert
+        let expected_width = 10.0 + 3.0 + 100.0 + 3.0 + 5.0 + 2.0 + 150.0 + 2.0 + 10.0; // Padding + first child margins + first child width + spacing + second child margins + second child width + padding
+        let expected_height = 5.0 + 60.0 + 2.0 + 5.0; // Container top padding + max child height (including max vertical margin) + container bottom padding
+        assert_eq!(size.width, expected_width);
+        assert_eq!(size.height, expected_height);
+    }
+}

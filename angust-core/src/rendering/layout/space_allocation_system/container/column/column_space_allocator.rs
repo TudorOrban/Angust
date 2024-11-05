@@ -6,7 +6,7 @@ use crate::rendering::{
         styles::{FlexWrap, Overflow},
     }, 
     layout::{
-        size_estimation_system::{parent_size_estimator, percentage_size_estimator}, 
+        size_estimation_system::{child_size_estimator, percentage_size_estimator}, 
         space_allocation_system::container::{column::flex_wrap_allocator, utils}
     }
 };
@@ -24,7 +24,7 @@ pub fn allocate_space_to_children_column_flex(
     percentage_size_estimator::estimate_percentage_height_sizes(container, allocated_size.height);
 
     // Identify and resolve vertical deficits
-    let requested_height = parent_size_estimator::precompute_requested_children_height(container);
+    let requested_height = child_size_estimator::precompute_requested_children_height(container);
     if requested_height > allocated_size.height && container.get_styles().flex_wrap.unwrap_or_default() != FlexWrap::NoWrap {
         flex_wrap_allocator::allocate_space_to_column_flex_wrap(container, allocated_position, allocated_size);
         return;
@@ -45,7 +45,7 @@ pub fn allocate_space_to_children_column_flex(
     // Prepare AlignItems y computations
     let all_indices: Vec<usize> = (0..container.children.len()).collect();
     let (children_max_width, max_width_child_margin) = 
-        parent_size_estimator::get_max_width_child_properties(container, &all_indices);
+        child_size_estimator::get_max_width_child_properties(container, &all_indices);
 
     for (index, child) in container.children.iter_mut().enumerate() {
         let child_effective_size = child.get_effective_size();

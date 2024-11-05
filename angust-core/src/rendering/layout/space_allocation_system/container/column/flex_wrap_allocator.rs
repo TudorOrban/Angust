@@ -1,6 +1,6 @@
 use crate::rendering::{
     elements::{common_types::{Position, Size}, container::Container, element::Element}, 
-    layout::{size_estimation_system::parent_size_estimator, space_allocation_system::container::utils}, 
+    layout::{size_estimation_system::child_size_estimator, space_allocation_system::container::utils}, 
 };
 
 use super::{position_allocator, size_allocator};
@@ -21,7 +21,7 @@ pub fn allocate_space_to_column_flex_wrap(
 
     for line in children_lines {
         let (line_max_width, line_max_width_child_margin) = 
-            parent_size_estimator::get_max_width_child_properties(container, &line.children_indices);
+            child_size_estimator::get_max_width_child_properties(container, &line.children_indices);
 
         for &child_index in &line.children_indices {
             let child = &mut container.children[child_index];
