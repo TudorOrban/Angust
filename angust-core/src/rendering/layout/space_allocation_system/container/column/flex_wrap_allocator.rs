@@ -12,7 +12,7 @@ pub fn allocate_space_to_column_flex_wrap(
 ) {
     let (spacing, align_items, flex_wrap, overflow) = utils::unwrap_container_styles(container);
 
-    let children_lines = group_children_into_lines(container, allocated_size);
+    let children_lines = group_children_into_column_lines(container, allocated_size);
 
     let mut cursor_position = allocated_position;
     cursor_position.x += container.get_styles().padding.unwrap_or_default().left.value;
@@ -51,7 +51,7 @@ pub fn allocate_space_to_column_flex_wrap(
 /*
  * Group children into lines based on the available width.
  */
-fn group_children_into_lines(container: &Container, allocated_size: Size) -> Vec<Line> {
+fn group_children_into_column_lines(container: &Container, allocated_size: Size) -> Vec<Line> {
     let mut lines: Vec<Line> = Vec::new();
     let mut current_line = Line {
         children_indices: Vec::new(),
@@ -97,4 +97,132 @@ struct Line {
     children_indices: Vec<usize>,  // Store indices to the children
     total_height: f32,
     max_width: f32,
+}
+
+
+// Tests
+#[cfg(test)]
+mod tests {
+    use crate::rendering::elements::{common_types::OptionalSize, styles::{Dimension, Margin, Padding, Spacing, Styles, Unit}};
+
+    use super::*; 
+    
+    #[test]
+    fn test_allocate_space_to_column_flex_wrap() {
+        // Arrange
+        let mut container = Container::new();
+        container.set_styles(Styles {
+            padding: Some(Padding {
+                top: Dimension { value: 10.0, unit: Unit::Px },
+                left: Dimension { value: 5.0, unit: Unit::Px },
+                ..Default::default()
+            }),
+            ..Default::default()
+        });
+
+        let mut child = Container::new();
+        child.set_requested_size(OptionalSize {
+            width: Some(Dimension { value: 50.0, unit: Unit::Px }),
+            height: Some(Dimension { value: 100.0, unit: Unit::Px })
+        });
+        child.set_styles(Styles {
+            margin: Some(Margin {
+                top: Dimension { value: 5.0, unit: Unit::Px },
+                bottom: Dimension { value: 5.0, unit: Unit::Px },
+                ..Default::default()
+            }),
+            ..Default::default()
+        });
+
+        container.add_child(Box::new(child));
+
+        let allocated_position = Position { x: 0.0, y: 0.0 };
+        let allocated_size = Size { width: 100.0, height: 300.0 };
+        
+        // Act
+        allocate_space_to_column_flex_wrap(&mut container, allocated_position, allocated_size);
+
+        // Assert
+        let allocated_child = &container.children[0];
+        assert_eq!(allocated_child.get_position().y, 15.0); // 10 padding + 5 margin
+        assert_eq!(allocated_child.get_position().x, 5.0);  // 5 padding
+        assert_eq!(allocated_child.get_size().height, 100.0);
+        assert_eq!(allocated_child.get_size().width, 50.0);
+    }
+
+    #[test]
+    fn test_group_children_into_columns() {
+        // Arrange
+        let mut container = Container::new();
+        container.set_styles(Styles {
+            padding: Some(Padding {
+                top: Dimension { value: 10.0, unit: Unit::Px },
+                bottom: Dimension { value: 10.0, unit: Unit::Px },
+                ..Default::default()
+            }),
+            spacing: Some(Spacing {
+                spacing_y: Dimension { value: 5.0, unit: Unit::Px },
+                ..Default::default()
+            }),
+            ..Default::default()
+        });
+
+        let mut first_child = Container::new();
+        first_child.set_requested_size(OptionalSize {
+            width: Some(Dimension { value: 20.0, unit: Unit::Px }),
+            height: Some(Dimension { value: 100.0, unit: Unit::Px })
+        });
+        first_child.set_styles(Styles {
+            margin: Some(Margin {
+                top: Dimension { value: 5.0, unit: Unit::Px },
+                bottom: Dimension { value: 5.0, unit: Unit::Px },
+                ..Default::default()
+            }),
+            ..Default::default()
+        });
+
+        let mut second_child = Container::new();
+        second_child.set_requested_size(OptionalSize {
+            width: Some(Dimension { value: 25.0, unit: Unit::Px }),
+            height: Some(Dimension { value: 150.0, unit: Unit::Px })
+        });
+        second_child.set_styles(Styles {
+            margin: Some(Margin {
+                top: Dimension { value: 3.0, unit: Unit::Px },
+                bottom: Dimension { value: 3.0, unit: Unit::Px },
+                ..Default::default()
+            }),
+            ..Default::default()
+        });
+
+        let mut third_child = Container::new();
+        third_child.set_requested_size(OptionalSize {
+            width: Some(Dimension { value: 30.0, unit: Unit::Px }),
+            height: Some(Dimension { value: 200.0, unit: Unit::Px })
+        });
+        third_child.set_styles(Styles {
+            margin: Some(Margin {
+                top: Dimension { value: 2.0, unit: Unit::Px },
+                bottom: Dimension { value: 2.0, unit: Unit::Px },
+                ..Default::default()
+            }),
+            ..Default::default()
+        });
+
+        container.add_child(Box::new(first_child));
+        container.add_child(Box::new(second_child));
+        container.add_child(Box::new(third_child));
+
+        let allocated_size = Size { width: 100.0, height: 300.0 }; // Constraint the height to 300.0 to force wrapping.
+
+        // Act
+        let columns = group_children_into_column_lines(&container, allocated_size);
+
+        // Assert
+        assert_eq!(columns.len(), 2);  // Expect two columns due to height constraints.
+        assert_eq!(columns[0].children_indices, vec![0, 1]);  // First and second child fit on the first column.
+        assert_eq!(columns[1].children_indices, vec![2]);  // Third child wraps to the next column.
+        assert!(columns[0].total_height > 0.0 && columns[1].total_height > 0.0);
+        assert!(columns[0].max_width == 25.0 && columns[1].max_width == 30.0);  // Check max width of each column.
+    }
 }
