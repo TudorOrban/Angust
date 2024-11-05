@@ -80,3 +80,34 @@ pub fn compute_child_y_position(
 
     cursor_position.y + offset
 }
+
+
+// Tests
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::rendering::elements::{common_types::Position, styles::{Dimension, Margin, Unit}};
+
+    #[test]
+    fn test_compute_child_y_position() {
+        let cases = vec![
+            (AlignItems::FlexStart, Position { x: 0.0, y: 100.0 }, Size { width: 50.0, height: 20.0 }, 50.0, Margin { top: Dimension { value: 5.0, unit: Unit::Px }, bottom: Dimension { value: 5.0, unit: Unit::Px }, ..Default::default() }, Margin { top: Dimension { value: 10.0, unit: Unit::Px }, bottom: Dimension { value: 5.0, unit: Unit::Px }, ..Default::default() }, 110.0),
+            (AlignItems::FlexEnd, Position { x: 0.0, y: 100.0 }, Size { width: 50.0, height: 20.0 }, 50.0, Margin { top: Dimension { value: 5.0, unit: Unit::Px }, bottom: Dimension { value: 5.0, unit: Unit::Px }, ..Default::default() }, Margin { top: Dimension { value: 10.0, unit: Unit::Px }, bottom: Dimension { value: 15.0, unit: Unit::Px }, ..Default::default() }, 125.0),
+            (AlignItems::Center, Position { x: 0.0, y: 100.0 }, Size { width: 50.0, height: 20.0 }, 50.0, Margin { top: Dimension { value: 5.0, unit: Unit::Px }, bottom: Dimension { value: 5.0, unit: Unit::Px }, ..Default::default() }, Margin { top: Dimension { value: 10.0, unit: Unit::Px }, bottom: Dimension { value: 5.0, unit: Unit::Px }, ..Default::default() }, 120.0),
+            (AlignItems::Stretch, Position { x: 0.0, y: 100.0 }, Size { width: 50.0, height: 20.0 }, 50.0, Margin { top: Dimension { value: 5.0, unit: Unit::Px }, bottom: Dimension { value: 5.0, unit: Unit::Px }, ..Default::default() }, Margin { top: Dimension { value: 10.0, unit: Unit::Px }, bottom: Dimension { value: 5.0, unit: Unit::Px }, ..Default::default() }, 110.0),
+            (AlignItems::Baseline, Position { x: 0.0, y: 100.0 }, Size { width: 50.0, height: 20.0 }, 50.0, Margin { top: Dimension { value: 5.0, unit: Unit::Px }, bottom: Dimension { value: 5.0, unit: Unit::Px }, ..Default::default() }, Margin { top: Dimension { value: 10.0, unit: Unit::Px }, bottom: Dimension { value: 5.0, unit: Unit::Px }, ..Default::default() }, 110.0),
+        ];
+
+        for (align_items, cursor_position, child_size, max_height, max_height_margin, child_margin, expected_y) in cases {
+            let result_y = compute_child_y_position(
+                align_items,
+                cursor_position,
+                child_size,
+                max_height,
+                max_height_margin,
+                child_margin
+            );
+            assert!((result_y - expected_y).abs() < f32::EPSILON, "Failed at {:?} alignment, expected {}, got {}", align_items, expected_y, result_y);
+        }
+    }
+}
