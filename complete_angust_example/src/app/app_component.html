@@ -1,11 +1,21 @@
-<div style="width: 1800px; height: 1200px;">
+<div style="width: 1800px; height: 1200px; padding: 20px 20px 20px 20px;">
     
     <!-- <router-component></router-component> -->
+    <div style="display: flex; flex-direction: row;">
+        <div style="width: 300px; height: 1200px; padding: 20px 20px 20px 20px;">
+            <router-component></router-component>
+        </div>
+
+        <div style="width: 1500px; height: 1200px; padding: 20px 20px 20px 20px;">
+
+        </div>
+    </div>
 
     <button style="background-color: rgb(255, 0, 0); width: 400px; height: 200px;" @onclick="change_route('/header')">
         <div style="background-color: rgb(255, 0, 0); width: 400px; height: 200px;">
 
         </div>
+        
     </button>
 
     <button style="background-color: rgb(0, 255, 0); width: 600px; height: 200px;" @onclick="change_route('/main-menu/1')">
@@ -26,6 +36,90 @@
         </div>
     </button>
 
+    <div>
+        "rite the code
+
+        Then, open main.rs and replace the contents of the file with:
+        
+        use mini_redis::{client, Result};
+        
+        #[tokio::main]
+        async fn main() -> Result<()> {
+            // Open a connection to the mini-redis address.
+            let mut client = client::connect("127.0.0.1:6379").await?;
+        
+            // Set the key "hello" with value "world"
+            client.set("hello", "world".into()).await?;
+        
+            // Get key "hello"
+            let result = client.get("hello").await?;
+        
+            println!("got value from the server; result={:?}", result);
+        
+            Ok(())
+        }
+        
+        Make sure the Mini-Redis server is running. In a separate terminal window, run:
+        
+        $ mini-redis-server
+        
+        If you have not already installed mini-redis, you can do so with
+        
+        $ cargo install mini-redis
+        
+        Now, run the my-redis application:
+        
+        $ cargo run
+        got value from the server; result=Some(b"world")
+        
+        Success!
+        
+        You can find the full code here.
+        Breaking it down
+        
+        Let's take some time to go over what we just did. There isn't much code, but a lot is happening.
+        
+        let mut client = client::connect("127.0.0.1:6379").await?;
+        
+        The client::connect function is provided by the mini-redis crate. It asynchronously establishes a TCP connection with the specified remote address. Once the connection is established, a client handle is returned. Even though the operation is performed asynchronously, the code we write looks synchronous. The only indication that the operation is asynchronous is the .await operator.
+        What is asynchronous programming?
+        
+        Most computer programs are executed in the same order in which they are written. The first line executes, then the next, and so on. With synchronous programming, when a program encounters an operation that cannot be completed immediately, it will block until the operation completes. For example, establishing a TCP connection requires an exchange with a peer over the network, which can take a sizeable amount of time. During this time, the thread is blocked.
+        
+        With asynchronous programming, operations that cannot complete immediately are suspended to the background. The thread is not blocked, and can continue running other things. Once the operation completes, the task is unsuspended and continues processing from where it left off. Our example from before only has one task, so nothing happens while it is suspended, but asynchronous programs typically have many such tasks.
+        
+        Although asynchronous programming can result in faster applications, it often results in much more complicated programs. The programmer is required to track all the state necessary to resume work once the asynchronous operation completes. Historically, this is a tedious and error-prone task.
+        Compile-time green-threading
+        
+        Rust implements asynchronous programming using a feature called async/await. Functions that perform asynchronous operations are labeled with the async keyword. In our example, the connect function is defined like this:
+        
+        use mini_redis::Result;
+        use mini_redis::client::Client;
+        use tokio::net::ToSocketAddrs;
+        
+            // ...
+        
+        The async fn definition looks like a regular synchronous function, but operates asynchronously. Rust transforms the async fn at compile time into a routine that operates asynchronously. Any calls to .await within the async fn yield control back to the thread. The thread may do other work while the operation processes in the background.
+        
+            Although other languages implement async/await too, Rust takes a unique approach. Primarily, Rust's async operations are lazy. This results in different runtime semantics than other languages.
+        
+        If this doesn't quite make sense yet, don't worry. We will explore async/await more throughout the guide.
+        Using async/await
+        
+        Async functions are called like any other Rust function. However, calling these functions does not result in the function body executing. Instead, calling an async fn returns a value representing the operation. This is conceptually analogous to a zero-argument closure. To actually run the operation, you should use the .await operator on the return value.
+        
+        For example, the given program
+        
+        async fn say_world() {
+            println!("world");
+        }
+        
+        #[tokio::main]
+        async fn main() {
+            // Calling `say_world()` does not execute the body of `say_world()`.
+            let op = say_world();
+        "
+    </div>
 
 
 <!--     

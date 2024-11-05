@@ -78,5 +78,5 @@ pub fn compute_child_x_position(
         AlignItems::Stretch | AlignItems::Baseline => child_margin.left.value, // Simplified; Baseline needs additional logic
     };
 
-    cursor_position.y + offset
+    cursor_position.x + offset
 }
