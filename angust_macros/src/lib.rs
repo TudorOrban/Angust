@@ -3,6 +3,9 @@ use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{parse_macro_input, Fields, ItemStruct};
 
+/*
+ * Proc macro for implementing the ReflectiveState and ReactiveState traits of Angust
+ */
 #[proc_macro_attribute]
 pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input_struct = parse_macro_input!(item as ItemStruct);
