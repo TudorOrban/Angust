@@ -36,7 +36,7 @@ impl ElementRenderer {
         canvas.draw_rect(row_rect, &paint);
          
         if border_width.value == 0.0 {
-            // return; // Draw all borders for now for debugging
+            return; // Draw all borders for now for debugging
         }
         paint.set_anti_alias(true);
         paint.set_style(PaintStyle::Stroke);

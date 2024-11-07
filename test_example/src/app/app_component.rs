@@ -55,7 +55,10 @@ impl AppComponent {
                 "Alice".to_string(),
                 "Hello, App Component!".to_string(),
                 vec![
-                    UIItem::new("Label 1".to_string(), "Value 1".to_string()) 
+                    UIItem::new("Home".to_string(), "home".to_string()),
+                    UIItem::new("Dashboard".to_string(), "dashboard".to_string()),
+                    UIItem::new("Browse".to_string(), "browse".to_string()),
+                    UIItem::new("Settings".to_string(), "settings".to_string()), 
                 ],
             );
 

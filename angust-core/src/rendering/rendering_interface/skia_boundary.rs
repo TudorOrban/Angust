@@ -20,7 +20,7 @@ pub fn estimate_text_size(
 
     Size {
         width: rect.width(),
-        height: rect.height(),
+        height: rect.height() + 10.0,
     }
 }
 
