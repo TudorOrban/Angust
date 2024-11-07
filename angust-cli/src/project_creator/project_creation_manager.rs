@@ -1,7 +1,10 @@
 use std::{env, fs, path::PathBuf};
 
 
-use crate::{project_creator::{app_directory_creator, assets_directory_creator, configuration_file_creator, core_file_creator, styles_directory_creator}, shared::utils};
+use crate::{
+    project_creator::{app_directory_creator, assets_directory_creator, configuration_file_creator, core_file_creator, styles_directory_creator}, 
+    shared::utils
+};
 
 
 
@@ -16,7 +19,7 @@ pub fn create_project(name: &str) {
 
     let angust_config = configuration_file_creator::create_configuration_files(&project_root_path, snake_case_name);
     
-    core_file_creator::create_core_files(&project_root_path, &angust_config.pathing_config.main_rs_path, &angust_config.pathing_config.index_html_path);
+    core_file_creator::create_core_app_files(&project_root_path, &angust_config.pathing_config.main_rs_path, &angust_config.pathing_config.index_html_path);
 
     app_directory_creator::create_app_directory(&project_root_path, &angust_config.pathing_config.app_dir_path);
     
