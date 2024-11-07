@@ -2613,6 +2613,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "test_example"
+version = "0.1.0"
+dependencies = [
+ "angust",
+ "angust_macros",
+ "tokio",
+]
+
+[[package]]
 name = "thin-slice"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

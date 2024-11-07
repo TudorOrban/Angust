@@ -46,25 +46,27 @@ fn initialize_cargo_project(project_root_path: &PathBuf) {
     }
 }
 
-fn adjust_cargo_toml(project_root_path: &PathBuf, name: &String) {
+fn adjust_cargo_toml(project_root_path: &PathBuf, project_name: &String) {
     let cargo_toml_path = project_root_path.join("Cargo.toml");
 
     let cargo_toml_contents = fs::read_to_string(&cargo_toml_path)
         .expect("Failed to read Cargo.toml");
     let mut doc = cargo_toml_contents.parse::<DocumentMut>()
         .expect("Failed to parse Cargo.toml");
-
+ 
     // Modify the package name and version
-    doc["package"]["name"] = value(name);
+    doc["package"]["name"] = value(project_name);
     doc["package"]["version"] = value("0.1.0");
     doc["package"]["edition"] = value("2021");
 
     // Specify dependency to be a local path for development purposes
     doc["dependencies"]["angust"] = value("../angust-core/");
 
+    doc["dependencies"]["tokio"] = value("1.41.0");
+
     // Define a binary target
     let bin_table = doc["bin"].or_insert(toml_edit::table());
-    bin_table["name"] = value(name);
+    bin_table["name"] = value(project_name);
     bin_table["path"] = value("src/main.rs");
 
     fs::write(&cargo_toml_path, doc.to_string())

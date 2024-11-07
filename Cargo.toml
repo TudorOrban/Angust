@@ -3,7 +3,8 @@ members = [
     "angust-core", "angust_macros",                     
     "cartan",
     "complete_angust_example",
-    "angust_macros"
+    "angust_macros",
+    "test_example",
 ]
 resolver = "2"
 exclude = [
