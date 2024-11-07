@@ -35,10 +35,14 @@ impl AppComponentState {
     }
     
     pub fn is_active_tab(&self, tab_name: String) -> bool {
+        println!("Tab name: {:?}", tab_name);
+        println!("Active Tab reactive: {:?}", self.active_tab_reactive.value);
         self.active_tab_reactive.value == tab_name
     }
 
     pub fn set_active_tab(&mut self, tab_name: String) {
+        println!("Set Tab name: {:?}", tab_name);
+        println!("Set Active Tab reactive: {:?}", self.active_tab_reactive.value);
         self.active_tab_reactive.set(tab_name);
     }
 

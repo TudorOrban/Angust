@@ -1,6 +1,26 @@
-<div @for="let item of ui_items" style="display: flex; flex-direction: row; border-width: 2px; border-color: rgb(150, 150, 150);">
-    <button style="margin: 20px 20px 20px 20px; height: 40px; font-size: 18px; font-weight: 600;" @onclick="change_route('/header')">
-        {{ item.label }}
-    </button>
-
+<div>
+    <div @for="let item of ui_items" style="display: flex; flex-direction: row; border-width: 2px; border-color: rgb(150, 150, 150);">
+        <button style="margin: 20px 20px 20px 20px; height: 40px; font-size: 18px; font-weight: 600;" @onclick="set_active_tab('dashboard')">
+            {{ item.label }}
+        </button>
+    
+    </div>
+    
+    <div @if="is_active_tab('home')">
+        <div style="width: 400px; height: 200px; background-color: rgb(255, 0, 0);">
+    
+        </div>
+    </div>
+    
+    <div @if="is_active_tab('dashboard')">
+        <div style="width: 400px; height: 200px; background-color: rgb(0, 255, 0);">
+    
+        </div>
+    </div>
+    
+    <div @if="is_active_tab('settings')">
+        <div style="width: 400px; height: 200px; background-color: rgb(0, 0, 255);">
+    
+        </div>
+    </div>
 </div>

@@ -29,17 +29,17 @@ multiplicative_expression = {
     | primary
 }
 
-primary = {
-    number
-    | string_literal
-    | boolean_literal
-    | identifier
-}
-
 function_call = {
     identifier ~ "(" ~ expression_list? ~ ")"
 }
 
 expression_list = {
     expression ~ ("," ~ expression)*
+}
+
+primary = {
+    number
+    | string_literal
+    | boolean_literal
+    | identifier
 }

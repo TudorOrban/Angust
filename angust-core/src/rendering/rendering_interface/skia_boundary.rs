@@ -17,10 +17,13 @@ pub fn estimate_text_size(
     paint.set_anti_alias(true);
 
     let (_, rect) = font.measure_str(text, Some(&paint));
+    
+    let (_, font_metrics) = font.metrics();
+    let height = font_metrics.descent - font_metrics.ascent + font_metrics.leading;
 
     Size {
         width: rect.width(),
-        height: rect.height() + 10.0,
+        height: height,
     }
 }
 
