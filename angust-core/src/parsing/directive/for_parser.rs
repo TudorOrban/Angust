@@ -60,7 +60,9 @@ pub fn access_loop_field<State: ReactiveState>(
     base_property: &str,
     nested_property: Option<&[&str]>,
 ) -> Result<Box<dyn ReflectiveState>, ParsingError> {
+    println!("Loop contexts: {:?}", context.for_loop_contexts);
     let loop_variable_context = identify_loop_variable_context(base_property, context).ok_or_else(|| {
+        println!("Loop variable not found for '{}'", base_property);
         ParsingError::FieldAccessError(field.to_string())
     })?;
     let array_access_path = loop_variable_context.array_access_path.clone();
@@ -68,18 +70,21 @@ pub fn access_loop_field<State: ReactiveState>(
 
     // Get current loop array
     let array_reflective = access_field(state, &array_access_path, context).or_else(|_| {
+        println!("Array not found for '{}'", array_access_path);
         Err(ParsingError::FieldAccessError(format!("Array not found for '{}'", array_access_path)))
     })?;
 
     // Get current array item
     let current_index = loop_variable_context.current_index;
     let array_item_as_reflective = array_reflective.get_field(&current_index.to_string()).ok_or_else(|| {
+        println!("Index {} out of bounds for '{}'", current_index, array_access_path);
         ParsingError::FieldAccessError(format!("Index {} out of bounds for '{}'", current_index, array_access_path))
     })?;
 
     if nested_property.is_some() {
+        println!("Nested field access: {:?}", nested_property.unwrap());
         return get_nested_field(&*array_item_as_reflective, &nested_property.unwrap()).ok_or_else(|| {
-            ParsingError::FieldAccessError(field.to_string())
+            ParsingError::FieldAccessError(format!("Test: {:?}", field.to_string()))
         });
     } else {
         return Ok(array_item_as_reflective);

@@ -33,39 +33,44 @@ fn create_app_component(app_dir_path: &PathBuf) {
     let app_component_contents = r#"
 use std::collections::HashMap;
 
-use angust::rendering::elements::component::{component::Component, component_factory::ComponentFactory};
+use angust::rendering::elements::component::{
+    component::Component, 
+    component_factory_registry::ComponentFactory, 
+};
+use angust_macros::component_state;
 
 
-pub struct AppComponent {
-    component: Component<AppComponentState>,    
-}
-
-#[derive(Clone)]
-pub struct AppComponentState {
+#[component_state]
+struct AppComponentState {
     content: String,
 }
 
 impl AppComponentState {
-    fn new() -> Self {
-        Self { content: String::from("Hello, App Component!") }
-    }
+
+}
+
+pub struct AppComponent {
+
 }
 
 impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
-        let state_factory = || AppComponentState::new();
-
         registry.insert("app-component".to_string(), Box::new(move || {
-            Box::new(
-                Component::new(
-                    "app-component".to_string(),
-                    "src/app/app_component.html".to_string(),
-                    state_factory() 
-                )
-            )
+            let state_factory = || AppComponentState::new(
+                "app-component works!".to_string(),
+            );
+
+            let component = Component::new(
+                "app-component".to_string(),
+                "src/app/app_component.html".to_string(),
+                state_factory() 
+            );
+
+            Box::new(component)
         }));
     }
-}
+
+}  
     "#;
 
     fs::write(&app_component_path, app_component_contents)
@@ -76,11 +81,8 @@ fn create_app_template(app_dir_path: &PathBuf) {
     let app_template_path = app_dir_path.join("app_component.html");
 
     let app_template_contents = r#"
-<div style="background-color: rgb(50, 50, 220)">
-
-    <h1>{{ content }}</h1>
-
-    <button @onclick="toggle">Toggle Content</button>
+<div>
+    {{ content }}
 </div>
     "#;
 

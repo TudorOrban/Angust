@@ -189,11 +189,11 @@ impl<State: ReactiveState> Component<State> {
 
     // - Input handling
     fn update_children_inputs(&mut self) {
-        let input_setters = &self.component_functions.input_setters;
-        
-        let context = ParsingContext::new(None, None, Some(&self.state), Some(&self.component_functions), Some(&mut self.template_expressions_asts), Some(&mut self.template_event_handler_asts), None, None);
+        let results = self.evaluate_input_expressions();
 
-        for (property_name, ast) in self.input_expressions_asts.iter() {
+        let input_setters = &self.component_functions.input_setters;
+
+        for (property_name, ast_result) in results {
             let setter_name = format!("set_{}", property_name);
             let input_setter_opt = input_setters.get(&setter_name);
             if input_setter_opt.is_none() {
@@ -202,10 +202,31 @@ impl<State: ReactiveState> Component<State> {
             }
             let input_setter = input_setter_opt.unwrap();
 
+            input_setter(&mut self.state, vec![ast_result]);
+        }
+    }
+
+    fn evaluate_input_expressions(&mut self) -> HashMap<String, Box<dyn Any>> {
+        let input_setters = &self.component_functions.input_setters;
+
+        let context = ParsingContext::new(None, None, Some(&self.state), Some(&self.component_functions), Some(&mut self.template_expressions_asts), Some(&mut self.template_event_handler_asts), None, None);
+
+        let mut results: HashMap<String, Box<dyn Any>> = HashMap::new();
+        
+        for (property_name, ast) in self.input_expressions_asts.iter() {
+            let setter_name = format!("set_{}", property_name);
+            let input_setter_opt = input_setters.get(&setter_name);
+            if input_setter_opt.is_none() {
+                println!("No input setter found for property: {}", property_name);
+                continue;
+            }
+
             let value = ast_evaluator::evaluate_ast(&ast, &context).unwrap();
 
-            input_setter(&mut self.state, vec![Box::new(value)]);
+            results.insert(property_name.clone(), value);
         }
+
+        results
     }
 }
 

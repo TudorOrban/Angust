@@ -22,7 +22,6 @@ pub fn parse_on_click_expression<State: ReactiveState>(
 
     let ast = ast::parse_string_to_ast(on_click_attribute.clone())
         .map_err(|e| ParsingError::ASTParsingError(format!("Error parsing on click expression: {:?}", e)))?;
-    println!("AST: {:?}", ast);
     
     // Get root function name
     let mut root_function_name = match ast.clone() {

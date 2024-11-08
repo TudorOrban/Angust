@@ -14,5 +14,4 @@ pub fn register_components() {
     AppComponent::register(&mut registry);
 
     initialize_component_registry(registry);
-
 }

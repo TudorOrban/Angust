@@ -6,4 +6,6 @@ pub fn register_services() {
     let mut registry = ServiceContainer::new();
 
     initialize_service_registry(registry);
-}
+}   
+    
+    

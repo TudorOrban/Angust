@@ -8,17 +8,6 @@ use crate::{
 use super::ast::{ASTNode, Operator};
 
 
-// pub fn evaluate_expression<State: ReactiveState>(
-//     expression: &ASTNode,
-//     context: &ParsingContext<State>
-// ) -> Result<Box<dyn Any>, ParsingError> {   
-//     let state = context.component_state.expect("Component state not found");
-//     let functions = context.component_functions.expect("Component functions not found");
-
-
-
-// }
-
 pub fn evaluate_ast<State: ReactiveState>(
     node: &ASTNode,
     context: &ParsingContext<State>
@@ -50,6 +39,10 @@ fn evaluate_identifier<State: ReactiveState>(
     name: &str,
     context: &ParsingContext<State>
 ) -> Result<Box<dyn Any>, ParsingError> {
+    let result = access_field(context.component_state.unwrap(), name, context);
+    if result.is_err() {
+        println!("{:?}", result.err());
+    }
     match access_field(context.component_state.unwrap(), name, context) {
         Ok(val) => {
             if let Some(num) = val.as_any().downcast_ref::<f64>() {

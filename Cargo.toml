@@ -4,7 +4,8 @@ members = [
     "cartan",
     "complete_angust_example",
     "angust_macros",
-    "test_example",
+    "test_example", 
+    "test_new",
 ]
 resolver = "2"
 exclude = [

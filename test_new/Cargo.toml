@@ -1,5 +1,5 @@
 [package]
-name = "complete_angust_example"
+name = "test_new"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,8 +9,7 @@ angust_macros = { path = "../angust_macros/" }
 
 tokio = "1.41.0"
 
-
 [[bin]]
-name = "complete_angust_example"
+name = "test_new"
 path = "src/main.rs"
 

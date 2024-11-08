@@ -43,7 +43,7 @@ pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Comp
 
     let element = html_parser::map_dom_to_elements::<State>(&dom, None, &mut parsing_context)
         .unwrap_or_else(|e| panic!("Failed to map DOM to elements: {:?}", e));
-    
+
     // Add elements to Angust DOM
     let mut container = Box::new(Container::new());
     container.add_child(element);

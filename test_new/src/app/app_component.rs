@@ -1,5 +1,4 @@
 
-
 use std::collections::HashMap;
 
 use angust::rendering::elements::component::{
@@ -39,5 +38,5 @@ impl AppComponent {
         }));
     }
 
-}
+}  
     
