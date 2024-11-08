@@ -10,7 +10,7 @@ use angust::{
                 component_factory_registry::ComponentFactory, 
                 functions::component_functions::ComponentFunctions, 
             }, 
-            service::{async_manager::FutureExt, service_container::get_global_service}
+            service::{async_manager::FutureExt, service_registry::get_global_service}
         }, 
         router::router_proxy::get_router
     }, 

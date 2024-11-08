@@ -1,6 +1,6 @@
 use std::{fs, path::PathBuf, process::Command};
 
-use toml_edit::{value, DocumentMut};
+use toml_edit::{value, ArrayOfTables, DocumentMut, Item, Table};
 
 use crate::shared::types::AngustConfiguration;
 
@@ -60,14 +60,23 @@ fn adjust_cargo_toml(project_root_path: &PathBuf, project_name: &String) {
     doc["package"]["edition"] = value("2021");
 
     // Specify dependency to be a local path for development purposes
-    doc["dependencies"]["angust"] = value("../angust-core/");
-
+    doc["dependencies"]["angust"]["path"] = value("../angust-core/");
+    doc["dependencies"]["angust_macros"]["path"] = value("../angust_macros/");
     doc["dependencies"]["tokio"] = value("1.41.0");
 
     // Define a binary target
-    let bin_table = doc["bin"].or_insert(toml_edit::table());
-    bin_table["name"] = value(project_name);
-    bin_table["path"] = value("src/main.rs");
+    let bins = if let Some(array) = doc["bin"].as_array_of_tables_mut() {
+        array
+    } else {
+        let aot = ArrayOfTables::new();
+        doc["bin"] = Item::ArrayOfTables(aot.clone());
+        doc["bin"].as_array_of_tables_mut().unwrap()
+    };
+
+    let mut bin_table = Table::new();
+    bin_table["name"] = value(project_name).into();
+    bin_table["path"] = value("src/main.rs").into();
+    bins.push(bin_table);
 
     fs::write(&cargo_toml_path, doc.to_string())
         .expect("Failed to write modified Cargo.toml");

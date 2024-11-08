@@ -81,7 +81,7 @@ fn create_app_template(app_dir_path: &PathBuf) {
     let app_template_path = app_dir_path.join("app_component.html");
 
     let app_template_contents = r#"
-<div>
+<div style="width: 1800px; height: 1200px; background-color: rgb(255, 255, 255);">
     {{ content }}
 </div>
     "#;

@@ -56,7 +56,7 @@ fn create_component_registration_file(project_root_path: &PathBuf, component_reg
     let component_registration_contents = r#"
 use std::collections::HashMap;
 
-use angust::rendering::elements::component::component_factory::initialize_component_registry;
+use angust::rendering::elements::component::component_factory_registry::initialize_component_registry;
 
 use crate::app::app_component::AppComponent;
 
@@ -80,11 +80,11 @@ fn create_service_registration_file(project_root_path: &PathBuf, service_registr
     let service_registration_path = project_root_path.join(service_registration_path);
 
     let service_registration_contents = r#"
-use angust::rendering::elements::service::service_container::{initialize_service_registry, ServiceContainer};
+use angust::rendering::elements::service::service_registry::{initialize_service_registry, ServiceRegistry};
 
 
 pub fn register_services() {
-    let mut registry = ServiceContainer::new();
+    let mut registry = ServiceRegistry::new();
 
     initialize_service_registry(registry);
 }   

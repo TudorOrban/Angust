@@ -1,2 +1,2 @@
-pub mod service_container;
+pub mod service_registry;
 pub mod async_manager;

@@ -3,13 +3,13 @@ use std::any::Any;
 use std::sync::Arc;
 use once_cell::sync::OnceCell;
 
-pub struct ServiceContainer {
+pub struct ServiceRegistry {
     services: HashMap<String, Arc<dyn Any + Send + Sync>>,
 }
 
-impl ServiceContainer {
+impl ServiceRegistry {
     pub fn new() -> Self {
-        ServiceContainer {
+        ServiceRegistry {
             services: HashMap::new(),
         }
     }
@@ -23,9 +23,9 @@ impl ServiceContainer {
     }
 }
 
-static SERVICE_REGISTRY: OnceCell<Arc<ServiceContainer>> = OnceCell::new();
+static SERVICE_REGISTRY: OnceCell<Arc<ServiceRegistry>> = OnceCell::new();
 
-pub fn initialize_service_registry(registry: ServiceContainer) {
+pub fn initialize_service_registry(registry: ServiceRegistry) {
     let _ = SERVICE_REGISTRY.set(Arc::new(registry));
 }
 
