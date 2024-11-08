@@ -1,14 +1,27 @@
 use std::any::Any;
 
-use crate::{parsing::html::error::ParsingError, rendering::elements::component::{functions::component_functions::ComponentFunctions, state::{nested_reflectivity::get_nested_field, reflectivity::ReflectiveState}}};
+use crate::{
+    parsing::html::{error::ParsingError, html_parser::ParsingContext}, 
+    rendering::elements::component::state::{nested_reflectivity::access_field, reactivity::ReactiveState}
+};
 
 use super::ast::{ASTNode, Operator};
 
 
-pub fn evaluate_ast<State: ReflectiveState>(
+// pub fn evaluate_expression<State: ReactiveState>(
+//     expression: &ASTNode,
+//     context: &ParsingContext<State>
+// ) -> Result<Box<dyn Any>, ParsingError> {   
+//     let state = context.component_state.expect("Component state not found");
+//     let functions = context.component_functions.expect("Component functions not found");
+
+
+
+// }
+
+pub fn evaluate_ast<State: ReactiveState>(
     node: &ASTNode,
-    state: &State,
-    functions: &ComponentFunctions<State>,
+    context: &ParsingContext<State>
 ) -> Result<Box<dyn Any>, ParsingError> {
     match node {
         ASTNode::Number(num) => {
@@ -21,24 +34,24 @@ pub fn evaluate_ast<State: ReflectiveState>(
             Ok(Box::new(*boolean))
         },
         ASTNode::Identifier(name) => 
-            evaluate_identifier(name, state),
+            evaluate_identifier(name, context),
         ASTNode::FunctionCall(name, args) =>
-            evaluate_component_function(name, args.clone(), state, functions),
+            evaluate_component_function(name, args.clone(), context),
         ASTNode::BinaryOperation { operator, left, right } =>
-            evaluate_binary_operation(operator, left, right, state, functions),
+            evaluate_binary_operation(operator, left, right, context),
         ASTNode::Comparison { operator, left, right } =>
-            evaluate_comparison(operator, left, right, state, functions),
+            evaluate_comparison(operator, left, right, context),
         ASTNode::LogicalOperation { operator, left, right } =>
-            evaluate_logical_operation(operator, left, right, state, functions),
+            evaluate_logical_operation(operator, left, right, context),
     }
 }
 
-fn evaluate_identifier<State: ReflectiveState>(
+fn evaluate_identifier<State: ReactiveState>(
     name: &str,
-    state: &State,
+    context: &ParsingContext<State>
 ) -> Result<Box<dyn Any>, ParsingError> {
-    match get_nested_field(state, &[name]) {
-        Some(val) => {
+    match access_field(context.component_state.unwrap(), name, context) {
+        Ok(val) => {
             if let Some(num) = val.as_any().downcast_ref::<f64>() {
                 return Ok(Box::new(*num));
             }
@@ -53,19 +66,40 @@ fn evaluate_identifier<State: ReflectiveState>(
             }
             Ok(val.as_any())
         }
-        None => Err(ParsingError::ASTEvaluationError(format!("Field {} not found", name))),
+        Err(_) => Err(ParsingError::ASTEvaluationError(format!("Field {} not found", name))),
     }
+    // let property_path: Vec<&str> = name.split('.').collect();
+    // match get_nested_field(state, &property_path) {
+    //     Some(val) => {
+    //         if let Some(num) = val.as_any().downcast_ref::<f64>() {
+    //             return Ok(Box::new(*num));
+    //         }
+    //         if let Some(int) = val.as_any().downcast_ref::<i64>() {
+    //             return Ok(Box::new(*int));
+    //         }
+    //         if let Some(txt) = val.as_any().downcast_ref::<String>() {
+    //             return Ok(Box::new(txt.clone()));
+    //         }
+    //         if let Some(boolean) = val.as_any().downcast_ref::<bool>() {
+    //             return Ok(Box::new(*boolean));
+    //         }
+    //         Ok(val.as_any())
+    //     }
+    //     None => Err(ParsingError::ASTEvaluationError(format!("Field {} not found", name))),
+    // }
 }
 
-fn evaluate_component_function<State: ReflectiveState>(
+fn evaluate_component_function<State: ReactiveState>(
     name: &str,
     args: Vec<ASTNode>,
-    state: &State,
-    functions: &ComponentFunctions<State>,
+    context: &ParsingContext<State>
 ) -> Result<Box<dyn Any>, ParsingError> {
     let arg_values: Result<Vec<Box<dyn Any>>, ParsingError> = args.iter()
-        .map(|arg| evaluate_ast(arg, state, functions))
+        .map(|arg| evaluate_ast(arg, context))
         .collect();
+
+    let state = context.component_state.expect("Component state not found");
+    let functions = context.component_functions.expect("Component functions not found");
 
     match functions.dynamic_params_functions.get(name) {
         Some(func) => Ok(func(state, arg_values?)),
@@ -73,15 +107,14 @@ fn evaluate_component_function<State: ReflectiveState>(
     }
 }
 
-fn evaluate_binary_operation<State: ReflectiveState>(
+fn evaluate_binary_operation<State: ReactiveState>(
     operator: &Operator,
     left: &ASTNode,
     right: &ASTNode,
-    state: &State,
-    functions: &ComponentFunctions<State>,
+    context: &ParsingContext<State>
 ) -> Result<Box<dyn Any>, ParsingError> {
-    let left_val = evaluate_ast(left, state, functions)?;
-    let right_val = evaluate_ast(right, state, functions)?;
+    let left_val = evaluate_ast(left, context)?;
+    let right_val = evaluate_ast(right, context)?;
 
     let left_float = left_val.downcast_ref::<f64>()
         .ok_or_else(|| ParsingError::ASTEvaluationError("Expected a floating point number on the left side of operation".to_string()))?;
@@ -100,15 +133,14 @@ fn evaluate_binary_operation<State: ReflectiveState>(
     Ok(Box::new(result)) 
 }
 
-fn evaluate_comparison<State: ReflectiveState>(
+fn evaluate_comparison<State: ReactiveState>(
     operator: &Operator,
     left: &ASTNode,
     right: &ASTNode,
-    state: &State,
-    functions: &ComponentFunctions<State>,
+    context: &ParsingContext<State>
 ) -> Result<Box<dyn Any>, ParsingError> {
-    let left_val = evaluate_ast(left, state, functions)?;
-    let right_val = evaluate_ast(right, state, functions)?;
+    let left_val = evaluate_ast(left, context)?;
+    let right_val = evaluate_ast(right, context)?;
 
     // Attempt to downcast and compare for: f64, i64, ParsingError, bool
     let result = left_val.downcast_ref::<f64>().and_then(|left_float| {
@@ -157,15 +189,14 @@ fn compare_values<T: PartialOrd + PartialEq>(
     }
 }
 
-fn evaluate_logical_operation<State: ReflectiveState>(
+fn evaluate_logical_operation<State: ReactiveState>(
     operator: &Operator,
     left: &ASTNode,
     right: &ASTNode,
-    state: &State,
-    functions: &ComponentFunctions<State>,
+    context: &ParsingContext<State>
 ) -> Result<Box<dyn Any>, ParsingError> {
-    let left_val = evaluate_ast(left, state, functions)?;
-    let right_val = evaluate_ast(right, state, functions)?;
+    let left_val = evaluate_ast(left, context)?;
+    let right_val = evaluate_ast(right, context)?;
 
     let left_bool = *left_val.downcast_ref::<bool>()
         .ok_or_else(|| ParsingError::ASTEvaluationError("Type mismatch".to_string()))?;

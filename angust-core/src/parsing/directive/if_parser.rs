@@ -21,9 +21,7 @@ pub fn parse_if_expression<State: ReactiveState>(
         .map_err(|e| ParsingError::ASTParsingError(format!("{:?}", e)))?;
     ParsingContext::add_template_expression_ast(context, ast.clone());
 
-    let state = context.component_state.expect("Component state not found");
-    let functions = context.component_functions.expect("Component functions not found");
-    let evaluation_result = ast_evaluator::evaluate_ast::<State>(&ast, state, functions)?;
+    let evaluation_result = ast_evaluator::evaluate_ast::<State>(&ast, context)?;
 
     let is_if_true = evaluation_result
         .downcast_ref::<bool>()

@@ -4,7 +4,7 @@ use regex::Regex;
 
 use crate::{
     application::event_loop_proxy::{get_event_loop_proxy, ApplicationEvent}, 
-    parsing::expression::{ast::ASTNode, ast_evaluator}, 
+    parsing::{expression::{ast::ASTNode, ast_evaluator}, html::html_parser::ParsingContext}, 
     rendering::{
         elements::{
             common_types::{OptionalSize, Position, Size}, 
@@ -170,8 +170,10 @@ impl<State: ReactiveState> Component<State> {
     fn determine_params(&mut self, params_asts: &Vec<ASTNode>) -> Vec<Box<dyn Any>> {
         let mut param_values: Vec<Box<dyn Any>> = vec![];
 
+        let context = ParsingContext::new(None, None, Some(&self.state), Some(&self.component_functions), Some(&mut self.template_expressions_asts), Some(&mut self.template_event_handler_asts), Some(&mut self.input_expressions_asts), None);
+
         for params_ast in params_asts {
-            let param_value = match ast_evaluator::evaluate_ast(&params_ast, &self.state, &self.component_functions) {
+            let param_value = match ast_evaluator::evaluate_ast(&params_ast, &context) {
                 Ok(value) => value,
                 Err(e) => {
                     println!("Error evaluating dynamic params: {}", e);
@@ -188,6 +190,8 @@ impl<State: ReactiveState> Component<State> {
     // - Input handling
     fn update_children_inputs(&mut self) {
         let input_setters = &self.component_functions.input_setters;
+        
+        let context = ParsingContext::new(None, None, Some(&self.state), Some(&self.component_functions), Some(&mut self.template_expressions_asts), Some(&mut self.template_event_handler_asts), None, None);
 
         for (property_name, ast) in self.input_expressions_asts.iter() {
             let setter_name = format!("set_{}", property_name);
@@ -198,7 +202,7 @@ impl<State: ReactiveState> Component<State> {
             }
             let input_setter = input_setter_opt.unwrap();
 
-            let value = ast_evaluator::evaluate_ast(&ast, &self.state, &self.component_functions).unwrap();
+            let value = ast_evaluator::evaluate_ast(&ast, &context).unwrap();
 
             input_setter(&mut self.state, vec![Box::new(value)]);
         }

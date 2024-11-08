@@ -1,7 +1,7 @@
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 
 number = @{ "-"? ~ ('0'..'9')+ }
-identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+identifier = @{ (ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")*) ~ ("." ~ (ASCII_ALPHANUMERIC | "_")+)* }
 string_literal = @{ "'" ~ (!"'" ~ ANY)* ~ "'" }
 boolean_literal = { "true" | "false" }
 
@@ -9,23 +9,30 @@ comparison_operator = { "==" | "!=" | "<" | ">" | "<=" | ">=" }
 logical_operator = { "&&" | "||" }
 operator = { "+" | "-" | "*" | "/" }
 
-expression = { logical_expression }
+expression = _{
+    property_access
+    | logical_expression
+}
 
-logical_expression = {
+property_access = _{
+    identifier ~ ("." ~ identifier)+
+}
+
+logical_expression = _{
     comparison_expression ~ (logical_operator ~ comparison_expression)*
 }
 
-comparison_expression = {
+comparison_expression = _{
     additive_expression ~ (comparison_operator ~ additive_expression)*
 }
 
-additive_expression = {
+additive_expression = _{
     multiplicative_expression ~ (operator ~ multiplicative_expression)*
 }
 
-multiplicative_expression = {
-    function_call
-    | "(" ~ expression ~ ")" 
+multiplicative_expression = _{
+    "(" ~ expression ~ ")" 
+    | function_call
     | primary
 }
 
@@ -33,11 +40,11 @@ function_call = {
     identifier ~ "(" ~ expression_list? ~ ")"
 }
 
-expression_list = {
+expression_list = _{
     expression ~ ("," ~ expression)*
 }
 
-primary = {
+primary = _{
     number
     | string_literal
     | boolean_literal

@@ -1,6 +1,6 @@
 <div>
     <div @for="let item of ui_items" style="display: flex; flex-direction: row; border-width: 2px; border-color: rgb(150, 150, 150);">
-        <button style="margin: 20px 20px 20px 20px; height: 40px; font-size: 18px; font-weight: 600;" @onclick="set_active_tab('dashboard')">
+        <button style="margin: 20px 20px 20px 20px; height: 40px; font-size: 18px; font-weight: 600;" @onclick="set_active_tab(item.value)">
             {{ item.label }}
         </button>
     

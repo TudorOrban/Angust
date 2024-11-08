@@ -30,7 +30,7 @@ pub fn compute_inputs_from_parent_component<State: ReactiveState>(
             continue;
         }
 
-        let input_value = ast_evaluator::evaluate_ast(input_ast, state, &component_functions)?;
+        let input_value = ast_evaluator::evaluate_ast(input_ast, context)?;
 
         input_values.insert(input_name.clone(), input_value);
     }
