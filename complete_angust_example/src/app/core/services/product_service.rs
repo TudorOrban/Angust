@@ -20,7 +20,6 @@ impl ProductService {
         }
     }
 
-    #[allow(dead_code)]
     pub fn get_products(&self) -> Vec<Product> {
         self.products.clone()
     }

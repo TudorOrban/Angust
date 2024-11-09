@@ -20,10 +20,10 @@ pub fn dispatch_command(command_name: &str, arg_matches: &ArgMatches) {
 
 fn dispatch_generate_command(arg_matches: &ArgMatches) {
     if let Some(("component", component_matches)) = arg_matches.subcommand() {
-        let path = component_matches.get_one::<String>("name").unwrap();
+        let path = component_matches.get_one::<String>("path").unwrap();
         component_generator::generate_component(&path);
     } else if let Some(("service", service_matches)) = arg_matches.subcommand() {
-        let path = service_matches.get_one::<String>("name").unwrap();
+        let path = service_matches.get_one::<String>("path").unwrap();
         service_generator::generate_service(&path);
     }
 }

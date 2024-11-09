@@ -1,6 +1,8 @@
-use std::{env, fs::{self, File}, io::{Read, Write}, path::{Path, PathBuf}};
+use std::{env, fs::{self, File}, io::{Read, Write}, path::PathBuf};
 
 use crate::shared::utils;
+
+use super::common::create_object_module;
 
 
 /*
@@ -18,7 +20,7 @@ pub fn generate_component(path: &str) {
         snake_case_component_name
     ) = process_path(path);
 
-    create_component_module(&component_dir_path, &current_dir_path);
+    create_object_module(&component_dir_path, &current_dir_path);
     create_component_rs_file(
         &component_rs_path, &path_to_html_from_root, &pascal_case_component_name.to_string(), &kebab_case_component_name
     );
@@ -46,49 +48,6 @@ fn process_path(path: &str) -> (PathBuf, PathBuf, PathBuf, PathBuf, String, Stri
     let path_to_html_from_root = path_from_root.join(html_file_name);
 
     (current_dir_path, component_dir_path, component_rs_path, path_to_html_from_root, pascal_component_name.to_string(), kebab_case_component_name, snake_case_component_name)
-}
-
-fn create_component_module(component_dir_path: &PathBuf, current_dir_path: &PathBuf) {
-    let base_path = current_dir_path.join("src").join("app");  // Starting point inside src/app
-    let relative_path = component_dir_path.strip_prefix(&base_path).unwrap();
-
-    let mut current_path = base_path.clone();
-    let mut previous_mod_path = Some(base_path.join("mod.rs"));  // mod.rs in app directory
-
-    for component in relative_path.iter() {
-        current_path.push(component);
-
-        if !current_path.exists() {
-            fs::create_dir_all(&current_path).expect("Failed to create directory");
-        }
-
-        if let Some(ref mod_path) = previous_mod_path {
-            let module_name = component.to_str().unwrap();
-            update_mod_file(mod_path, module_name);
-        }
-
-        previous_mod_path = Some(current_path.join("mod.rs"));
-    }
-
-    // Ensure the last component's mod.rs is updated to include the component file
-    if let Some(ref final_mod_path) = previous_mod_path {
-        let file_stem = component_dir_path.file_stem().unwrap().to_str().unwrap();
-        update_mod_file(final_mod_path, file_stem);
-    }
-}
-
-fn update_mod_file(mod_file_path: &Path, module_name: &str) {
-    if !mod_file_path.exists() {
-        let mut mod_file = File::create(mod_file_path).unwrap();
-        writeln!(mod_file, "pub mod {};", module_name).expect("Failed to write to mod.rs");
-    } else {
-        let mut contents = String::new();
-        File::open(mod_file_path).unwrap().read_to_string(&mut contents).unwrap();
-        if !contents.contains(&format!("pub mod {};", module_name)) {
-            let mut mod_file = File::options().append(true).open(mod_file_path).unwrap();
-            writeln!(mod_file, "pub mod {};", module_name).expect("Failed to write to mod.rs");
-        }
-    }
 }
 
 fn create_component_rs_file(

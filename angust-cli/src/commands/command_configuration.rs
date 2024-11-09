@@ -23,8 +23,8 @@ pub fn get_command_configuration() -> Command {
                     Command::new("component")
                         .about("Generate a new component")
                         .arg(
-                            Arg::new("name")
-                                .help("Name of the component")
+                            Arg::new("path")
+                                .help("Path of the component")
                                 .required(true)
                                 .index(1),
                         ),
@@ -33,8 +33,8 @@ pub fn get_command_configuration() -> Command {
                     Command::new("service")
                         .about("Generate a new service")
                         .arg(
-                            Arg::new("name")
-                                .help("Name of the service")
+                            Arg::new("path")
+                                .help("Path of the service")
                                 .required(true)
                                 .index(1),
                         ),
