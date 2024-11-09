@@ -1,8 +1,9 @@
 [workspace]
 members = [
     "angust-core", "angust_macros",  
-    "angust_macros",
+    "angust_macros", "examples/chain_optim/chain_optim_frontend",
     "examples/cli_create_project_example",
+    "examples/chain_optim/chain_optim_frontend", "examples/chain_optim/chain_optim_backend",
 
 ]
 resolver = "2"

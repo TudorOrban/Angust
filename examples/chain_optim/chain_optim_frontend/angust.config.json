@@ -1,0 +1,10 @@
+{
+  "pathing_config": {
+    "angust_config_path": "angust.configuration.json",
+    "app_dir_path": "src/app",
+    "assets_dir_path": "src/assets",
+    "styles_dir_path": "src/styles",
+    "main_rs_path": "src/main.rs",
+    "index_html_path": "src/index.html"
+  }
+}
