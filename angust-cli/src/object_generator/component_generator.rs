@@ -1,8 +1,10 @@
-use std::{env, fs::{self, File}, io::{Read, Write}, path::PathBuf};
+use std::{
+    fs::{self, File}, 
+    io::{Read, Write}, 
+    path::PathBuf
+};
 
-use crate::shared::utils;
-
-use super::common::create_object_module;
+use super::common::{create_object_module, process_path, ObjectType};
 
 
 /*
@@ -18,7 +20,7 @@ pub fn generate_component(path: &str) {
         pascal_case_component_name, 
         kebab_case_component_name,
         snake_case_component_name
-    ) = process_path(path);
+    ) = process_path(path, ObjectType::Component);
 
     create_object_module(&component_dir_path, &current_dir_path);
     create_component_rs_file(
@@ -26,28 +28,6 @@ pub fn generate_component(path: &str) {
     );
     create_component_template(&component_dir_path, &snake_case_component_name, &kebab_case_component_name);
     update_component_registration_module(&component_rs_path, &current_dir_path, &pascal_case_component_name);
-}
-
-fn process_path(path: &str) -> (PathBuf, PathBuf, PathBuf, PathBuf, String, String, String) {
-    let provided_path = PathBuf::from(path);
-    let current_dir_path = env::current_dir().expect("Failed to get current directory");
-
-    let pascal_component_name = provided_path.file_name().unwrap().to_str().unwrap().to_owned() + "Component";
-    let kebab_case_component_name = utils::string_pascal_to_kebab_case(&pascal_component_name);
-    let snake_case_component_name = utils::string_pascal_to_snake_case(&pascal_component_name);
-    
-    let provided_path_dir = provided_path.parent().unwrap();
-    let path_from_root: &std::path::Path = provided_path_dir; // Expand this in the future
-    let full_provided_path_dir = PathBuf::from(current_dir_path.clone()).join(path_from_root);
-    let component_dir_path = full_provided_path_dir.join(snake_case_component_name.clone());
-    
-    let rs_file_name = format!("{}.rs", snake_case_component_name);
-    let component_rs_path = component_dir_path.join(rs_file_name);
-
-    let html_file_name = format!("{}.html", snake_case_component_name);
-    let path_to_html_from_root = path_from_root.join(html_file_name);
-
-    (current_dir_path, component_dir_path, component_rs_path, path_to_html_from_root, pascal_component_name.to_string(), kebab_case_component_name, snake_case_component_name)
 }
 
 fn create_component_rs_file(
