@@ -10,8 +10,8 @@ use crate::app::app_component::AppComponent;
  */
 pub fn register_components() {
     let mut registry = HashMap::new();
-
-    AppComponent::register(&mut registry);
+    
+    AppComponent::register(&mut registry);  
 
     initialize_component_registry(registry);
 }

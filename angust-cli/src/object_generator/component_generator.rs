@@ -104,37 +104,40 @@ fn create_component_rs_file(
     let component_component_contents = format!(r#"
 use std::collections::HashMap;
 
-use angust::rendering::elements::component::{{component::Component, component_factory::ComponentFactory}};
+use angust::rendering::elements::component::{{
+    component::Component, 
+    component_factory_registry::ComponentFactory, 
+}};
+use angust_macros::component_state;
 
 
-pub struct {pascal_case_component_name} {{
-    component: Component<{pascal_case_component_name}State>,    
-}}
-
-pub struct {pascal_case_component_name}State {{
+#[component_state]
+struct {pascal_case_component_name}State {{
     content: String,
 }}
 
 impl {pascal_case_component_name}State {{
-    pub fn new() -> {pascal_case_component_name}State {{
-        {pascal_case_component_name}State {{
-            content: "Hello from {kebab_case_component_name}".to_string(),
-        }}
-    }}
+
+}}
+
+pub struct {pascal_case_component_name} {{
+
 }}
 
 impl {pascal_case_component_name} {{
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {{
-        let state_factory = || {pascal_case_component_name}State::new();
-
         registry.insert("{kebab_case_component_name}".to_string(), Box::new(move || {{
-            Box::new(
-                Component::new(
-                    "{kebab_case_component_name}".to_string(),
-                    "{path_to_html_from_root}".to_string(),
-                    state_factory() 
-                )
-            )
+            let state_factory = || {pascal_case_component_name}State::new(
+                "{kebab_case_component_name} works!".to_string(),
+            );
+
+            let component = Component::new(
+                "{kebab_case_component_name}".to_string(),
+                "{path_to_html_from_root}".to_string(),
+                state_factory() 
+            );
+
+            Box::new(component)
         }}));
     }}
 }}
@@ -153,13 +156,15 @@ fn create_component_template(
 
     let component_template_contents = format!(r#"
 <div>
-    <div>{kebab_case_component_name} works!</div>
+    {kebab_case_component_name} works!
 </div>
     "#);
 
     fs::write(&component_template_path, component_template_contents)
         .expect("Failed to write component.component.html file");
 }
+
+
 
 fn update_component_registration_module(
     component_rs_path: &PathBuf, 
@@ -182,32 +187,23 @@ fn update_component_registration_module(
         File::open(&component_registration_file_path).unwrap().read_to_string(&mut contents).unwrap();
     }
 
-    let mut new_contents = String::new();
-
-    // Find the last `use crate` occurrence and place the new import after it
-    let last_use_crate_index = contents.rfind("use crate").map(|idx| contents[idx..].find('\n').unwrap() + idx + 1).unwrap_or(0);
-
-    new_contents.push_str(&contents[..last_use_crate_index]);
+    // Insert the import statement if it does not exist
     if !contents.contains(&import_statement) {
-        new_contents.push_str(&format!("{}\n", import_statement));
+        let last_use_crate_index = contents.rfind("use crate").map(|idx| contents[idx..].find('\n').unwrap() + idx + 1).unwrap_or(0);
+        contents.insert_str(last_use_crate_index, &format!("{}\n", import_statement));
     }
-    new_contents.push_str(&contents[last_use_crate_index..]);
 
-    // Add the register call within the function block
-    let function_start_index = new_contents.find("pub fn register_components()").unwrap();
-    let function_body_start = new_contents[function_start_index..].find('{').unwrap() + function_start_index + 1;
-    let function_body_end = new_contents[function_start_index..].rfind('}').unwrap() + function_start_index;
-
-    // TODO: Make sure to add BEFORE initialize_registry(registry)
-    let before_register_block = new_contents[..function_body_start].to_string();
-    let register_block = new_contents[function_body_start..function_body_end].to_string();
-    let after_register_block = new_contents[function_body_end..].to_string();
-
-    if !register_block.contains(&register_call) {
-        let updated_register_block = format!("{}\n{}\n", register_block, register_call);
-        new_contents = format!("{}{}{}", before_register_block, updated_register_block, after_register_block);
+    // Ensure all registration calls are correctly placed before the initialization call
+    let init_call_index = contents.find("initialize_component_registry(registry);").unwrap();
+    if !contents[..init_call_index].contains(&register_call) {
+        let last_register_index = contents[..init_call_index].rfind(';').unwrap() + 1;
+        contents.insert_str(last_register_index, &format!("\n{}", register_call));
     }
+
+    // Properly indent the initialize component registry line
+    let init_line_start = contents.rfind("initialize_component_registry(registry);").unwrap();
+    contents.replace_range(init_line_start..init_line_start, "");
 
     // Write the updated contents back to the file
-    File::create(&component_registration_file_path).unwrap().write_all(new_contents.as_bytes()).unwrap();
+    File::create(&component_registration_file_path).unwrap().write_all(contents.as_bytes()).unwrap();
 }
