@@ -345,13 +345,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cartan"
-version = "0.1.0"
-dependencies = [
- "angust",
-]
-
-[[package]]
 name = "cc"
 version = "1.1.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -420,6 +413,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "cli_create_project_example"
+version = "0.1.0"
+dependencies = [
+ "angust",
+ "angust_macros",
+ "tokio",
+]
+
+[[package]]
 name = "color_quant"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -433,15 +435,6 @@ checksum = "ba5a308b75df32fe02788e748662718f03fde005016435c444eea572398219fd"
 dependencies = [
  "bytes",
  "memchr",
-]
-
-[[package]]
-name = "complete_angust_example"
-version = "0.1.0"
-dependencies = [
- "angust",
- "angust_macros",
- "tokio",
 ]
 
 [[package]]
@@ -2610,24 +2603,6 @@ dependencies = [
  "futf",
  "mac",
  "utf-8",
-]
-
-[[package]]
-name = "test_example"
-version = "0.1.0"
-dependencies = [
- "angust",
- "angust_macros",
- "tokio",
-]
-
-[[package]]
-name = "test_new"
-version = "0.1.0"
-dependencies = [
- "angust",
- "angust_macros",
- "tokio",
 ]
 
 [[package]]

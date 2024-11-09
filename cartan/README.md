@@ -1,1 +1,0 @@
-This project contains the source code for Cartan, a basic browser developed using the Angust GUI framework.
