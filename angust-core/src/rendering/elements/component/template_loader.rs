@@ -18,8 +18,8 @@ pub fn load_component_template<'a, State: ReactiveState>(component: &'a mut Comp
     let project_root = PathBuf::from(identify_project_root_path());
     let template_path = project_root.join(component.template_relative_path.clone());
 
-    let template_content = std::fs::read_to_string(template_path)
-        .expect("Failed to read template file");
+    let template_content = std::fs::read_to_string(template_path.clone())
+        .expect(format!("Failed to read template file: {}", template_path.display()).as_str());
     
     // Parse template HTML content
     let dom = html_parser::parse_html_content(&template_content);

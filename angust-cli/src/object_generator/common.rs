@@ -26,7 +26,7 @@ pub fn process_path(path: &str, object_type: ObjectType) -> (PathBuf, PathBuf, P
     let rs_file_name = format!("{}.rs", snake_case_object_name);
     let object_rs_path = object_dir_path.join(rs_file_name);
 
-    let html_file_name = format!("{}.html", snake_case_object_name);
+    let html_file_name = format!("{}/{}.html", snake_case_object_name, snake_case_object_name);
     let path_to_html_from_root = path_from_root.join(html_file_name);
 
     (current_dir_path, object_dir_path, object_rs_path, path_to_html_from_root, pascal_object_name.to_string(), kebab_case_object_name, snake_case_object_name)
