@@ -126,23 +126,19 @@ fn update_component_registration_module(
         File::open(&component_registration_file_path).unwrap().read_to_string(&mut contents).unwrap();
     }
 
-    // Insert the import statement if it does not exist
     if !contents.contains(&import_statement) {
         let last_use_crate_index = contents.rfind("use crate").map(|idx| contents[idx..].find('\n').unwrap() + idx + 1).unwrap_or(0);
         contents.insert_str(last_use_crate_index, &format!("{}\n", import_statement));
     }
 
-    // Ensure all registration calls are correctly placed before the initialization call
     let init_call_index = contents.find("initialize_component_registry(registry);").unwrap();
     if !contents[..init_call_index].contains(&register_call) {
         let last_register_index = contents[..init_call_index].rfind(';').unwrap() + 1;
         contents.insert_str(last_register_index, &format!("\n{}", register_call));
     }
 
-    // Properly indent the initialize component registry line
     let init_line_start = contents.rfind("initialize_component_registry(registry);").unwrap();
     contents.replace_range(init_line_start..init_line_start, "");
 
-    // Write the updated contents back to the file
     File::create(&component_registration_file_path).unwrap().write_all(contents.as_bytes()).unwrap();
 }
