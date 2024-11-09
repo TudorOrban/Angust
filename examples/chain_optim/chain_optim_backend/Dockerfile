@@ -5,5 +5,5 @@ RUN cargo build --release
 
 FROM debian:buster-slim
 WORKDIR /app
-COPY --from=builder /app/target/release/rust_backend .
-CMD ["./rust_backend"]
+COPY --from=builder /app/target/release/chain_optim_backend .
+CMD ["./chain_optim_backend"]

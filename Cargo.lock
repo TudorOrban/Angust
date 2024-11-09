@@ -800,7 +800,6 @@ version = "0.1.0"
 dependencies = [
  "actix-rt",
  "actix-web",
- "ahash 0.7.8",
  "mysql",
  "serde",
  "serde_json",

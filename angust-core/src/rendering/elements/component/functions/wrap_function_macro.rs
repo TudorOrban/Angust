@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! wrap_fn {
     ($state:ty, $func:path, $($t:ty),*) => {
-        Box::new(move |state: &$state, args: Vec<Box<dyn Any>>| -> Box<dyn Any> {
+        Box::new(move |state: &$state, args: Vec<Box<dyn std::any::Any>>| -> Box<dyn std::any::Any> {
             let mut arg_iter = args.into_iter();
             let result = $func(
                 state,
@@ -15,7 +15,7 @@ macro_rules! wrap_fn {
                 )*
             );
 
-            Box::new(result) as Box<dyn Any>
+            Box::new(result) as Box<dyn std::any::Any>
         })
     };
 }
@@ -23,7 +23,7 @@ macro_rules! wrap_fn {
 #[macro_export]
 macro_rules! wrap_fn_mut {
     ($state:ty, $func:path, $($t:ty),*) => {
-        Box::new(move |state: &mut $state, args: Vec<Box<dyn Any>>| {
+        Box::new(move |state: &mut $state, args: Vec<Box<dyn std::any::Any>>| {
             let mut arg_iter = args.into_iter();
             let result = $func(
                 state,

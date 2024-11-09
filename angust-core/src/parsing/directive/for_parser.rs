@@ -60,7 +60,6 @@ pub fn access_loop_field<State: ReactiveState>(
     base_property: &str,
     nested_property: Option<&[&str]>,
 ) -> Result<Box<dyn ReflectiveState>, ParsingError> {
-    println!("Loop contexts: {:?}", context.for_loop_contexts);
     let loop_variable_context = identify_loop_variable_context(base_property, context).ok_or_else(|| {
         println!("Loop variable not found for '{}'", base_property);
         ParsingError::FieldAccessError(field.to_string())
@@ -82,7 +81,6 @@ pub fn access_loop_field<State: ReactiveState>(
     })?;
 
     if nested_property.is_some() {
-        println!("Nested field access: {:?}", nested_property.unwrap());
         return get_nested_field(&*array_item_as_reflective, &nested_property.unwrap()).ok_or_else(|| {
             ParsingError::FieldAccessError(format!("Test: {:?}", field.to_string()))
         });
