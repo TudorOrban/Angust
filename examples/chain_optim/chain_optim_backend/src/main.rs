@@ -36,18 +36,26 @@ async fn get_products(pool: web::Data<Pool>) -> impl Responder {
     web::Json(products)
 }
 
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let pool = Pool::new(database_url).unwrap();
-
-    HttpServer::new(move || {
-        App::new()
-            .app_data(pool.clone())
-            .route("/users", web::get().to(get_users))
-            .route("/products", web::get().to(get_products))
-    })
-    .bind("0.0.0.0:8080")?
-    .run()
-    .await
+    println!("Connecting to {}", database_url);
+    match Pool::new(database_url) {
+        Ok(pool) => {
+            HttpServer::new(move || {
+                App::new()
+                    .app_data(pool.clone())
+                    .route("/users", web::get().to(get_users))
+                    .route("/products", web::get().to(get_products))
+            })
+            .bind("0.0.0.0:8080")?
+            .run()
+            .await
+        }
+        Err(e) => {
+            eprintln!("Failed to connect to the database: {}", e);
+            std::process::exit(1);
+        }
+    }
 }
