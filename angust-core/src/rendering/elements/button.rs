@@ -27,7 +27,12 @@ pub struct Button {
 }
 
 impl Button {
-    pub fn new(on_click_handler_name: Option<String>, container: Option<Container>, styles: Option<Styles>) -> Self {
+    pub fn new(
+        on_click_handler_name: Option<String>,
+        loop_contexts: Option<Vec<ForLoopContext>>,
+        container: Option<Container>, 
+        styles: Option<Styles>
+    ) -> Self {
         let id = ElementIDGenerator::get();
 
         let container_vec = if let Some(container_child) = container {
@@ -40,7 +45,7 @@ impl Button {
             _id: id,
             container: container_vec,
             on_click_handler_name,
-            loop_contexts: vec![],
+            loop_contexts: loop_contexts.unwrap_or(vec![]),
             position: Position::default(),
             size: Size::default(),
             styles: styles.unwrap_or_default(),

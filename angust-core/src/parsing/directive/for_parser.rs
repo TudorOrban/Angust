@@ -27,7 +27,7 @@ pub fn parse_for_expression<State: ReactiveState>(
     let array_path = captures.get(2).unwrap().as_str();
 
     let state = context.component_state.expect("Component state not found");
-    let array_property = access_field(state, array_path, context)?;
+    let array_property = access_field(state, array_path, &context.for_loop_contexts)?;
 
     let array_len = match array_property.get_field("len") {
         Some(len) => len.as_any().downcast_ref::<usize>().unwrap().clone(),
@@ -54,21 +54,21 @@ pub fn parse_for_attribute<State: ReactiveState>(
 }
 
 // For accessing logic
-pub fn access_loop_field<State: ReactiveState>(
-    context: &ParsingContext<State>,
+pub fn access_loop_field(
     field: &str,
     base_property: &str,
     nested_property: Option<&[&str]>,
+    state: &dyn ReflectiveState,
+    for_loop_contexts: &Option<Vec<ForLoopContext>>,
 ) -> Result<Box<dyn ReflectiveState>, ParsingError> {
-    let loop_variable_context = identify_loop_variable_context(base_property, context).ok_or_else(|| {
+    let loop_variable_context = identify_loop_variable_context(base_property, for_loop_contexts).ok_or_else(|| {
         println!("Loop variable not found for '{}'", base_property);
         ParsingError::FieldAccessError(field.to_string())
     })?;
     let array_access_path = loop_variable_context.array_access_path.clone();
-    let state = context.component_state.expect("Component state not found");
 
     // Get current loop array
-    let array_reflective = access_field(state, &array_access_path, context).or_else(|_| {
+    let array_reflective = access_field(state, &array_access_path, for_loop_contexts).or_else(|_| {
         println!("Array not found for '{}'", array_access_path);
         Err(ParsingError::FieldAccessError(format!("Array not found for '{}'", array_access_path)))
     })?;
@@ -89,14 +89,14 @@ pub fn access_loop_field<State: ReactiveState>(
     }
 }
 
-pub fn identify_loop_variable_context<State: ReactiveState>(
+pub fn identify_loop_variable_context(
     base_property: &str,
-    context: &ParsingContext<State>,
+    for_loop_contexts: &Option<Vec<ForLoopContext>>,
 ) -> Option<ForLoopContext> {
-    if context.for_loop_contexts.is_none() {
+    if for_loop_contexts.is_none() {
         return None;
     }
-    let for_loop_contexts = context.for_loop_contexts.as_ref().unwrap();
+    let for_loop_contexts = for_loop_contexts.as_ref().unwrap();
 
     // Functional style
     for_loop_contexts.iter().find(|for_loop_context| for_loop_context.loop_variable == base_property).cloned()

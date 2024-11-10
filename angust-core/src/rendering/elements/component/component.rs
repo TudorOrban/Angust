@@ -4,10 +4,16 @@ use regex::Regex;
 
 use crate::{
     application::event_loop_proxy::{get_event_loop_proxy, ApplicationEvent}, 
-    parsing::{expression::{ast::ASTNode, ast_evaluator}, html::html_parser::ParsingContext}, 
+    parsing::{directive::for_parser::ForLoopContext, expression::{ast::ASTNode, ast_evaluator}}, 
     rendering::{
         elements::{
-            button::EventPropagationData, common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::Styles
+            button::EventPropagationData, 
+            common_types::{OptionalSize, Position, Size}, 
+            container::Container, 
+            element::{Element, ElementType, EventType}, 
+            element_id_generator::ElementIDGenerator, 
+            event_propagator, 
+            styles::Styles
         }, layout::size_estimation_system::effective_size_estimator,  
     }
 };
@@ -137,13 +143,13 @@ impl<State: ReactiveState> Component<State> {
 
     // Internal
     // - Event handling
-    fn trigger_dynamic_params_event_handler(&mut self, event_name: &String, event_ast: &ASTNode) {
+    fn trigger_dynamic_params_event_handler(&mut self, event_name: &String, event_ast: &ASTNode, for_loop_contexts: Vec<ForLoopContext>) {
         let params_asts = match event_ast {
             ASTNode::FunctionCall(_, params) => params,
             _ => return,
         };
 
-        let param_values = self.determine_handler_params(params_asts);
+        let param_values = self.determine_handler_params(params_asts, for_loop_contexts);
 
         // Identify the function name (to be refactored later)
         let regex = Regex::new(r"^(.+?)_id_\d+$").unwrap();
@@ -162,13 +168,11 @@ impl<State: ReactiveState> Component<State> {
         }
     }
 
-    fn determine_handler_params(&mut self, params_asts: &Vec<ASTNode>) -> Vec<Box<dyn Any>> {
+    fn determine_handler_params(&mut self, params_asts: &Vec<ASTNode>, for_loop_contexts: Vec<ForLoopContext>) -> Vec<Box<dyn Any>> {
         let mut param_values: Vec<Box<dyn Any>> = vec![];
 
-        let context = ParsingContext::new(None, None, Some(&self.state), Some(&self.component_functions), Some(&mut self.template_expressions_asts), Some(&mut self.template_event_handler_asts), Some(&mut self.input_expressions_asts), None);
-
         for params_ast in params_asts {
-            let param_value = match ast_evaluator::evaluate_ast(&params_ast, &context) {
+            let param_value = match ast_evaluator::evaluate_ast(&params_ast, &self.state, &self.component_functions, &for_loop_contexts) {
                 Ok(value) => value,
                 Err(e) => {
                     println!("Error evaluating dynamic params: {}", e);
@@ -204,8 +208,6 @@ impl<State: ReactiveState> Component<State> {
     fn evaluate_input_expressions(&mut self) -> HashMap<String, Box<dyn Any>> {
         let input_setters = &self.component_functions.input_setters;
 
-        let context = ParsingContext::new(None, None, Some(&self.state), Some(&self.component_functions), Some(&mut self.template_expressions_asts), Some(&mut self.template_event_handler_asts), None, None);
-
         let mut results: HashMap<String, Box<dyn Any>> = HashMap::new();
         
         for (property_name, ast) in self.input_expressions_asts.iter() {
@@ -216,7 +218,7 @@ impl<State: ReactiveState> Component<State> {
                 continue;
             }
 
-            let value = ast_evaluator::evaluate_ast(&ast, &context).unwrap();
+            let value = ast_evaluator::evaluate_ast(&ast, &self.state, &self.component_functions, &vec![]).unwrap(); // TODO: Fix for loop contexts
 
             results.insert(property_name.clone(), value);
         }
@@ -244,12 +246,14 @@ impl<State: ReactiveState> Element for Component<State> {
         
         for data in event_propagation_datas.iter() {
             let handler_name = &data.handler_name;
+            let for_loop_contexts = &data.for_loop_contexts;
+
             if let Some(handler) = self.component_functions.event_handlers.get_mut(handler_name) {
                 handler(&mut self.state);
             }
             
             if let Some(event_ast) = self.template_event_handler_asts.get(handler_name) {
-                self.trigger_dynamic_params_event_handler(&handler_name.clone(), &event_ast.clone()); // TODO: Fix this clone
+                self.trigger_dynamic_params_event_handler(&handler_name.clone(), &event_ast.clone(), for_loop_contexts.clone()); // TODO: Fix this clone
             }
         }
 

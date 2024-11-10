@@ -21,7 +21,10 @@ pub fn parse_if_expression<State: ReactiveState>(
         .map_err(|e| ParsingError::ASTParsingError(format!("{:?}", e)))?;
     ParsingContext::add_template_expression_ast(context, ast.clone());
 
-    let evaluation_result = ast_evaluator::evaluate_ast::<State>(&ast, context)?;
+    let state = context.component_state.expect("Could not get component state");
+    let component_functions = context.component_functions.expect("Could not get component functions");
+    let for_loop_contexts = context.for_loop_contexts.clone().unwrap_or(vec![]);
+    let evaluation_result = ast_evaluator::evaluate_ast::<State>(&ast, state, component_functions, &for_loop_contexts)?;
 
     let is_if_true = evaluation_result
         .downcast_ref::<bool>()

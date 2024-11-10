@@ -130,7 +130,7 @@ fn process_button_element<State : ReactiveState>(
     let mut child_container = Container::new();
     map_dom_children_to_elements::<State>(node, &mut child_container, context, &styles).unwrap();
         
-    let mut button = Button::new(Some(on_click_handler_name), None, Some(styles));
+    let mut button = Button::new(Some(on_click_handler_name), context.for_loop_contexts.clone(), None, Some(styles));
     button.add_child(Box::new(child_container));
 
     Ok(Box::new(button))

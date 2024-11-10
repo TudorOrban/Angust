@@ -1,12 +1,15 @@
-use crate::parsing::{directive::for_parser::access_loop_field, html::{error::ParsingError, html_parser::ParsingContext}};
+use crate::parsing::{
+    directive::for_parser::{access_loop_field, ForLoopContext}, 
+    html::error::ParsingError
+};
 
-use super::{reactivity::ReactiveState, reflectivity::ReflectiveState};
+use super::reflectivity::ReflectiveState;
 
 
-pub fn access_field<State: ReactiveState>(
+pub fn access_field(
     obj: &dyn ReflectiveState,
     field: &str,
-    context: &ParsingContext<State>,
+    for_loop_contexts: &Option<Vec<ForLoopContext>>,
 ) -> Result<Box<dyn ReflectiveState>, ParsingError> {
     let property_path: Vec<&str> = field.split('.').collect();
     let base_property = match property_path.get(0) { 
@@ -24,7 +27,7 @@ pub fn access_field<State: ReactiveState>(
     }
 
     // Check for loop variable secondly
-    access_loop_field(context, field, base_property, nested_property)
+    access_loop_field(field, base_property, nested_property, obj, for_loop_contexts)
 }
 
 pub fn get_nested_field(

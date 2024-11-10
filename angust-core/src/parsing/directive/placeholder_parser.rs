@@ -33,7 +33,7 @@ fn substitute_state_placeholder<State: ReactiveState>(
     state: &State,
     context: &mut ParsingContext<State>,
 ) -> Result<String, ParsingError> {
-    let property = access_field(state, property_access_path, context)?;
+    let property = access_field(state, property_access_path, &context.for_loop_contexts)?;
     if let Some(val) = property.as_any().downcast_ref::<String>() {
         return Ok(val.clone());
     } else {

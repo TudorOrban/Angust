@@ -5,7 +5,14 @@ use skia_safe::{
 use winit::window::Window;
 use skia_safe::gpu::DirectContext;
 
-use super::{elements::{button::EventPropagationData, common_types::{Position, Size}, element::{Element, EventType}}, ui_manager::UIManager};
+use super::{
+    elements::{
+        button::EventPropagationData, 
+        common_types::{Position, Size}, 
+        element::{Element, EventType}
+    }, 
+    ui_manager::UIManager
+};
 
 pub struct Renderer {
     pub surface: Surface,
