@@ -4,12 +4,7 @@ use crate::{
     application::event_loop_proxy::{get_event_loop_proxy, ApplicationEvent},
     rendering::{
         elements::{
-            common_types::{OptionalSize, Position, Size}, 
-            component::{component::ComponentInterface, component_factory_registry::create_component}, 
-            container::Container, 
-            element::{Element, ElementType, EventType}, 
-            element_id_generator::ElementIDGenerator, 
-            styles::Styles
+            button::EventPropagationData, common_types::{OptionalSize, Position, Size}, component::{component::ComponentInterface, component_factory_registry::create_component}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, styles::Styles
         }, layout::size_estimation_system::effective_size_estimator, 
     }
 };
@@ -99,7 +94,7 @@ impl Element for RouterComponent {
         self.current_component.handle_event(cursor_position, event_type);
     }
     
-    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<EventPropagationData> {
         self.current_component.propagate_event(cursor_position, event_type)
     }
 

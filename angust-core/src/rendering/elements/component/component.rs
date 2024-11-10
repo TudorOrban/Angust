@@ -7,12 +7,7 @@ use crate::{
     parsing::{expression::{ast::ASTNode, ast_evaluator}, html::html_parser::ParsingContext}, 
     rendering::{
         elements::{
-            common_types::{OptionalSize, Position, Size}, 
-            container::Container, 
-            element::{Element, ElementType, EventType}, 
-            element_id_generator::ElementIDGenerator, 
-            event_propagator, 
-            styles::Styles
+            button::EventPropagationData, common_types::{OptionalSize, Position, Size}, container::Container, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::Styles
         }, layout::size_estimation_system::effective_size_estimator,  
     }
 };
@@ -148,7 +143,7 @@ impl<State: ReactiveState> Component<State> {
             _ => return,
         };
 
-        let param_values = self.determine_params(params_asts);
+        let param_values = self.determine_handler_params(params_asts);
 
         // Identify the function name (to be refactored later)
         let regex = Regex::new(r"^(.+?)_id_\d+$").unwrap();
@@ -167,7 +162,7 @@ impl<State: ReactiveState> Component<State> {
         }
     }
 
-    fn determine_params(&mut self, params_asts: &Vec<ASTNode>) -> Vec<Box<dyn Any>> {
+    fn determine_handler_params(&mut self, params_asts: &Vec<ASTNode>) -> Vec<Box<dyn Any>> {
         let mut param_values: Vec<Box<dyn Any>> = vec![];
 
         let context = ParsingContext::new(None, None, Some(&self.state), Some(&self.component_functions), Some(&mut self.template_expressions_asts), Some(&mut self.template_event_handler_asts), Some(&mut self.input_expressions_asts), None);
@@ -244,10 +239,11 @@ impl<State: ReactiveState> Element for Component<State> {
         self.content.handle_event(cursor_position, event_type);
     }
     
-    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
-        let event_handler_names = event_propagator::propagate_event(self, cursor_position, event_type);
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<EventPropagationData> {
+        let event_propagation_datas = event_propagator::propagate_event(self, cursor_position, event_type);
         
-        for handler_name in event_handler_names.iter() {
+        for data in event_propagation_datas.iter() {
+            let handler_name = &data.handler_name;
             if let Some(handler) = self.component_functions.event_handlers.get_mut(handler_name) {
                 handler(&mut self.state);
             }

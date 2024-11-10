@@ -11,11 +11,7 @@ use crate::{
 };
 
 use super::{
-    common_types::{OptionalSize, Position, Size}, 
-    component::component::ComponentInterface, 
-    element::{Element, ElementType, EventType}, 
-    element_id_generator::ElementIDGenerator, event_propagator, 
-    styles::Styles
+    button::EventPropagationData, common_types::{OptionalSize, Position, Size}, component::component::ComponentInterface, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::Styles
 };
 
 
@@ -74,7 +70,7 @@ impl Element for Image {
 
     fn handle_event(&mut self, _: Point, _: &EventType) {}
     
-    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<EventPropagationData> {
         event_propagator::propagate_event(self, cursor_position, event_type)
     }
 

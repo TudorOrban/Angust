@@ -2,7 +2,7 @@ use std::{any::Any, collections::HashMap};
 
 use skia_safe::{Canvas, Color, Point};
 
-use crate::rendering::{layout::size_estimation_system::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer};
+use crate::{parsing::directive::for_parser::ForLoopContext, rendering::{layout::size_estimation_system::effective_size_estimator, rendering_interface::element_renderer::ElementRenderer}};
 
 use super::{
     common_types::{OptionalSize, Position, Size}, 
@@ -17,6 +17,7 @@ pub struct Button {
 
     container: Option<Vec<Box<dyn Element>>>, // Only one container is allowed
     pub on_click_handler_name: Option<String>,
+    pub loop_contexts: Vec<ForLoopContext>,
 
     position: Position,
     size: Size,
@@ -39,6 +40,7 @@ impl Button {
             _id: id,
             container: container_vec,
             on_click_handler_name,
+            loop_contexts: vec![],
             position: Position::default(),
             size: Size::default(),
             styles: styles.unwrap_or_default(),
@@ -52,7 +54,7 @@ impl Button {
     }
 
     // Utils    
-    fn position_within_bounds(&self, point: skia_safe::Point) -> bool {
+    fn is_position_within_bounds(&self, point: skia_safe::Point) -> bool {
         point.x >= self.position.x && point.x <= self.position.x + self.size.width &&
         point.y >= self.position.y && point.y <= self.position.y + self.size.height
     }
@@ -93,19 +95,25 @@ impl Element for Button {
         
     }
 
-    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<EventPropagationData> {
         let mut event_targets = Vec::new();
 
         // Check if the cursor_position is within the bounds of the button
-        if self.position_within_bounds(cursor_position) {
-            if let Some(handler_name) = &self.on_click_handler_name {
-                match event_type {
-                    EventType::MouseClick => {
-                        event_targets.push(handler_name.clone());
-                    },
-                    _ => {}
-                }
-            }
+        let is_position_within_bounds = self.is_position_within_bounds(cursor_position);
+        if !is_position_within_bounds {
+            return event_targets;
+        }
+
+        if self.on_click_handler_name.is_none() {
+            return event_targets;
+        }
+        let handler_name = self.on_click_handler_name.as_ref().unwrap();
+        
+        match event_type {
+            EventType::MouseClick => {
+                event_targets.push(EventPropagationData { handler_name: handler_name.clone(), for_loop_contexts: self.loop_contexts.clone() });
+            },
+            _ => {}
         }
 
         // TODO: Propagate to children as well
@@ -265,4 +273,10 @@ impl Element for Button {
             }
         }
     }
+}
+
+
+pub struct EventPropagationData {
+    pub handler_name: String,
+    pub for_loop_contexts: Vec<ForLoopContext>,
 }

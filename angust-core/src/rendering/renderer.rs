@@ -5,7 +5,7 @@ use skia_safe::{
 use winit::window::Window;
 use skia_safe::gpu::DirectContext;
 
-use super::{elements::{common_types::{Position, Size}, element::{Element, EventType}}, ui_manager::UIManager};
+use super::{elements::{button::EventPropagationData, common_types::{Position, Size}, element::{Element, EventType}}, ui_manager::UIManager};
 
 pub struct Renderer {
     pub surface: Surface,
@@ -49,7 +49,7 @@ impl Renderer {
         self.ui_manager.handle_event(cursor_position, &event_type);
     }
 
-    pub fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+    pub fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<EventPropagationData> {
         self.ui_manager.propagate_event(cursor_position, event_type)
     }
 

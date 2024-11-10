@@ -1,4 +1,4 @@
-use actix_web::{web, App, HttpServer, Responder};
+use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use mysql::*;
 use mysql::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -19,30 +19,60 @@ struct Product {
 
 
 async fn get_users(pool: web::Data<Pool>) -> impl Responder {
-    let mut conn = pool.get_conn().unwrap();
-    let users: Vec<User> = conn.query_map(
+    let mut conn = match pool.get_conn() {
+        Ok(conn) => conn,
+        Err(e) => {
+            eprintln!("Failed to get DB connection: {}", e);
+            return HttpResponse::InternalServerError().body("Failed to connect to database");
+        }
+    };
+
+    let users: Result<Vec<User>, mysql::Error> = conn.query_map(
         "SELECT id, name FROM users",
         |(id, name)| User { id, name },
-    ).unwrap();
-    web::Json(users)
+    );
+
+    match users {
+        Ok(users) => HttpResponse::Ok().json(users),
+        Err(e) => {
+            eprintln!("Query failed: {}", e);
+            HttpResponse::InternalServerError().body("Failed to execute query")
+        }
+    }
 }
 
 async fn get_products(pool: web::Data<Pool>) -> impl Responder {
-    let mut conn = pool.get_conn().unwrap();
-    let products: Vec<Product> = conn.query_map(
+    let mut conn = match pool.get_conn() {
+        Ok(conn) => conn,
+        Err(e) => {
+            eprintln!("Failed to get DB connection: {}", e);
+            return HttpResponse::InternalServerError().body("Failed to connect to database");
+        }
+    };
+
+    let products: Result<Vec<Product>, mysql::Error> = conn.query_map(
         "SELECT id, name, user_id FROM products",
         |(id, name, user_id)| Product { id, name, user_id },
-    ).unwrap();
-    web::Json(products)
+    );
+
+    match products {
+        Ok(products) => HttpResponse::Ok().json(products),
+        Err(e) => {
+            eprintln!("Query failed: {}", e);
+            HttpResponse::InternalServerError().body("Failed to execute query")
+        }
+    }
 }
 
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let database_url = "mysql://root@mysql:3306/chain_optim_database";
     println!("Connecting to {}", database_url);
+
     match Pool::new(database_url) {
         Ok(pool) => {
+            println!("Connected to {}", database_url);
             HttpServer::new(move || {
                 App::new()
                     .app_data(pool.clone())

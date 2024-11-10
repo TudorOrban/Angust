@@ -3,9 +3,9 @@ use std::{any::Any, collections::HashMap};
 use skia_safe::{Canvas, Point};
 
 use super::{
+    button::EventPropagationData, 
     common_types::{OptionalSize, Position, Size}, 
-    component::component::ComponentInterface, 
-    styles::Styles
+    component::component::ComponentInterface, styles::Styles
 };
 
 // This is the trait that all Angust elements must implement.
@@ -16,7 +16,7 @@ pub trait Element {
     fn handle_event(&mut self, cursor_position: Point, event_type: &EventType);
 
     // Experimental: gather all names of event handlers that should be called by a parent Custom Component
-    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String>;
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<EventPropagationData>;
 
     // Getters and setters
     fn set_id(&mut self, id: String);

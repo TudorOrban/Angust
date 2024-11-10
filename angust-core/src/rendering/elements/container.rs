@@ -14,12 +14,7 @@ use crate::{
 };
 
 use super::{
-    common_types::{OptionalSize, Position, ScrollbarState, Size}, 
-    component::component::ComponentInterface, 
-    element::{Element, ElementType, EventType}, 
-    element_id_generator::ElementIDGenerator, 
-    event_propagator, 
-    styles::{Directions, Styles}
+    button::EventPropagationData, common_types::{OptionalSize, Position, ScrollbarState, Size}, component::component::ComponentInterface, element::{Element, ElementType, EventType}, element_id_generator::ElementIDGenerator, event_propagator, styles::{Directions, Styles}
 };
 
 pub struct Container {
@@ -104,7 +99,7 @@ impl Element for Container {
         }
     }
 
-    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+    fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<EventPropagationData> {
         event_propagator::propagate_event(self, cursor_position, event_type)
     }
 

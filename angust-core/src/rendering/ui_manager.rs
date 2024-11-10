@@ -1,4 +1,4 @@
-use super::elements::{common_types::{Position, Size}, element::{Element, EventType}};
+use super::elements::{button::EventPropagationData, common_types::{Position, Size}, element::{Element, EventType}};
 
 pub struct UIManager {
     root_element: Box<dyn Element>,
@@ -22,7 +22,7 @@ impl UIManager {
         self.root_element.handle_event(cursor_position, event_type);
     }
 
-    pub fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<String> {
+    pub fn propagate_event(&mut self, cursor_position: skia_safe::Point, event_type: &EventType) -> Vec<EventPropagationData> {
         self.root_element.propagate_event(cursor_position, event_type)
     }
 
