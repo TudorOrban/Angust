@@ -30,7 +30,7 @@ impl ProductsComponent {
 
             let component = Component::new(
                 "products-component".to_string(),
-                "src/app/features/products/components/products_component.html".to_string(),
+                "src/app/features/products/components/products_component/products_component.html".to_string(),
                 state_factory() 
             );
 

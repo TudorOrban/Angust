@@ -30,7 +30,7 @@ impl HomeComponent {
 
             let component = Component::new(
                 "home-component".to_string(),
-                "src/app/features/home/components/home_component.html".to_string(),
+                "src/app/features/home/components/home_component/home_component.html".to_string(),
                 state_factory() 
             );
 

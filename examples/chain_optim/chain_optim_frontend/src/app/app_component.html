@@ -1,11 +1,11 @@
 
 <div style="width: 1800px; height: 1200px; background-color: rgb(255, 255, 255);">
     <div @for="let item of navigation_items" style="display: flex; flex-direction: row; spacing: 40px 0px; align-items: center; padding: 10px 10px 10px 10px;">
-        <button style="font-size: 24px; font-weight: 600;" @onclick="set_active_item(item)">
+        <button style="font-size: 24px; font-weight: 600;" @onclick="navigate_to(item)">
             {{ item }}
         </button>
     </div>
 
-    <dashboard-component></dashboard-component>
+    <router-component></router-component>
 </div>
     

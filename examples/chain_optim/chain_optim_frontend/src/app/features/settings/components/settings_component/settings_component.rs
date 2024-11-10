@@ -30,7 +30,7 @@ impl SettingsComponent {
 
             let component = Component::new(
                 "settings-component".to_string(),
-                "src/app/features/settings/components/settings_component.html".to_string(),
+                "src/app/features/settings/components/settings_component/settings_component.html".to_string(),
                 state_factory() 
             );
 

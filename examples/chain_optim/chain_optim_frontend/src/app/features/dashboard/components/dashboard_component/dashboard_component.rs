@@ -30,7 +30,7 @@ impl DashboardComponent {
 
             let component = Component::new(
                 "dashboard-component".to_string(),
-                "src/app/pages/dashboard_component/dashboard_component.html".to_string(),
+                "src/app/features/dashboard/components/dashboard_component/dashboard_component.html".to_string(),
                 state_factory() 
             );
 
