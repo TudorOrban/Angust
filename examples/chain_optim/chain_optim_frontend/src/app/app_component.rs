@@ -22,7 +22,6 @@ impl AppComponentState {
 
     fn navigate_to(&mut self, item: String) {
         let router = get_router();
-        println!("navigating to {}", item);
         router.navigate_to(&item);   
     }
 }

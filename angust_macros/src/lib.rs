@@ -90,6 +90,9 @@ pub fn component_state(_attr: TokenStream, item: TokenStream) -> TokenStream {
             #(#reactive_field_definitions)*
         }
 
+        unsafe impl Send for #struct_name {} // Ok because state updates are supposed to happen on the same thread (GUI thread)
+        unsafe impl Sync for #struct_name {}
+
         impl #struct_name {
             // Constructor function
             pub fn new(#(#constructor_params),*) -> Self {

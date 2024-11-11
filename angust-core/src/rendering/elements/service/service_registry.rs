@@ -14,12 +14,12 @@ impl ServiceRegistry {
         }
     }
 
-    pub fn add_service<T: Any + Send + Sync + 'static>(&mut self, service_id: &str, service: T) {
-        self.services.insert(service_id.to_string(), Arc::new(service));
+    pub fn add_service<T: Any + Send + Sync + 'static>(&mut self, service_name: &str, service: T) {
+        self.services.insert(service_name.to_string(), Arc::new(service));
     }
 
-    pub fn get_service<T: Any + Send + Sync + 'static>(&self, service_id: &str) -> Option<&T> {
-        self.services.get(service_id)?.as_ref().downcast_ref::<T>()
+    pub fn get_service<T: Any + Send + Sync + 'static>(&self, service_name: &str) -> Option<&T> {
+        self.services.get(service_name)?.as_ref().downcast_ref::<T>()
     }
 }
 
@@ -29,6 +29,6 @@ pub fn initialize_service_registry(registry: ServiceRegistry) {
     let _ = SERVICE_REGISTRY.set(Arc::new(registry));
 }
 
-pub fn get_global_service<T: Any + Send + Sync + 'static>(service_id: &str) -> Option<&T> {
-    SERVICE_REGISTRY.get().and_then(|registry| registry.get_service(service_id))
+pub fn get_global_service<T: Any + Send + Sync + 'static>(service_name: &str) -> Option<&T> {
+    SERVICE_REGISTRY.get().and_then(|registry| registry.get_service(service_name))
 }
