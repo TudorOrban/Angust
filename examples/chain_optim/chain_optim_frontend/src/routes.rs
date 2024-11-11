@@ -14,7 +14,7 @@ pub fn register_routes() {
     
     let route_config = RouteConfiguration {
         routes,
-        initial_route: Some("Home".to_string()),
+        initial_route: Some("Products".to_string()),
         cache_pages: true,
     };
 

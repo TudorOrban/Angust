@@ -1,9 +1,11 @@
 
-use std::{future::Future, sync::{Arc, Mutex}, fmt};
+use std::{any::Any, collections::HashMap, fmt, future::Future, sync::{Arc, Mutex}};
 
+use lazy_static::lazy_static;
 use tokio::{runtime::Handle, task::JoinHandle};
 
 use crate::application::event_loop_proxy::{get_event_loop_proxy, ApplicationEvent};
+
 
 /*
  * This function allows the user to return to the GUI thread to handle the response of an async operation.
@@ -13,13 +15,16 @@ pub fn post_to_gui_thread<F>(f: F)
 where
     F: FnOnce() + Send + 'static,
 {
-    if let Some(proxy) = get_event_loop_proxy() {
-        let task = ClosureExecutor::new(f);
-        proxy.send_event(ApplicationEvent::ExecuteTask(task))
-             .expect("Failed to send event to GUI thread");
-    } else {
+    let event_loop_proxy_opt = get_event_loop_proxy();
+    if event_loop_proxy_opt.is_none() {
         eprintln!("Event loop proxy not set");
+        return;
     }
+    let proxy = event_loop_proxy_opt.unwrap();
+
+    let task = ClosureExecutor::new(f);
+    proxy.send_event(ApplicationEvent::ExecuteTask(task))
+            .expect("Failed to send event to GUI thread");
 }
 
 // Struct that safely encapsulates a FnOnce closure for message passing between threads
@@ -50,6 +55,7 @@ impl fmt::Debug for ClosureExecutor {
         write!(f, "ClosureExecutor")
     }
 }
+
 
 // This allows the user to chain the async operation with post_to_gui_thread
 pub trait FutureExt: Future {
@@ -84,4 +90,38 @@ where
 {
     let handle = Handle::current();
     handle.spawn(future)
+}
+
+
+type Callback = Box<dyn Fn(&dyn Any) + Send>;
+
+pub struct EventManager {
+    callbacks: Mutex<HashMap<usize, Callback>>,
+}
+
+impl EventManager {
+    pub fn new() -> Self {
+        EventManager {
+            callbacks: Mutex::new(HashMap::new()),
+        }
+    }
+
+    pub fn register_callback<F>(&self, id: usize, callback: F)
+    where
+        F: Fn(&dyn Any) + Send + 'static,
+    {
+        let mut callbacks = self.callbacks.lock().unwrap();
+        callbacks.insert(id, Box::new(callback));
+    }
+
+    pub fn trigger_event(&self, id: usize, data: &dyn Any) {
+        if let Some(callback) = self.callbacks.lock().unwrap().get(&id) {
+            callback(data);
+        }
+    }
+}
+
+// Initialize the event manager as a global instance
+lazy_static! {
+    pub static ref EVENT_MANAGER: EventManager = EventManager::new();
 }

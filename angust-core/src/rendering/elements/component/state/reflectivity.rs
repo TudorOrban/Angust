@@ -163,3 +163,37 @@ where
         Box::new(self.clone())
     }
 }
+
+impl<T> ReflectiveState for Option<T>
+where
+    T: ReflectiveState + Clone + 'static,
+{
+    fn get_field(&self, name: &str) -> Option<Box<dyn ReflectiveState>> {
+        match self {
+            Some(inner) => inner.get_field(name),
+            None => None,
+        }
+    }
+
+    fn set_field(&mut self, name: &str, value: Box<dyn Any>) {
+        match self {
+            Some(inner) => inner.set_field(name, value),
+            None => {}
+        }
+    }
+
+    fn get_all_properties(&self) -> Vec<&str> {
+        match self {
+            Some(inner) => inner.get_all_properties(),
+            None => vec![],
+        }
+    }
+
+    fn as_any(&self) -> Box<dyn Any> {
+        Box::new(self.clone())
+    }
+
+    fn clone_box(&self) -> Box<dyn ReflectiveState> {
+        Box::new(self.clone())
+    }
+}

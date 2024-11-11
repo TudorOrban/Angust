@@ -113,6 +113,7 @@ impl<State: ReactiveState> Component<State> {
     }
 
     fn trigger_user_defined_init(&mut self) {
+        println!("Triggering user-defined init for component {}", self.name);
         let user_defined_init_optional = self.component_functions.initialization_function.as_ref();
         if user_defined_init_optional.is_none() {
             return;

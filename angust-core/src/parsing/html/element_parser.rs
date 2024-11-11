@@ -28,6 +28,9 @@ pub fn dispatch_element_processing<State : ReactiveState>(
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
 ) -> Result<Box<dyn Element>, ParsingError> {
+    let local_name = elem_data.name.local.as_ref();
+    let ns = elem_data.name.ns.as_ref();
+    println!("Processing element: {} (namespace: {})", local_name, ns);
     match elem_data.name.local.as_ref() {
         "div" => process_div_element::<State>(elem_data, node, parent_styles, context),
         "button" => process_button_element::<State>(elem_data, node, parent_styles, context),

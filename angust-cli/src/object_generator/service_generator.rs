@@ -17,13 +17,13 @@ pub fn generate_service(path: &str) {
         component_rs_path, 
         _,
         pascal_case_component_name, 
-        _,
+        kebab_case_component_name,
         _
     ) = process_path(path, ObjectType::Service);
 
     create_object_module(&component_dir_path, &current_dir_path);
     create_service_rs_file(&component_rs_path, &pascal_case_component_name);
-    update_service_registration_module(&component_rs_path, &current_dir_path, &pascal_case_component_name);
+    update_service_registration_module(&component_rs_path, &current_dir_path, &pascal_case_component_name, &kebab_case_component_name);
 }
 
 fn create_service_rs_file(
@@ -53,7 +53,8 @@ impl {pascal_case_component_name} {{
 fn update_service_registration_module(
     service_rs_path: &PathBuf, 
     current_dir_path: &PathBuf,
-    pascal_case_service_name: &str
+    pascal_case_service_name: &str,
+    kebab_case_service_name: &str,
 ) {
     let relative_path = service_rs_path.strip_prefix(current_dir_path.join("src")).unwrap();
     let import_path = relative_path.to_str().unwrap()
@@ -62,7 +63,7 @@ fn update_service_registration_module(
     let module_path = import_path.replace("/", "::");
 
     let import_statement = format!("use crate::{}::{};", module_path, pascal_case_service_name);
-    let register_call = format!("    registry.add_service(\"{}\", {}::new());", pascal_case_service_name, pascal_case_service_name);
+    let register_call = format!("    registry.add_service(\"{}\", {}::new());", kebab_case_service_name, pascal_case_service_name);
 
     let service_registration_file_path = current_dir_path.join("src").join("service_registration.rs");
 

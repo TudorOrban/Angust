@@ -51,6 +51,27 @@ pub fn map_dom_to_elements<State : ReactiveState>(
     }
 }
 
+pub fn print_dom_structure(dom: &NodeRef) {
+    match dom.data() {
+        NodeData::Document(_) | NodeData::Doctype(_) => {
+            println!("Document or Doctype node");
+        },
+        NodeData::Element(ref elem_data) => {
+            println!("Element node: {:?}", elem_data.name.local);
+        },
+        NodeData::Text(ref text) => {
+            println!("Text node: {:?}", text.borrow());
+        },
+        _ => {
+            println!("Other node type");
+        },
+    }
+
+    for child in dom.children() {
+        print_dom_structure(&child);
+    }
+}
+
 pub fn process_document_nodes<State : ReactiveState>(
     node: &NodeRef, 
     parent_styles: Option<&Styles>, 

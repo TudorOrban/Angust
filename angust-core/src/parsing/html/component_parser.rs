@@ -22,6 +22,7 @@ pub fn process_custom_component<State : ReactiveState>(
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
 ) -> Result<Box<dyn Element>, ParsingError> {
+    println!("Processing custom component: {}", component_name);
     let skippable_elements = vec!["!DOCTYPE", "html", "head", "meta", "body", "title", "h1"]; // To be implemented in the future
     if skippable_elements.contains(&component_name) {
         return html_parser::general_traversal::<State>(node, parent_styles, context)
@@ -35,18 +36,19 @@ pub fn process_custom_component<State : ReactiveState>(
     if component_optional.is_none() {
         return Err(ParsingError::ComponentNotFound(component_name.to_string()));
     }
-    let mut component_box = component_optional.unwrap();
+    let mut component = component_optional.unwrap();
     
     let attributes = elem_data.attributes.borrow();
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
-    component_box.set_styles(styles);
+    component.set_styles(styles);
     
     // Compute inputs using parent state and functions *before* initializing the component (i.e. parsing its template)
-    let input_values = input_evaluator::compute_inputs_from_parent_component(&component_box, context)?;
+    println!("Name: {}, Scanned inputs: {:?}", component_name, context.scanned_inputs);
+    let input_values = input_evaluator::compute_inputs_from_parent_component(&component, context)?;
     
-    component_box.initialize(input_values);
+    component.initialize(input_values);
 
-    Ok(component_box)
+    Ok(component)
 }
 
 fn process_router_component<State : ReactiveState>(
@@ -55,12 +57,12 @@ fn process_router_component<State : ReactiveState>(
     context: &mut ParsingContext<State>,
 ) -> Result<Box<dyn Element>, ParsingError> {
     let attributes = elem_data.attributes.borrow();
-    let mut component_box = Box::new(RouterComponent::new());
+    let mut component = Box::new(RouterComponent::new());
     
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
-    component_box.set_styles(styles);
+    component.set_styles(styles);
     
-    component_box.initialize(HashMap::new());
+    component.initialize(HashMap::new());
 
-    Ok(component_box)
+    Ok(component)
 }

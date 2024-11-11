@@ -1,5 +1,9 @@
-
 <div>
-    products-component works!
+    <div @for="let product of products">
+        <product-component [product]="product">
+            
+        </product-component>
+    </div>
+
+
 </div>
-    
