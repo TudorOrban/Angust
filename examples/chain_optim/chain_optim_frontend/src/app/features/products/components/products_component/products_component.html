@@ -1,3 +1,5 @@
+<!-- products_component.html -->
+
 <div style="padding: 20px 20px 20px 40px;">
     <div style="display: flex; flex-direction: row; align-items: center; spacing: 10px 0px; margin: 4px 10px 16px 10px;">
         <div style="font-size: 24px; font-weight: 600;">
@@ -10,8 +12,6 @@
     </div>
 
     <div @for="let product of products" style="display: flex; flex-direction: column; spacing: 0px 8px;">
-        <product-component [product]="product">
-            
-        </product-component>
+        <product-component [product]="product" />
     </div>
 </div>

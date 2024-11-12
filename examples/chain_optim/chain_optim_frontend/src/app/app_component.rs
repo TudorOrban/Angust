@@ -26,12 +26,9 @@ impl AppComponentState {
     }
 }
 
-pub struct AppComponent {
-
-}
+pub struct AppComponent;
 
 impl AppComponent {
-
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
         registry.insert("app-component".to_string(), Box::new(move || {
             let state_factory = || AppComponentState::new(
@@ -61,4 +58,3 @@ impl AppComponent {
     }
 
 }  
-    
