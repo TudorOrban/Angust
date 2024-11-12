@@ -1,11 +1,19 @@
 
 <div style="width: 1800px; height: 1200px; background-color: rgb(255, 255, 255);">
-    <div @for="let item of navigation_items" style="display: flex; flex-direction: row; spacing: 40px 0px; align-items: center; padding: 10px 10px 10px 10px;">
-        <button style="font-size: 24px; font-weight: 600;" @onclick="navigate_to(item)">
-            {{ item }}
-        </button>
+    <!-- Header -->
+    <div style="display: flex; flex-direction: row; align-items: center; width: 1800px; height: 72px; padding: 16px 40px 10px 40px; background-color: rgb(40, 40, 40); color: rgb(230, 230, 230);">
+        <img src="settings.png" alt="logo" style="width: 32px; height: 32px;"/>
+
+        <div @for="let item of navigation_items" style="display: flex; flex-direction: row; spacing: 40px 0px; align-items: center; margin: 0px 0px 0px 10px;">
+            <button style="font-size: 24px; font-weight: 600;" @onclick="navigate_to(item)">
+                {{ item }}
+            </button>
+        </div>
+
+        <img src="user-solid.png" alt="user avatar" style="width: 24px; height: 24px; margin: 0px 0px 0px 160px;"/>
     </div>
 
+    <!-- Main content -->
     <router-component></router-component>
 </div>
     

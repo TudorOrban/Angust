@@ -1,6 +1,6 @@
 
-<div style="display: flex; flex-direction: row; width: 600px; padding: 20px 20px 20px 20px; spacing: 100px 0px; border-width: 1px; border-color: rgb(160, 160, 160);">
-    <div style="display: flex; spacing: 40px 0px; width: 500px;">
+<div style="display: flex; flex-direction: row; align-items: center; width: 800px; padding: 8px 16px 16px 24px; background-color: rgb(245, 245, 245); border-width: 1px; border-color: rgb(160, 160, 160);">
+    <div style="display: flex; flex-direction: column; width: 300px; spacing: 0px 6px;">
         <div style="font-size: 18px; font-weight: 600;">
             {{ product.name }}
         </div>
@@ -10,14 +10,17 @@
         </div>
 
         <div style="font-size: 14px; font-weight: 600;">
-            Price: {{ product.price }}
+            Price: ${{ product.price }}
         </div>
     </div>
 
-    <button style="height: 50px; background-color: rgb(30, 60, 200); border-width: 1px;" @onclick="edit_product(product.id)">
-        <div style="font-size: 16px; font-weight: 600; color: rgb(230, 230, 230);">
-            Edit
-        </div>
-    </button>
+    <div style="display: flex; flex-direction: row; width: 400px; margin: 0px 0px 0px 520px; spacing: 10px 0px;">
+        <button style="background-color: rgb(22, 66, 188); border-width: 1px; font-size: 16px; font-weight: 600;" @onclick="edit_product(product.id)">
+            <img src="pen-to-square-solid.png" alt="logo" style="width: 16px; height: 16px; margin: 10px 10px 10px 10px;"/>
+        </button>
+
+        <button style="background-color: rgb(153, 18, 18); border-width: 1px; font-size: 16px; font-weight: 600;" @onclick="delete_product(product.id)">
+            <img src="trash-solid.png" alt="logo" style="width: 16px; height: 16px; margin: 10px 10px 10px 10px;"/>
+        </button>
+    </div>
 </div>
-    

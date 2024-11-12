@@ -23,7 +23,7 @@ async fn main() {
     service_registration::register_services();
     routes::register_routes();
 
-    let mut app = Application::new(initial_state, String::from("New Angust App"));
+    let mut app = Application::new(initial_state, String::from("ChainOptim"));
     
     app.run();
 }

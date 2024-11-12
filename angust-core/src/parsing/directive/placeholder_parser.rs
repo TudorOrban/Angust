@@ -14,7 +14,8 @@ pub fn parse_state_placeholder<State: ReactiveState>(
     context: &mut ParsingContext<State>,
 ) -> Result<String, ParsingError> {
     let re = Regex::new(r"\{\{(\s*[^}]+\s*)\}\}").unwrap();
-    let mut result = text.to_string();
+    let mut result = String::new();
+    let mut last_end = 0;
 
     for cap in re.captures_iter(text) {
         let property_access_path = match cap.get(1) {
@@ -22,8 +23,17 @@ pub fn parse_state_placeholder<State: ReactiveState>(
             None => continue,
         };
 
-        result = substitute_state_placeholder(property_access_path, state, context)?;
+        // Append the text before the current placeholder
+        result.push_str(&text[last_end..cap.get(0).unwrap().start()]);
+
+        // Append the substituted value
+        let property_state = substitute_state_placeholder(property_access_path, state, context)?;
+        result.push_str(&property_state);
+
+        last_end = cap.get(0).unwrap().end();
     }
+
+    result.push_str(&text[last_end..]);
 
     Ok(result)
 }

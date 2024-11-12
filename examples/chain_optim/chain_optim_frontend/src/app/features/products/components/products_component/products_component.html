@@ -1,20 +1,17 @@
-<div>
-    <div style="display: flex; flex-direction: row; align-items: center; spacing: 10px 0px; padding: 20px 40px 20px 40px;">
+<div style="padding: 20px 20px 20px 40px;">
+    <div style="display: flex; flex-direction: row; align-items: center; spacing: 10px 0px; margin: 4px 10px 16px 10px;">
         <div style="font-size: 24px; font-weight: 600;">
             Products
         </div>
 
         <div style="font-size: 20px; font-weight: 600;">
-            ( {{ products.len }} )
+            ({{ products.len }})
         </div>
     </div>
 
-
-    <div @for="let product of products" style="padding: 0px 40px 40px 40px; spacing: 40px 0px;">
+    <div @for="let product of products" style="display: flex; flex-direction: column; spacing: 0px 8px;">
         <product-component [product]="product">
             
         </product-component>
     </div>
-
-
 </div>

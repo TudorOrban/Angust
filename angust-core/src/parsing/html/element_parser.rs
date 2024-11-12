@@ -57,7 +57,7 @@ fn process_div_element<State : ReactiveState>(
     let array_length = for_loop_context.array_length;
 
     if for_loop_context.is_for_loop {
-        parse_for_loop(node, context, &for_loop_context, array_length, &styles, &mut container);
+        parse_for_loop(node, &mut container, context, &for_loop_context, array_length, &styles);
     } else {
         map_dom_children_to_elements(node, &mut container, context, &styles)?;
     }
@@ -67,11 +67,11 @@ fn process_div_element<State : ReactiveState>(
 
 fn parse_for_loop<State: ReactiveState>(
     node: &NodeRef, 
+    container: &mut Container,
     context: &mut ParsingContext<State>,
     for_loop_context: &ForLoopContext,
     array_length: usize,
     styles: &Styles,
-    container: &mut Container,
 ) {
     context.add_for_loop_context(for_loop_context.clone());
 
@@ -139,8 +139,10 @@ fn process_image_element<State : ReactiveState>(
     let styles = css_parser::parse_styles(&attributes, parent_styles, &context.stylesheet);
 
     let relative_path = context.angust_config.clone().unwrap_or_default().pathing_config.assets_dir_path.to_string() + "/img";
+
     let image = Image::new(
         relative_path, src.to_string(), Some(styles)
     );
+
     Ok(Box::new(image))
 }
