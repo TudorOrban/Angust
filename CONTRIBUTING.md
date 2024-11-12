@@ -23,10 +23,20 @@ We are committed to providing a welcoming and inclusive experience for everyone.
 ## Reporting Bugs or Requesting Features
 
 ### Bugs
-If you encounter a bug, please report it to us by opening an issue. Provide as much detail as possible, including steps to reproduce the bug and any error messages or screenshots.
+If you encounter a bug, please report it to us by opening an issue. We have a bug report template to help you provide all the necessary information.
+
+1. Go to the [Issues](https://github.com/your-repo/angust/issues) page.
+2. Click on the "New issue" button.
+3. Select the "Bug Report" template.
+4. Fill out the template with as much detail as possible, including steps to reproduce the bug and any error messages or screenshots.
 
 ### Feature Requests
-We welcome suggestions for new features. If there's something you'd like to see added to Angust, please open a new issue, describe your idea, and explain how it would benefit users.
+We welcome suggestions for new features. If there's something you'd like to see added to Angust, please open a new issue.
+
+1. Go to the [Issues](https://github.com/your-repo/angust/issues) page.
+2. Click on the "New issue" button.
+3. Select the "Feature Request" template.
+4. Fill out the template with a clear description of your idea and explain how it would benefit users.
 
 ## Community and Support
 
