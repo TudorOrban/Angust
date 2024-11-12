@@ -4,7 +4,10 @@ use regex::Regex;
 
 use crate::{
     application::event_loop_proxy::{get_event_loop_proxy, ApplicationEvent}, 
-    parsing::{directive::for_parser::ForLoopContext, expression::{ast::ASTNode, ast_evaluator}}, 
+    parsing::{
+        directive::for_parser::ForLoopContext, 
+        expression::{ast::ASTNode, ast_evaluator}
+    }, 
     rendering::{
         elements::{
             button::EventPropagationData, 
@@ -14,7 +17,8 @@ use crate::{
             element_id_generator::ElementIDGenerator, 
             event_propagator, 
             styles::Styles
-        }, layout::size_estimation_system::effective_size_estimator,  
+        }, 
+        layout::size_estimation_system::effective_size_estimator,  
     }
 };
 

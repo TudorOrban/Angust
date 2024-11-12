@@ -1,10 +1,23 @@
 
-<div>
-    <div>
-        product-component works!
+<div style="display: flex; flex-direction: row; width: 600px; padding: 20px 20px 20px 20px; spacing: 100px 0px; border-width: 1px; border-color: rgb(160, 160, 160);">
+    <div style="display: flex; spacing: 40px 0px; width: 500px;">
+        <div style="font-size: 18px; font-weight: 600;">
+            {{ product.name }}
+        </div>
 
+        <div style="font-size: 14px;">
+            {{ product.description }}
+        </div>
+
+        <div style="font-size: 14px; font-weight: 600;">
+            Price: {{ product.price }}
+        </div>
     </div>
-    
-    {{ product.name }}
+
+    <button style="height: 50px; background-color: rgb(30, 60, 200); border-width: 1px;" @onclick="edit_product(product.id)">
+        <div style="font-size: 16px; font-weight: 600; color: rgb(230, 230, 230);">
+            Edit
+        </div>
+    </button>
 </div>
     

@@ -18,8 +18,11 @@ struct ProductComponentState {
 impl ProductComponentState {
 
     fn set_product(&mut self, product: Product) {
-        println!("{:?}", product);
         self.product = Some(product);
+    }
+
+    fn edit_product(&mut self, product_id: u32) {
+        println!("Editing product: {}", product_id);
     }
 }
 
@@ -42,7 +45,10 @@ impl ProductComponent {
 
             let component_functions = ComponentFunctions::new(
                 vec![], vec![], vec![], 
-                vec![], vec![], 
+                vec![], 
+                vec![
+                    ("edit_product", wrap_fn_mut!(ProductComponentState, ProductComponentState::edit_product, u32))
+                ], 
                 vec![
                     ("set_product", wrap_fn_mut!(ProductComponentState, ProductComponentState::set_product, Product))
                 ],

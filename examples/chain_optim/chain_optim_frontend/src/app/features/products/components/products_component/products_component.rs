@@ -24,8 +24,6 @@ impl ProductsComponentState {
         let product_service: &ProductService = get_global_service("product-service").unwrap();
         
         self.products = product_service.get_products();
-
-        println!("Loaded products: {:?}", self.products);
     }
 }
 

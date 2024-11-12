@@ -36,6 +36,10 @@ fn substitute_state_placeholder<State: ReactiveState>(
     let property = access_field(state, property_access_path, &context.for_loop_contexts)?;
     if let Some(val) = property.as_any().downcast_ref::<String>() {
         return Ok(val.clone());
+    } else if let Some(val) = property.as_any().downcast_ref::<f64>() {
+        return Ok(val.to_string());
+    } else if let Some(val) = property.as_any().downcast_ref::<usize>() {
+        return Ok(val.to_string());
     } else {
         return Err(ParsingError::FieldAccessError(format!("Property '{}' is not a string", property_access_path)));
     }
