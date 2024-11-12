@@ -24,14 +24,14 @@ pub struct DashboardComponent {
 impl DashboardComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
         registry.insert("dashboard-component".to_string(), Box::new(move || {
-            let state_factory = || DashboardComponentState::new(
+            let state = DashboardComponentState::new(
                 "dashboard-component works!".to_string(),
             );
 
             let component = Component::new(
                 "dashboard-component".to_string(),
                 "src/app/features/dashboard/components/dashboard_component/dashboard_component.html".to_string(),
-                state_factory() 
+                state
             );
 
             Box::new(component)

@@ -66,14 +66,14 @@ pub struct {pascal_case_component_name} {{
 impl {pascal_case_component_name} {{
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {{
         registry.insert("{kebab_case_component_name}".to_string(), Box::new(move || {{
-            let state_factory = || {pascal_case_component_name}State::new(
+            let state = {pascal_case_component_name}State::new(
                 "{kebab_case_component_name} works!".to_string(),
             );
 
             let component = Component::new(
                 "{kebab_case_component_name}".to_string(),
                 "{path_to_html_from_root}".to_string(),
-                state_factory() 
+                state
             );
 
             Box::new(component)

@@ -25,14 +25,14 @@ pub struct AppComponent {
 impl AppComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
         registry.insert("app-component".to_string(), Box::new(move || {
-            let state_factory = || AppComponentState::new(
+            let state = AppComponentState::new(
                 "app-component works!".to_string(),
             );
 
             let component = Component::new(
                 "app-component".to_string(),
                 "src/app/app_component.html".to_string(),
-                state_factory() 
+                state
             );
 
             Box::new(component)

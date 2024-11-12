@@ -24,14 +24,14 @@ pub struct HomeComponent {
 impl HomeComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
         registry.insert("home-component".to_string(), Box::new(move || {
-            let state_factory = || HomeComponentState::new(
+            let state = HomeComponentState::new(
                 "home-component works!".to_string(),
             );
 
             let component = Component::new(
                 "home-component".to_string(),
                 "src/app/features/home/components/home_component/home_component.html".to_string(),
-                state_factory() 
+                state
             );
 
             Box::new(component)

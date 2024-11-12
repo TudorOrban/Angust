@@ -24,14 +24,14 @@ pub struct SettingsComponent {
 impl SettingsComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
         registry.insert("settings-component".to_string(), Box::new(move || {
-            let state_factory = || SettingsComponentState::new(
+            let state = SettingsComponentState::new(
                 "settings-component works!".to_string(),
             );
 
             let component = Component::new(
                 "settings-component".to_string(),
                 "src/app/features/settings/components/settings_component/settings_component.html".to_string(),
-                state_factory() 
+                state
             );
 
             Box::new(component)

@@ -9,6 +9,6 @@ members = [
 ]
 resolver = "2"
 exclude = [
-    "angust_cli"
+    "crates/angust_cli"
     
 ]

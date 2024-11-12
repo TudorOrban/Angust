@@ -33,14 +33,14 @@ pub struct ProductComponent {
 impl ProductComponent {
     pub fn register(registry: &mut HashMap<String, ComponentFactory>) {
         registry.insert("product-component".to_string(), Box::new(move || {
-            let state_factory = || ProductComponentState::new(
+            let state = ProductComponentState::new(
                 None
             );
 
             let mut component = Component::new(
                 "product-component".to_string(),
                 "src/app/features/products/components/product_component/product_component.html".to_string(),
-                state_factory() 
+                state
             );
 
             let component_functions = ComponentFunctions::new(
