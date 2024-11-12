@@ -76,8 +76,8 @@ impl<State: ReactiveState> Component<State> {
     // Initialization
     fn initialize(&mut self, inputs: HashMap<String, Box<dyn Any>>) {
         self.setup_listeners();
-        self.load_component_template(inputs);
         self.trigger_user_defined_init();
+        self.load_component_template(inputs);
     }
 
     fn setup_listeners(&mut self) {
@@ -113,7 +113,6 @@ impl<State: ReactiveState> Component<State> {
     }
 
     fn trigger_user_defined_init(&mut self) {
-        println!("Triggering user-defined init for component {}", self.name);
         let user_defined_init_optional = self.component_functions.initialization_function.as_ref();
         if user_defined_init_optional.is_none() {
             return;

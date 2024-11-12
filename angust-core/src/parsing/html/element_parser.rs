@@ -28,9 +28,6 @@ pub fn dispatch_element_processing<State : ReactiveState>(
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
 ) -> Result<Box<dyn Element>, ParsingError> {
-    let local_name = elem_data.name.local.as_ref();
-    let ns = elem_data.name.ns.as_ref();
-    println!("Processing element: {} (namespace: {})", local_name, ns);
     match elem_data.name.local.as_ref() {
         "div" => process_div_element::<State>(elem_data, node, parent_styles, context),
         "button" => process_button_element::<State>(elem_data, node, parent_styles, context),
@@ -62,35 +59,10 @@ fn process_div_element<State : ReactiveState>(
     if for_loop_context.is_for_loop {
         parse_for_loop(node, context, &for_loop_context, array_length, &styles, &mut container);
     } else {
-        let children_results: Result<Vec<Box<dyn Element>>, ParsingError> = node.children()
-            .map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(&styles), context))
-            .collect();
-
-        let children = children_results?;
-        for child_element in children {
-            container.add_child(child_element);
-        }
+        map_dom_children_to_elements(node, &mut container, context, &styles)?;
     }
 
     Ok(Box::new(container))
-}
-
-fn map_dom_children_to_elements<State : ReactiveState>(
-    node: &NodeRef, 
-    node_element: &mut Container,
-    context: &mut ParsingContext<State>,
-    styles: &Styles,
-) -> Result<(), ParsingError> {
-    let children_results: Result<Vec<Box<dyn Element>>, ParsingError> = node.children()
-            .map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(styles), context))
-            .collect();
-
-    let children = children_results?;
-    for child_element in children {
-        node_element.add_child(child_element);
-    }
-
-    Ok(())
 }
 
 fn parse_for_loop<State: ReactiveState>(
@@ -114,6 +86,24 @@ fn parse_for_loop<State: ReactiveState>(
     }
 
     context.remove_loop_context(&for_loop_context.context_id);
+}
+
+fn map_dom_children_to_elements<State : ReactiveState>(
+    node: &NodeRef, 
+    node_element: &mut Container,
+    context: &mut ParsingContext<State>,
+    styles: &Styles,
+) -> Result<(), ParsingError> {
+    let children_results: Result<Vec<Box<dyn Element>>, ParsingError> = node.children()
+            .map(|child| html_parser::map_dom_to_elements::<State>(&child, Some(styles), context))
+            .collect();
+    let children = children_results?;
+
+    for child_element in children {
+        node_element.add_child(child_element);
+    }
+
+    Ok(())
 }
 
 fn process_button_element<State : ReactiveState>(

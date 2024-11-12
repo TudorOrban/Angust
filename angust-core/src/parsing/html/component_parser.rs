@@ -22,7 +22,6 @@ pub fn process_custom_component<State : ReactiveState>(
     parent_styles: Option<&Styles>, 
     context: &mut ParsingContext<State>,
 ) -> Result<Box<dyn Element>, ParsingError> {
-    println!("Processing custom component: {}", component_name);
     let skippable_elements = vec!["!DOCTYPE", "html", "head", "meta", "body", "title", "h1"]; // To be implemented in the future
     if skippable_elements.contains(&component_name) {
         return html_parser::general_traversal::<State>(node, parent_styles, context)
@@ -43,7 +42,6 @@ pub fn process_custom_component<State : ReactiveState>(
     component.set_styles(styles);
     
     // Compute inputs using parent state and functions *before* initializing the component (i.e. parsing its template)
-    println!("Name: {}, Scanned inputs: {:?}", component_name, context.scanned_inputs);
     let input_values = input_evaluator::compute_inputs_from_parent_component(&component, context)?;
     
     component.initialize(input_values);
