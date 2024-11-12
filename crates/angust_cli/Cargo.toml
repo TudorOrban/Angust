@@ -1,5 +1,5 @@
 [package]
-name = "angust-cli"
+name = "angust_cli"
 version = "0.1.0"
 edition = "2021"
 
