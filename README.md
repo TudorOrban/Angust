@@ -2,7 +2,9 @@
 
 Angust is a Rust GUI framework designed to bridge the gap between the safety and performance of Rust and the simplicity and scalability of web development. It provides an Angular-style API to develop dynamic UI applications, through reusable Components and associated HTML templates.
 
-![Screenshots](/screenshots/Compilation.png)
+![AppComponent.rs](/screenshots/AppComponent.rs.png)
+![AppComponent.html](/screenshots/AppComponent.html.png)
+![ExampleAppResult](/screenshots/ExampleAppResult.png)
 
 ### Features
 * Rendering of standard **HTML - CSS**
@@ -26,4 +28,4 @@ That's it, you can now run the app with `cd <your_project_name>`, `cargo run`. H
 In mid stages of development.
 
 ### Contributing
-All contributions are warmly welcomed. Head over to [CONTRIBUTING.md](https://github.com/TudorOrban/ChainOptim-backend/blob/main/CONTRIBUTING.md) for details.
+All contributions are warmly welcomed. Head over to [CONTRIBUTING.md](https://github.com/TudorOrban/Angust/blob/main/CONTRIBUTING.md) for details.

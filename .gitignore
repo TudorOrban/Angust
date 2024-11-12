@@ -1,6 +1,9 @@
 target/
 angust-core/target/
 angust_cli/target/
-examples/full_project_example/target/
-cartan/target/
-test_angust_project/
+
+examples/cli_create_project_example/target/
+examples/chain_optim/chain_optim_frontend/target/
+examples/dev/
+
+.idea/
