@@ -1,0 +1,14 @@
+.main-sidebar-component {
+    width: 8rem;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.main-sidebar-component .primary {
+    color: var(--primary-color);
+}
+
+.main-sidebar-component .secondary {
+    color: var(--secondary-color);
+}
