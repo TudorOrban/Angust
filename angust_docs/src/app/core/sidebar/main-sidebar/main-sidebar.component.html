@@ -1,4 +1,23 @@
-<div class="w-64 h-full main-sidebar-component">
+<div class="flex flex-col justify-between main-sidebar-component">
+    <div class="flex flex-col items-center w-full py-8 space-y-8">
+        <img src="assets/images/angust_logo.jpg" alt="logo" class="w-10 h-10">
+
+        <app-version-select></app-version-select>
+
+        <div class="flex flex-col items-center w-full">
+            <button 
+                *ngFor="let item of mainNavigationItems" 
+                class="sidebar-navigation-item"
+                [class.active]="item.value === activeItemValue"
+                (click)="setActiveItem(item.value)"
+            >
+                <fa-icon [icon]="item.icon ?? faQuestion"></fa-icon> 
+                <div>
+                    {{ item.label }}
+                </div>
+            </button>
+        </div>
+    </div>
 
     <app-theme-toggle></app-theme-toggle>
 </div>
