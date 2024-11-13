@@ -4,11 +4,10 @@ members = [
     "crates/angust_macros",
     "examples/chain_optim/chain_optim_frontend",
     "examples/cli_create_project_example",
-    "examples/chain_optim/chain_optim_backend", "crates/angust_docs",
+    "examples/chain_optim/chain_optim_backend",
 
 ]
 resolver = "2"
 exclude = [
-    "crates/angust_cli"
-    
+    "crates/angust_cli",
 ]
