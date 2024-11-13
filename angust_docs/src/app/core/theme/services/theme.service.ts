@@ -17,6 +17,10 @@ export class ThemeService {
         this.applyTheme();
     }
 
+    getIsDarkTheme() {
+        return this.isDarkTheme;
+    }
+
     private applyTheme() {
         if (this.isDarkTheme) {
             document.body.classList.add('dark-theme');
