@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { VersionService } from '../../services/version.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UIItem } from '../../../../shared/types';

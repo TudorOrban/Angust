@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { UIItem } from '../../../../shared/types';
 import { CommonModule } from '@angular/common';
 import { NavigationManagerService } from '../../services/navigation-manager.service';
 import { NavigationItemType } from '../../models/navigation';
@@ -12,10 +11,13 @@ import { NavigationItemType } from '../../models/navigation';
     styleUrl: './navigation-sidebar.component.css',
 })
 export class NavigationSidebarComponent {
+    secondaryNavItems$;
     
     constructor(
         readonly navigationManagerService: NavigationManagerService,
-    ) {}
+    ) {
+        this.secondaryNavItems$ = this.navigationManagerService.activeNavItems$;
+    }
 
     NavigationItemType = NavigationItemType;
 
