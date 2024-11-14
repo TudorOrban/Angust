@@ -1,1 +1,10 @@
 <app-markdown-renderer [fileContent]="markdownContent"></app-markdown-renderer>
+
+
+<!-- Fallback -->
+<div
+    *ngIf="isMarkdownFileAbsent"
+    class="flex items-center justify-center w-full p-20 text-lg font-semibold"
+>
+    We are sorry, the documentation for this page is not available.
+</div>

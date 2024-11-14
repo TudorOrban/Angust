@@ -20,6 +20,7 @@ import { ThemeService } from '../../../../core/theme/services/theme.service';
 export class MarkdownRendererComponent implements OnChanges, OnDestroy {
     @Input() fileContent?: string;
     renderedContent?: string;
+    isMarkdownInvalid = false;
     isDarkTheme = false;
     private readonly themeSubscription: Subscription;
 
@@ -57,6 +58,7 @@ export class MarkdownRendererComponent implements OnChanges, OnDestroy {
             .catch((error) => {
                 console.error('Error rendering markdown:', error);
                 this.renderedContent = 'Error: Unable to render markdown.';
+                this.isMarkdownInvalid = true;
             });
     }
 

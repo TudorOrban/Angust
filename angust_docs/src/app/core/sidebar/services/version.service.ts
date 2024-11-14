@@ -6,9 +6,8 @@ import { UIItem } from '../../../shared/types';
 })
 export class VersionService {
     private readonly versions: UIItem[] = [
+        { label: 'v0', value: 'v0' },
         { label: 'v1', value: 'v1' },
-        { label: 'v2', value: 'v2' },
-        { label: 'v3', value: 'v3' }
     ];
     private activeVersionValue = 'v1';
 

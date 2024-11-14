@@ -1,7 +1,7 @@
 import { UIItem } from "../../../shared/types";
 
 export const secondaryNavItems: Record<string, Record<string, UIItem[]>> = {
-    "v1": {
+    "v0": {
         "user-guide": [
             {
                 label: 'What is Angust?',
@@ -153,11 +153,11 @@ export const secondaryNavItems: Record<string, Record<string, UIItem[]>> = {
             }
         ]
     },
-    "v2": {
+    "v1": {
         "user-guide": [
             {
-                label: 'What is Angust2?',
-                value: 'overview2',
+                label: 'What is Angust?',
+                value: 'overview',
             },
             {
                 label: 'Getting Started',

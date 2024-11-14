@@ -3,16 +3,18 @@ import { NavigationManagerService } from '../../../../core/sidebar/services/navi
 import { NavigationItemType } from '../../../../core/sidebar/models/navigation';
 import { MarkdownRendererComponent } from '../markdown-renderer/markdown-renderer.component';
 import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-markdown',
     standalone: true,
-    imports: [MarkdownRendererComponent],
+    imports: [CommonModule, MarkdownRendererComponent],
     templateUrl: './markdown.component.html',
     styleUrl: './markdown.component.css',
 })
 export class MarkdownComponent implements OnInit {
     markdownContent?: string;
+    isMarkdownFileAbsent = false;
 
     constructor(
         private readonly navigationManagerService: NavigationManagerService,
@@ -35,6 +37,7 @@ export class MarkdownComponent implements OnInit {
         if (secondarySubItem) {
             filePath += `/${secondarySubItem}`;
         }
+
         return `${filePath}.md`;
     }
     
@@ -45,6 +48,7 @@ export class MarkdownComponent implements OnInit {
             },
             (error) => {
                 console.error('Error loading markdown file:', error);
+                this.isMarkdownFileAbsent = true;
             }
         );
     }
