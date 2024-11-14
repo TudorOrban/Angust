@@ -6,7 +6,8 @@ import {
     faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
-import { VersionService } from '../../version/services/version.service';
+import { VersionService } from './version.service';
+import { SecondaryNavigationService } from './secondary-navigation.service';
 
 @Injectable({
     providedIn: 'root',
@@ -15,7 +16,8 @@ export class MainNavigationService {
 
     constructor(
         private readonly router: Router,
-        private readonly versionService: VersionService
+        private readonly versionService: VersionService,
+        private readonly secondaryNavigationService: SecondaryNavigationService
     ) {}
 
     private readonly navItems: UIItem[] = [
@@ -42,12 +44,7 @@ export class MainNavigationService {
     }
 
     setActiveItem(value: string) {
-        console.log("set active item to ", value);
         this.activeItemValue = value;
-        
-        let link = `${this.versionService.getActiveVersion()}/${value}`;
-
-        this.router.navigate([link]);
     }
 
     getActiveItem() {

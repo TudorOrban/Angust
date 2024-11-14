@@ -4,10 +4,11 @@ import {
     faQuestion,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { ThemeToggleComponent } from '../../theme/commponents/theme-toggle/theme-toggle.component';
-import { VersionSelectComponent } from '../../version/components/version-select/version-select.component';
+import { ThemeToggleComponent } from '../../../theme/commponents/theme-toggle/theme-toggle.component';
+import { VersionSelectComponent } from '../version-select/version-select.component';
 import { CommonModule } from '@angular/common';
-import { MainNavigationService } from '../services/main-navigation.service';
+import { NavigationManagerService } from '../../services/navigation-manager.service';
+import { NavigationItemType } from '../../models/navigation';
 
 @Component({
     selector: 'app-main-sidebar',
@@ -22,7 +23,9 @@ import { MainNavigationService } from '../services/main-navigation.service';
     styleUrl: './main-sidebar.component.css',
 })
 export class MainSidebarComponent {
-    constructor(readonly navigationService: MainNavigationService) {}
+    constructor(readonly navigationManagerService: NavigationManagerService) {}
+
+    NavigationItemType = NavigationItemType;
 
     faQuestion = faQuestion;
 

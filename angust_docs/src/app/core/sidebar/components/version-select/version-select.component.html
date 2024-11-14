@@ -1,0 +1,9 @@
+<select
+    [(ngModel)]="activeVersionValue"
+    (change)="onVersionChange(activeVersionValue)"
+    class="custom-select"
+>
+    <option *ngFor="let version of versions" [value]="version.value">
+        {{ version.label }}
+    </option>
+</select>

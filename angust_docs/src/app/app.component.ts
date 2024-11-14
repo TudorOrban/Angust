@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { MainSidebarComponent } from './core/sidebar/main-sidebar/main-sidebar.component';
-import { NavigationSidebarComponent } from './core/sidebar/navigation-sidebar/navigation-sidebar.component';
+import { MainSidebarComponent } from './core/sidebar/components/main-sidebar/main-sidebar.component';
+import { NavigationSidebarComponent } from './core/sidebar/components/navigation-sidebar/navigation-sidebar.component';
 import { MainNavigationService } from './core/sidebar/services/main-navigation.service';
 import { SecondaryNavigationService } from './core/sidebar/services/secondary-navigation.service';
 import { DynamicRoutesService } from './core/sidebar/services/dynamic-routes.service';
