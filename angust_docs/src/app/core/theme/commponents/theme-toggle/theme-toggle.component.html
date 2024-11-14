@@ -1,6 +1,6 @@
 <button
     class="sidebar-navigation-item w-full"
-    [class.active]="themeService.getIsDarkTheme()"
+    [class.active]="themeService.getIsDarkThemeValue()"
     (click)="toggleTheme()"
 >
     <fa-icon [icon]="faMoon" class="text-lg"></fa-icon>

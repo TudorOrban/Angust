@@ -8,6 +8,7 @@ import hljs from 'highlight.js';
 export class MarkdownRendererService {
     constructor() {
         const renderer = new marked.Renderer();
+        
         renderer.code = (data) => {
             const language = hljs.getLanguage(data.lang ?? "plaintext") ? data.lang : 'plaintext';
             return `<pre><code class="hljs ${language}">${
