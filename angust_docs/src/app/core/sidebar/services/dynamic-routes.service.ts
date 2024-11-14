@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Route, Router, Routes } from '@angular/router';
-import { VersionService } from './version.service';
 import { UIItem } from '../../../shared/types';
-import { MarkdownComponent } from '../../../content/markdown/markdown/markdown.component';
+import { MarkdownComponent } from '../../../content/markdown/components/markdown/markdown.component';
+import { NavigationManagerService } from './navigation-manager.service';
+import { NavigationItemType } from '../models/navigation';
 
 
 @Injectable({
@@ -11,19 +12,21 @@ import { MarkdownComponent } from '../../../content/markdown/markdown/markdown.c
 export class DynamicRoutesService {
     constructor(
         private readonly router: Router,
-        private readonly versionService: VersionService
+        private readonly navigationManagerService: NavigationManagerService,
     ) {}
     
-    public initializeRoutes(
-        mainNavItems: UIItem[],
-        secondaryNavItemsMap: Record<string, Record<string, UIItem[]>>
-    ): void {
+    public initializeRoutes(): void {
+        const versions = this.navigationManagerService.getNavItems(NavigationItemType.Version);
+        const mainNavItems = this.navigationManagerService.getNavItems(NavigationItemType.MainItem);
+        const navItemsConfiguration = this.navigationManagerService.getNavItemsConfiguration();
+
         const routes: Routes = [];
 
-        for (const version of this.versionService.getVersions()) {
+        for (const version of versions) {
             for (const mainItem of mainNavItems) {
                 const mainPath = `${version.value}/${mainItem.value}`;
-                let secondaryNavItems = secondaryNavItemsMap?.[version.value]?.[mainItem.value] ?? [];
+                let secondaryNavItems = navItemsConfiguration?.[version.value]?.[mainItem.value] ?? [];
+
                 const mainRoute: Route = {
                     path: mainPath,
                     component: MarkdownComponent,
@@ -33,8 +36,6 @@ export class DynamicRoutesService {
                 routes.push(mainRoute);
             }
         }
-
-        console.log("Routes: ", routes);
 
         this.router.resetConfig(routes);
     }

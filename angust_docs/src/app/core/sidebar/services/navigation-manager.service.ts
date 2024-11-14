@@ -111,6 +111,10 @@ export class NavigationManagerService {
     }
 
     // Getters
+    public getNavItemsConfiguration(): Record<string, Record<string, UIItem[]>> {
+        return this.secondaryNavigationService.getNavItems();
+    }
+    
     public getNavItems(type: NavigationItemType): UIItem[] {
         switch (type) {
             case NavigationItemType.Version:
