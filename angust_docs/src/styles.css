@@ -1,5 +1,6 @@
 
 @import './assets/styles/common.css';
+@import './assets/styles/markdown.css';
 
 @tailwind base;
 @tailwind components;
