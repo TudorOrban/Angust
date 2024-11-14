@@ -4,3 +4,21 @@
     color: var(--text-color);
     border: 1px solid var(--border-color);
 }
+
+.navigation-sidebar-component::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.navigation-sidebar-component::-webkit-scrollbar-track {
+    background: var(--secondary-color);
+}
+
+.navigation-sidebar-component::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-color);
+    border-radius: 4px;
+}
+
+.navigation-sidebar-component::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-color);
+}

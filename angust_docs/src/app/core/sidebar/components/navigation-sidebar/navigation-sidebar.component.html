@@ -39,7 +39,7 @@
                     <button
                         (click)="navigateTo(NavigationItemType.SecondaryItem, item, subItem.value)"
                         class="sidebar-navigation-sub-item mx-4 my-2 px-4 py-2 w-full flex items-center justify-start"
-                        [class.active]="subItem.value === navigationManagerService.getActiveSubItem()"
+                        [class.active]="item.value === navigationManagerService.getActiveItem(NavigationItemType.SecondaryItem) && subItem.value === navigationManagerService.getActiveSubItem()"
                     >
                         {{ subItem.label }}
                     </button>

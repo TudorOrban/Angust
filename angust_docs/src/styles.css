@@ -12,6 +12,8 @@
     --secondary-color: #eeeeee;
     --border-color: #dee2e6;
     --border-color-secondary: #b3b3b3;
+    --scrollbar-color: #d4d4d4;
+    --scrollbar-thumb-color: #a9a9a9;
   }
   
 .dark-theme {
@@ -21,6 +23,8 @@
     --secondary-color: #131212;
     --border-color: #222121;
     --border-color-secondary: #302f2f;
+    --scrollbar-color: #2a2a2a;
+    --scrollbar-thumb-color: #404040; 
 }
   
 body {
