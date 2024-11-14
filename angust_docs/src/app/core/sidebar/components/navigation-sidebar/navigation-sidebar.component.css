@@ -1,14 +1,6 @@
 .navigation-sidebar-component {
     width: 16rem;
-    background-color: var(--background-color);
+    background-color: var(--secondary-color);
     color: var(--text-color);
     border: 1px solid var(--border-color);
-}
-
-.navigation-sidebar-component .primary {
-    color: var(--primary-color);
-}
-
-.navigation-sidebar-component .secondary {
-    color: var(--secondary-color);
 }

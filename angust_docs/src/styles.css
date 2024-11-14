@@ -9,16 +9,18 @@
     --background-color: #ffffff;
     --text-color: #000000;
     --primary-color: #007bff;
-    --secondary-color: #6c757d;
+    --secondary-color: #eeeeee;
     --border-color: #dee2e6;
+    --border-color-secondary: #b3b3b3;
   }
   
 .dark-theme {
     --background-color: #100f0f;
     --text-color: #ffffff;
     --primary-color: #0056b3;
-    --secondary-color: #aab3b8;
+    --secondary-color: #131212;
     --border-color: #222121;
+    --border-color-secondary: #302f2f;
 }
   
 body {

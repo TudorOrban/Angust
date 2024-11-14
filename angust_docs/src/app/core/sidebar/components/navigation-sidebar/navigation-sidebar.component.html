@@ -1,14 +1,15 @@
-<div class="w-64 h-full navigation-sidebar-component">
+<div class="w-64 h-full navigation-sidebar-component overflow-x-hidden overflow-y-auto rounded-r-md">
 
-    <div class="flex flex-col items-center w-full">
+    <div class="flex flex-col items-center w-full pt-8">
         <div
             *ngFor="let item of secondaryNavItems$ | async" 
             class="w-full"
         >
+            <!-- Root item -->
             <button 
+                (click)="navigateTo(NavigationItemType.SecondaryItem, item)"
                 class="sidebar-navigation-item flex items-center justify-between w-full"
                 [class.active]="item.value === navigationManagerService.getActiveItem(NavigationItemType.SecondaryItem)"
-                (click)="navigationManagerService.navigateTo(item.value, NavigationItemType.SecondaryItem)"
             >
                 <div>
                     {{ item.label }}
@@ -16,7 +17,7 @@
 
                 <button 
                     *ngIf="item?.subItems || (item?.subItems?.length ?? 0) !== 0"
-                    (click)="item.isExpanded =!item.isExpanded"
+                    (click)="toggleExpand($event, item)"
                 >
                     <div *ngIf="!item?.isExpanded; else collapsedBlock">
                         <fa-icon [icon]="faCaretDown"></fa-icon>
@@ -27,14 +28,21 @@
                 </button>
             </button>
 
+            <!-- Sub items -->
             <div 
                 *ngIf="item?.subItems || (item?.subItems?.length?? 0) > 0"
                 [class.hidden]="!item.isExpanded"
             >
                 <div
                     *ngFor="let subItem of item.subItems" 
-                >
-                    {{ subItem.label }}
+                >   
+                    <button
+                        (click)="navigateTo(NavigationItemType.SecondaryItem, item, subItem.value)"
+                        class="sidebar-navigation-sub-item mx-4 my-2 px-4 py-2 w-full flex items-center justify-start"
+                        [class.active]="subItem.value === navigationManagerService.getActiveSubItem()"
+                    >
+                        {{ subItem.label }}
+                    </button>
                 </div>
             </div>
         </div>

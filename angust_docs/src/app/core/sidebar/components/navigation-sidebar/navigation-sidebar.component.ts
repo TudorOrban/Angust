@@ -4,6 +4,7 @@ import { NavigationManagerService } from '../../services/navigation-manager.serv
 import { NavigationItemType } from '../../models/navigation';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { UIItem } from '../../../../shared/types';
 
 @Component({
     selector: 'app-navigation-sidebar',
@@ -22,6 +23,16 @@ export class NavigationSidebarComponent {
     }
 
     NavigationItemType = NavigationItemType;
+
+    navigateTo(type: NavigationItemType, item: UIItem, subItemValue?: string): void {
+        item.isExpanded = true;
+        this.navigationManagerService.navigateTo(type, item.value, subItemValue);
+    }
+
+    toggleExpand(event: Event, item: UIItem): void {
+        event.stopPropagation(); // Prevent navigateTo() from firing.
+        item.isExpanded = !item.isExpanded;
+    }    
 
     faCaretUp = faCaretUp;
     faCaretDown = faCaretDown;

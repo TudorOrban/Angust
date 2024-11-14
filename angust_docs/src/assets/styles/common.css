@@ -1,3 +1,4 @@
+/* Navigation */
 .sidebar-navigation-item {
     padding: 1rem;
     color: var(--text-color, #777);
@@ -8,6 +9,18 @@
     color: white;
     background-color: var(--primary-color, #0056b3);
 }
+
+.sidebar-navigation-sub-item {
+    color: var(--text-color, #777);
+    transition: background-color 0.3s, color 0.3s;
+    border-left: 3px solid var(--border-color-secondary);
+}
+
+.sidebar-navigation-sub-item.active {
+    border-left: 4px solid var(--primary-color);
+}
+
+
 
 
 .custom-select {

@@ -1,7 +1,7 @@
 .main-sidebar-component {
     width: 8rem;
     height: 100%;
-    background-color: var(--background-color);
+    background-color: var(--secondary-color);
     color: var(--text-color);
     border: 1px solid var(--border-color);
 }

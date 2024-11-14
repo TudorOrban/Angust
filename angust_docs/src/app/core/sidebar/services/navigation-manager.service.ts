@@ -28,7 +28,7 @@ export class NavigationManagerService {
         this.activeNavItemsSource.next(initialItems);
     }
 
-    public navigateTo(value: string, type: NavigationItemType): void {
+    public navigateTo(type: NavigationItemType, itemValue: string, itemSubValue?: string): void {
         const version = this.versionService.getActiveVersion();
         const mainItem = this.mainNavigationService.getActiveItem();
         
@@ -36,22 +36,22 @@ export class NavigationManagerService {
 
         switch (type) {
             case NavigationItemType.Version: {
-                link = this.handleVersionNavigation(value, mainItem);
+                link = this.handleVersionNavigation(itemValue, mainItem);
                 break;
             }
             case NavigationItemType.MainItem: {
-                link = this.handleMainItemNavigation(version, value);
+                link = this.handleMainItemNavigation(version, itemValue);
                 break;
             }
             case NavigationItemType.SecondaryItem:
-                link = this.handleSecondaryItemNavigation(version, mainItem, value);
+                link = this.handleSecondaryItemNavigation(version, mainItem, itemValue, itemSubValue);
                 break;
             default:
                 break;
         }
 
         if (!link) {
-            console.log("Invalid link type: ", type);
+            console.error("Invalid link type: ", type);
             return;
         }
         this.router.navigate([link]);
@@ -64,6 +64,7 @@ export class NavigationManagerService {
         const firstSecondaryItem = this.secondaryNavigationService.getNavItems()?.[newVersion]?.[mainItem]?.[0];
         if (firstSecondaryItem) {
             this.secondaryNavigationService.setActiveItem(firstSecondaryItem.value);
+            this.secondaryNavigationService.setActiveSubItem();
             this.setActiveNavItems(newVersion, mainItem);
             return `${newVersion}/${mainItem}/${firstSecondaryItem.value}`;
         } else {
@@ -79,6 +80,7 @@ export class NavigationManagerService {
         const firstSecondaryItem = this.secondaryNavigationService.getNavItems()?.[version]?.[newMainItem]?.[0];
         if (firstSecondaryItem) {
             this.secondaryNavigationService.setActiveItem(firstSecondaryItem.value);
+            this.secondaryNavigationService.setActiveSubItem();
             this.setActiveNavItems(version, newMainItem);
             return `${version}/${newMainItem}/${firstSecondaryItem.value}`;
         } else {
@@ -87,9 +89,20 @@ export class NavigationManagerService {
         }
     }
 
-    private handleSecondaryItemNavigation(version: string, mainItem: string, newSecondaryItem: string): string | undefined {
+    private handleSecondaryItemNavigation(
+        version: string, 
+        mainItem: string, 
+        newSecondaryItem: string, 
+        newSecondaryItemSubValue?: string,
+    ): string | undefined {
         this.secondaryNavigationService.setActiveItem(newSecondaryItem);
-        return `${version}/${mainItem}/${newSecondaryItem}`;
+        this.secondaryNavigationService.setActiveSubItem(newSecondaryItemSubValue);
+
+        let link = `${version}/${mainItem}/${newSecondaryItem}`;
+        if (newSecondaryItemSubValue) {
+            link += `/${newSecondaryItemSubValue}`;
+        }
+        return link;
     }
 
     private setActiveNavItems(version: string, mainItem: string): void {
@@ -130,6 +143,10 @@ export class NavigationManagerService {
 
     getActiveNavItems(): UIItem[] {
         return this.activeNavItemsSource.value;
+    }
+
+    public getActiveSubItem(): string | undefined {
+        return this.secondaryNavigationService.getActiveSubItem();
     }
 
 }

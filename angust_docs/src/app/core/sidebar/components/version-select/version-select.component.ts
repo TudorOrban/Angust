@@ -24,7 +24,7 @@ export class VersionSelectComponent {
     }
 
     onVersionChange(newVersion: string): void {
-        this.navigationManagerService.navigateTo(newVersion, NavigationItemType.Version);
+        this.navigationManagerService.navigateTo(NavigationItemType.Version, newVersion);
 
         this.activeVersionValue = newVersion;
     }
