@@ -28,7 +28,7 @@ export class NavigationManagerService {
         this.activeNavItemsSource.next(initialItems);
     }
 
-    public setActiveItem(value: string, type: NavigationItemType) {
+    public navigateTo(value: string, type: NavigationItemType): void {
         const version = this.versionService.getActiveVersion();
         const mainItem = this.mainNavigationService.getActiveItem();
         
@@ -36,36 +36,15 @@ export class NavigationManagerService {
 
         switch (type) {
             case NavigationItemType.Version: {
-                this.versionService.setActiveVersion(value);
-
-                // Ensure to update the active secondary navigation item to the first one when changing the version.
-                const firstSecondaryItem = this.secondaryNavigationService.getNavItems()?.[version]?.[mainItem]?.[0];
-                if (firstSecondaryItem) {
-                    link = `${value}/${mainItem}/${firstSecondaryItem.value}`;
-                    this.secondaryNavigationService.setActiveItem(firstSecondaryItem.value);
-                    this.setActiveNavItems(version, mainItem);
-                }
-
+                link = this.handleVersionNavigation(value, mainItem);
                 break;
             }
             case NavigationItemType.MainItem: {
-                this.mainNavigationService.setActiveItem(value);
-                
-                // Ensure to update the active secondary navigation item to the first one when changing the main item.
-                const firstSecondaryItem = this.secondaryNavigationService.getNavItems()?.[version]?.[value]?.[0];
-                if (firstSecondaryItem) {
-                    link = `${version}/${value}/${firstSecondaryItem.value}`;
-                    this.secondaryNavigationService.setActiveItem(firstSecondaryItem.value);
-                    this.setActiveNavItems(version, value);
-                } else {
-                    console.log("No secondary items for main item: ", value);
-                }
-
+                link = this.handleMainItemNavigation(version, value);
                 break;
             }
             case NavigationItemType.SecondaryItem:
-                this.secondaryNavigationService.setActiveItem(value);
-                link = `${version}/${mainItem}/${value}`;
+                link = this.handleSecondaryItemNavigation(version, mainItem, value);
                 break;
             default:
                 break;
@@ -78,6 +57,47 @@ export class NavigationManagerService {
         this.router.navigate([link]);
     }
 
+    private handleVersionNavigation(newVersion: string, mainItem: string): string | undefined {
+        this.versionService.setActiveVersion(newVersion);
+
+        // Ensure to update the active secondary navigation item to the first one when changing the version.
+        const firstSecondaryItem = this.secondaryNavigationService.getNavItems()?.[newVersion]?.[mainItem]?.[0];
+        if (firstSecondaryItem) {
+            this.secondaryNavigationService.setActiveItem(firstSecondaryItem.value);
+            this.setActiveNavItems(newVersion, mainItem);
+            return `${newVersion}/${mainItem}/${firstSecondaryItem.value}`;
+        } else {
+            console.log("No secondary items for version: ", newVersion);
+            return undefined;
+        }
+    }
+
+    private handleMainItemNavigation(version: string, newMainItem: string): string | undefined {
+        this.mainNavigationService.setActiveItem(newMainItem);
+                
+        // Ensure to update the active secondary navigation item to the first one when changing the main item.
+        const firstSecondaryItem = this.secondaryNavigationService.getNavItems()?.[version]?.[newMainItem]?.[0];
+        if (firstSecondaryItem) {
+            this.secondaryNavigationService.setActiveItem(firstSecondaryItem.value);
+            this.setActiveNavItems(version, newMainItem);
+            return `${version}/${newMainItem}/${firstSecondaryItem.value}`;
+        } else {
+            console.log("No secondary items for main item: ", newMainItem);
+            return undefined;
+        }
+    }
+
+    private handleSecondaryItemNavigation(version: string, mainItem: string, newSecondaryItem: string): string | undefined {
+        this.secondaryNavigationService.setActiveItem(newSecondaryItem);
+        return `${version}/${mainItem}/${newSecondaryItem}`;
+    }
+
+    private setActiveNavItems(version: string, mainItem: string): void {
+        const navItems = this.secondaryNavigationService.getNavItems()?.[version]?.[mainItem];
+        this.activeNavItemsSource.next(navItems ?? []);
+    }
+
+    // Getters
     public getNavItems(type: NavigationItemType): UIItem[] {
         switch (type) {
             case NavigationItemType.Version:
@@ -108,14 +128,8 @@ export class NavigationManagerService {
         return this.activeNavItemsSource.asObservable();
     }
 
-    getActiveNavItems() {
+    getActiveNavItems(): UIItem[] {
         return this.activeNavItemsSource.value;
     }
 
-    setActiveNavItems(version: string, mainItem: string) {
-        console.log("setActiveNavItems: ", version, mainItem);
-        const navItems = this.secondaryNavigationService.getNavItems()?.[version]?.[mainItem];
-        console.log("navItems: ", navItems);
-        this.activeNavItemsSource.next(navItems ?? []);
-    }
 }

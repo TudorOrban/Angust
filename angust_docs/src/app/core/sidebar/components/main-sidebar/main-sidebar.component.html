@@ -7,9 +7,9 @@
         <div class="flex flex-col items-center w-full">
             <button 
                 *ngFor="let item of navigationManagerService.getNavItems(NavigationItemType.MainItem)" 
-                class="sidebar-navigation-item"
+                class="sidebar-navigation-item flex flex-col items-center w-full"
                 [class.active]="item.value === navigationManagerService.getActiveItem(NavigationItemType.MainItem)"
-                (click)="navigationManagerService.setActiveItem(item.value, NavigationItemType.MainItem)"
+                (click)="navigationManagerService.navigateTo(item.value, NavigationItemType.MainItem)"
             >
                 <fa-icon [icon]="item.icon ?? faQuestion"></fa-icon> 
                 <div>

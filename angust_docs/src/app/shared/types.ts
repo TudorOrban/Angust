@@ -12,5 +12,7 @@ export interface UIItem {
     value: string;
     link?: string;
     icon?: IconDefinition;
+    isActive?: boolean;
+    isExpanded?: boolean;
     subItems?: UIItem[];
 }
