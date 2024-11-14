@@ -1,4 +1,10 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import {
+    Component,
+    Input,
+    OnChanges,
+    OnDestroy,
+    SimpleChanges,
+} from '@angular/core';
 import { MarkdownRendererService } from '../../services/markdown-renderer.service';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
@@ -26,6 +32,7 @@ export class MarkdownRendererComponent implements OnChanges, OnDestroy {
             .subscribe((isDarkTheme) => {
                 console.log('Is dark theme:', isDarkTheme);
                 this.isDarkTheme = isDarkTheme;
+                this.updateHighlightTheme();
             });
     }
 
@@ -53,9 +60,25 @@ export class MarkdownRendererComponent implements OnChanges, OnDestroy {
             });
     }
 
+    private updateHighlightTheme() {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = this.isDarkTheme
+            ? 'assets/styles/markdown/github-dark.css'
+            : 'assets/styles/markdown/github.css';
+        link.id = 'highlight-theme';
+
+        const existingLink = document.getElementById('highlight-theme');
+        if (existingLink) {
+            document.head.removeChild(existingLink);
+        }
+
+        document.head.appendChild(link);
+    }
+
     ngOnDestroy(): void {
         if (this.themeSubscription) {
             this.themeSubscription.unsubscribe();
         }
-  }
+    }
 }
