@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class VersionService {
     private readonly versions = ['v1', 'v2', 'v3'];
-    private currentSelectedVersion = 'v1';
+    private activeVersion = 'v1';
 
     constructor() {}
 
@@ -13,11 +13,11 @@ export class VersionService {
         return this.versions;
     }
 
-    getCurrentSelectedVersion() {
-        return this.currentSelectedVersion;
+    getActiveVersion() {
+        return this.activeVersion;
     }
 
-    setCurrentSelectedVersion(version: string) {
-        this.currentSelectedVersion = version;
+    setActiveVersion(version: string) {
+        this.activeVersion = version;
     }
 }

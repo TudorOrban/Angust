@@ -1,6 +1,6 @@
 <select
-    [(ngModel)]="selectedVersion"
-    (change)="onVersionChange(selectedVersion)"
+    [(ngModel)]="activeVersion"
+    (change)="onVersionChange(activeVersion)"
     class="custom-select"
 >
     <option *ngFor="let version of versions" [value]="version">

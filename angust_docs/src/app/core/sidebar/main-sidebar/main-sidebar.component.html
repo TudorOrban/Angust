@@ -6,7 +6,7 @@
 
         <div class="flex flex-col items-center w-full">
             <button 
-                *ngFor="let item of navigationService.getMainNavigationItems()" 
+                *ngFor="let item of navigationService.getNavItems()" 
                 class="sidebar-navigation-item"
                 [class.active]="item.value === navigationService.getActiveItem()"
                 (click)="navigationService.setActiveItem(item.value)"

@@ -12,15 +12,15 @@ import { FormsModule } from '@angular/forms';
 })
 export class VersionSelectComponent {
     versions: string[];
-    selectedVersion: string;
+    activeVersion: string;
 
     constructor(private readonly versionService: VersionService) {
         this.versions = this.versionService.getVersions();
-        this.selectedVersion = this.versionService.getCurrentSelectedVersion();
+        this.activeVersion = this.versionService.getActiveVersion();
     }
 
     onVersionChange(newVersion: string): void {
-        this.versionService.setCurrentSelectedVersion(newVersion);
-        this.selectedVersion = newVersion;
+        this.versionService.setActiveVersion(newVersion);
+        this.activeVersion = newVersion;
     }
 }
