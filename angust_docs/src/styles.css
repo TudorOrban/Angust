@@ -19,10 +19,10 @@
   }
   
 .dark-theme {
-    --background-color: #100f0f;
+    --background-color: #08080e;
     --text-color: #ffffff;
     --primary-color: #0056b3;
-    --secondary-color: #131212;
+    --secondary-color: #090912;
     --border-color: #222121;
     --border-color-secondary: #302f2f;
     --scrollbar-color: #2a2a2a;

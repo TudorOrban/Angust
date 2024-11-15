@@ -27,6 +27,8 @@ export class MarkdownComponent implements OnInit {
         const secondaryItem = this.navigationManagerService.getActiveItem(NavigationItemType.SecondaryItem);
         const secondarySubItem = this.navigationManagerService.getActiveSubItem();
 
+        console.log("Version, mainItem, secondaryItem, secondarySubItem:", version, mainItem, secondaryItem, secondarySubItem);
+
         const filePath = this.constructMarkdownFilePath(version, mainItem, secondaryItem, secondarySubItem);
 
         this.loadMarkdownFile(filePath);

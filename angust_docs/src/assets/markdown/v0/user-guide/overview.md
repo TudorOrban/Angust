@@ -9,18 +9,18 @@ This [User Guide](https://tudororban.github.io/Angust/v0/user-guide/overview) ai
 
 &nbsp;
 
-> **Important Note**: Angust is currently in mid stages of development. As such, it still misses many useful features, contains many bugs and optimization issues, and it has an unstable API. We plan to release a production-grade initial version of the framework in the near future.
+> **Important Note**: Angust is currently in mid stages of development. As such, it still misses many core features, contains many bugs and optimization issues, and it has an unstable API. We plan to release a production-grade initial version of the framework in the near future.  Stay tuned for updates and consider contributing to the project to help shape its future.
 
 &nbsp;
 
 ## Table of Contents
 
-- [Getting Started](https://tudororban.github.io/Angust/v0/api-reference/getting-started)
-- [HTML and CSS](#html-and-css)
-- [Components](#components)
-- [Directives](#directives)
-- [Services](#services)
-- [Angust CLI](#angust-cli)
-- [Troubleshooting](#troubleshooting)
-- [Best Practices](#best-practices)
-- [Roadmap](#roadmap)
+- [Getting Started](https://tudororban.github.io/Angust/v0/user-guide/getting-started)
+- [HTML and CSS](https://tudorban.github.io/Angust/v0/user-guide/html-and-css)
+- [Components](https://tudorban.github.io/Angust/v0/user-guide/components/overview)
+- [Directives](https://tudorban.github.io/Angust/v0/user-guide/directives/overview)
+- [Services](https://tudorban.github.io/Angust/v0/user-guide/services/overview)
+- [Angust CLI](https://tudorban.github.io/Angust/v0/user-guide/angust-cli/overview)
+- [Troubleshooting](https://tudorban.github.io/Angust/v0/user-guide/troubleshooting)
+- [Best Practices](https://tudorban.github.io/Angust/v0/user-guide/best-practices)
+- [Roadmap](https://tudorban.github.io/Angust/v0/user-guide/roadmap)

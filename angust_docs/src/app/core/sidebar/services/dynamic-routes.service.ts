@@ -30,7 +30,7 @@ export class DynamicRoutesService {
                 const mainRoute: Route = {
                     path: mainPath,
                     component: MarkdownComponent,
-                    children: this.buildChildRoutes(secondaryNavItems)
+                    children: this.buildChildRoutes(secondaryNavItems),
                 };
 
                 routes.push(mainRoute);
