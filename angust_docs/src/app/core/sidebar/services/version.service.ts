@@ -9,7 +9,7 @@ export class VersionService {
         { label: 'v0', value: 'v0' },
         { label: 'v1', value: 'v1' },
     ];
-    private activeVersionValue = 'v1';
+    private activeVersionValue = 'v0';
 
     constructor() {}
 

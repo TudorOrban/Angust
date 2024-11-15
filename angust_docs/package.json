@@ -21,6 +21,7 @@
     "@fortawesome/angular-fontawesome": "^0.15.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "github-markdown-css": "^5.7.0",
     "highlight.js": "^11.10.0",
     "marked": "^15.0.0",
     "rxjs": "~7.8.0",

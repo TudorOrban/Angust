@@ -24,7 +24,7 @@ export class NavigationManagerService {
         private readonly mainNavigationService: MainNavigationService,
         private readonly secondaryNavigationService: SecondaryNavigationService
     ) {
-        const initialItems = this.secondaryNavigationService.getNavItems()["v1"]["user-guide"];
+        const initialItems = this.secondaryNavigationService.getNavItems()["v0"]["user-guide"];
         this.activeNavItemsSource.next(initialItems);
     }
 

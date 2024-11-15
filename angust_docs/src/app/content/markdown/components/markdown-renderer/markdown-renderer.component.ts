@@ -31,9 +31,8 @@ export class MarkdownRendererComponent implements OnChanges, OnDestroy {
         this.themeSubscription = this.themeService
             .getIsDarkTheme()
             .subscribe((isDarkTheme) => {
-                console.log('Is dark theme:', isDarkTheme);
                 this.isDarkTheme = isDarkTheme;
-                this.updateHighlightTheme();
+                this.updateTheme();
             });
     }
 
@@ -46,7 +45,6 @@ export class MarkdownRendererComponent implements OnChanges, OnDestroy {
             this.fileContent
         );
         if (!(result instanceof Promise)) {
-            console.log('Result: ', result);
             this.renderedContent = result;
             return;
         }
@@ -60,6 +58,27 @@ export class MarkdownRendererComponent implements OnChanges, OnDestroy {
                 this.renderedContent = 'Error: Unable to render markdown.';
                 this.isMarkdownInvalid = true;
             });
+    }
+
+    private updateTheme() {
+        this.updateMarkdownTheme();
+        this.updateHighlightTheme();
+    }
+    
+    private updateMarkdownTheme() {
+        const link = document.createElement('link');
+        link.rel ='stylesheet';
+        link.href = this.isDarkTheme
+           ? 'assets/styles/markdown/github-markdown-dark.css'
+           : 'assets/styles/markdown/github-markdown-light.css';
+        link.id ='markdown-theme';
+
+        const existingLink = document.getElementById('markdown-theme');
+        if (existingLink) {
+            document.head.removeChild(existingLink);
+        }
+
+        document.head.appendChild(link);
     }
 
     private updateHighlightTheme() {
