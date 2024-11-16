@@ -21,6 +21,7 @@ export class MarkdownRendererComponent implements OnChanges, OnDestroy {
     @Input() fileContent?: string;
     renderedContent?: string;
     isMarkdownInvalid = false;
+    isMardownReady = false;
     isDarkTheme = false;
     private readonly themeSubscription: Subscription;
 
@@ -41,17 +42,17 @@ export class MarkdownRendererComponent implements OnChanges, OnDestroy {
             return;
         }
 
-        const result = this.markdownRendererService.renderMarkdown(
-            this.fileContent
-        );
+        const result = this.markdownRendererService.renderMarkdown(this.fileContent);
         if (!(result instanceof Promise)) {
             this.renderedContent = result;
+            this.isMardownReady = true;
             return;
         }
 
         result
             .then((renderedContent) => {
                 this.renderedContent = renderedContent;
+                this.isMardownReady = true;
             })
             .catch((error) => {
                 console.error('Error rendering markdown:', error);
