@@ -131,6 +131,28 @@ impl ReflectiveState for f64 {
     }
 }
 
+impl ReflectiveState for bool {
+    fn get_field(&self, _name: &str) -> Option<Box<dyn ReflectiveState>> {
+        None
+    }
+
+    fn set_field(&mut self, _name: &str, _value: Box<dyn Any>) {
+        // Do nothing
+    }
+
+    fn get_all_properties(&self) -> Vec<&str> {
+        vec![]
+    }
+    
+    fn as_any(&self) -> Box<dyn Any> {
+        Box::new(self.clone())
+    }
+
+    fn clone_box(&self) -> Box<dyn ReflectiveState> {
+        Box::new(self.clone())
+    }
+}
+
 impl<T> ReflectiveState for Vec<T>
 where
     T: ReflectiveState + Clone + 'static,

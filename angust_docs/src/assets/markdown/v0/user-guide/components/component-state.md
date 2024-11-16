@@ -42,7 +42,6 @@ The `angust_macros` crate should be already added to your dependencies by the `a
 Once you define your struct, you can provide it, with some initial values, in the component registration:
 
 ```rust
-
 pub struct SomeComponent;
 
 impl SomeComponent {
@@ -69,6 +68,12 @@ Now the `{{ content }}` placeholder in the template should be replaced with "Wel
 
 &nbsp;
 
+> **Important Note**: Reactivity of the Component State will be considerably refactored in the near future. Expect changes before the release of the initial version v1.
+
+&nbsp;
+
 ## Next Step
 
 Next you can learn about how to define [Component Functions](https://tudorban.github.io/Angust/v0/user-guide/components/component-functions).
+
+&nbsp;
