@@ -111,8 +111,19 @@ code.hljs {
 .hljs-link,
 .hljs-params,
 .hljs-property,
-.hljs-punctuation,
-.hljs-tag {
+.hljs-punctuation {
   /* purposely ignored */
   
+}
+
+.hljs-tag {
+  color: #dbdbdb
+}
+
+.hljs-name {
+  color: #2dbf4f !important;
+}
+
+.hljs-attr {
+  color: #79c0ff !important;
 }
