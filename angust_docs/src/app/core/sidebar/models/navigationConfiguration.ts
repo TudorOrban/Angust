@@ -28,20 +28,12 @@ export const secondaryNavItems: Record<string, Record<string, UIItem[]>> = {
                         value: 'component-state',
                     },
                     {
-                        label: 'HTML Templates',
-                        value: 'html-templates',   
-                    },
-                    {
                         label: 'Component Functions',
                         value: 'component-functions',
                     },
                     {
-                        label: 'Component Inputs',
-                        value: 'component-inputs',
-                    },
-                    {
-                        label: 'Component Outputs',
-                        value: 'component-outputs',
+                        label: 'Inputs and Outputs',
+                        value: 'inputs-and-outputs',
                     },
                     {
                         label: 'Lifecycle Hooks',
