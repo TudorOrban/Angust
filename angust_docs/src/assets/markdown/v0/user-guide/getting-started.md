@@ -16,7 +16,7 @@ This section will guide you through the steps needed to get your first Angust pr
 
 #### Install Angust CLI
 
-For ease of development, we highly recommend installing the [Angust CLI](https://crates.io/TudorAOrban/angust_cli). After download, add the angust_cli executable to your environment variables.
+For ease of development, we highly recommend installing the [Angust CLI](TBA). After download, add the angust_cli executable to your environment variables.
 
 #### Create a new Angust project
 
