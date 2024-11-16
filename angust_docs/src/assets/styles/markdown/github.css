@@ -48,7 +48,7 @@ code.hljs {
 .hljs-selector-class,
 .hljs-selector-id {
   /* prettylights-syntax-constant */
-  color: #005cc5
+  color: #005cc5 !important
 }
 .hljs-regexp,
 .hljs-string,
@@ -72,7 +72,7 @@ code.hljs {
 .hljs-selector-tag,
 .hljs-selector-pseudo {
   /* prettylights-syntax-entity-tag */
-  color: #22863a
+  color: #2dbf4f !important
 }
 .hljs-subst {
   /* prettylights-syntax-storage-modifier-import */

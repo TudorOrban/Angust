@@ -55,7 +55,7 @@ code.hljs {
 }
 .hljs-tag .hljs-name,
 .hljs-tag .hljs-attr {
-  color: #444
+  color: #2dbf4f !important
 }
 .hljs-keyword,
 .hljs-attribute,

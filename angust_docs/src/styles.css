@@ -1,7 +1,6 @@
 
 @import './assets/styles/common.css';
 @import './assets/styles/markdown/markdown.css';
-@import './assets/styles/markdown/github-markdown.css';
 
 @tailwind base;
 @tailwind components;
