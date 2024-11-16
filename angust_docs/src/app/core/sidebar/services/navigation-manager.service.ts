@@ -113,6 +113,8 @@ export class NavigationManagerService {
 
                 this.secondaryNavigationService.setActiveSubItem(newSecondaryItemSubValue);
                 link += `/${newSecondaryItemSubValue}`;
+            } else {
+                this.secondaryNavigationService.setActiveSubItem();
             }
         } else {
             this.secondaryNavigationService.setActiveSubItem(newSecondaryItemSubValue);
