@@ -3,7 +3,7 @@ use angust::rendering::elements::service::service_registry::{initialize_service_
 
 
 pub fn register_services() {
-    let mut registry = ServiceRegistry::new();
+    let registry = ServiceRegistry::new();
 
     initialize_service_registry(registry);
 }
