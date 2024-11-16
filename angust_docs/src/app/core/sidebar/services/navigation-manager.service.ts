@@ -92,16 +92,33 @@ export class NavigationManagerService {
     private handleSecondaryItemNavigation(
         version: string, 
         mainItem: string, 
-        newSecondaryItem: string, 
+        newSecondaryItemValue: string, 
         newSecondaryItemSubValue?: string,
     ): string | undefined {
-        this.secondaryNavigationService.setActiveItem(newSecondaryItem);
-        this.secondaryNavigationService.setActiveSubItem(newSecondaryItemSubValue);
+        this.secondaryNavigationService.setActiveItem(newSecondaryItemValue);
 
-        let link = `${version}/${mainItem}/${newSecondaryItem}`;
-        if (newSecondaryItemSubValue) {
+        let link = `${version}/${mainItem}/${newSecondaryItemValue}`;
+
+        if (!newSecondaryItemSubValue) {
+            // If no newSecondaryItemSubValue, try to pick the first one on newSecondaryItem if it exists
+            const newSecondaryItem = this.secondaryNavigationService.getNavItems()?.[version]?.[mainItem]
+                ?.find((navItem) => navItem.value === newSecondaryItemValue);
+            if (!newSecondaryItem) {
+                console.log("Secondary Item Value not found in NavItems: ", newSecondaryItemValue);
+                return undefined;
+            }
+
+            if ((newSecondaryItem?.subItems?.length ?? 0) > 0) {
+                const newSecondaryItemSubValue = newSecondaryItem?.subItems?.[0].value;
+
+                this.secondaryNavigationService.setActiveSubItem(newSecondaryItemSubValue);
+                link += `/${newSecondaryItemSubValue}`;
+            }
+        } else {
+            this.secondaryNavigationService.setActiveSubItem(newSecondaryItemSubValue);
             link += `/${newSecondaryItemSubValue}`;
         }
+
         return link;
     }
 
