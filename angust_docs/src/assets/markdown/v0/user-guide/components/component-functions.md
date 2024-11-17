@@ -70,7 +70,7 @@ impl SomeComponent {
 
 Here we pass the transformed function to the `ComponentFunctions` constructor and add `component_functions` to the component. Ignore the other arguments for now.
 
-We will see in the [Directives](https://tudorban.github.io/Angust/v0/user-guide/directives/overview) how you can trigger the `toggle_dark_theme` from the template.
+We will see in the [Directives](https://tudorban.github.io/Angust/v0/user-guide/directives/overview) section how you can trigger the `toggle_dark_theme` from the template.
 
 &nbsp;
 

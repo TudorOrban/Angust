@@ -2,7 +2,6 @@ use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use mysql::*;
 use mysql::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct User {

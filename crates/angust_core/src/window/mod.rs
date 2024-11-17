@@ -8,7 +8,7 @@ use glutin::{
     surface::{Surface as GlutinSurface, SurfaceAttributesBuilder, WindowSurface},
 };
 use glutin_winit::DisplayBuilder;
-use raw_window_handle::{HasRawWindowHandle, HasWindowHandle};
+use raw_window_handle::HasRawWindowHandle;
 use skia_safe::gpu::DirectContext;
 use std::num::NonZeroU32;
 use winit::dpi::LogicalSize;
