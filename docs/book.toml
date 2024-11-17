@@ -1,8 +1,0 @@
-[book]
-authors = ["Tudor Andrei Orban"]
-language = "en"
-multilingual = false
-src = "src"
-title = "Angust Documentation"
-
-[output.html]
