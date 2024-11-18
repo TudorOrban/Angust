@@ -73,7 +73,7 @@ export const secondaryNavItems: Record<string, Record<string, UIItem[]>> = {
                     },
                     {
                         label: 'Registration and Usage',
-                        value:'registration',
+                        value:'registration-and-usage',
                     },
                     {
                         label: 'Async Operations',
