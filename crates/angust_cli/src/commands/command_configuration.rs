@@ -4,8 +4,8 @@ use clap::{Arg, Command};
 pub fn get_command_configuration() -> Command {
     Command::new("angust_cli")
         .version("0.1.0")
-        .author("Tudor Andrei Orban <tudororban2@gmail.com>")
-        .about("A CLI tool for managing Angust projects")
+        .author("Tudor Andrei Orban <tudoraorban@protonmail.com>")
+        .about("CLI tool for the Angust GUI framework")
         .subcommand(
             Command::new("create_project")
                 .about("Creates a new Angust project")

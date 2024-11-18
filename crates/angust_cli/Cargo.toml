@@ -2,6 +2,11 @@
 name = "angust_cli"
 version = "0.1.0"
 edition = "2021"
+authors = ["Tudor Andrei Orban <tudoraorban@protonmail.com>"]
+description = "A CLI tool for the Angust GUI framework"
+repository = "https://github.com/TudorOrban/Angust"
+license = "MIT"
+documentation = "https://tudororban.github.io/Angust"
 
 [dependencies]
 clap = "4.5.20"
@@ -9,3 +14,7 @@ clap = "4.5.20"
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.128"
 toml_edit = "0.22.22"
+
+[[bin]]
+name = "angust_cli"
+path = "src/main.rs"

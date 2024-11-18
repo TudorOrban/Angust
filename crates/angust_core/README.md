@@ -2,9 +2,14 @@
 
 Angust is a Rust GUI framework designed to bridge the gap between the safety and performance of Rust and the simplicity and scalability of web development. It provides an Angular-style API to develop dynamic UI applications, through reusable Components and associated HTML templates.
 
-This crate contains the core features provided by Angust. See also the [Angust CLI tool](TBA) and the [Angust Macros](TBA). 
+This crate contains the core features provided by Angust. See also the [Angust CLI tool](https://crates.io/crates/angust_cli) and the [Angust Macros](https://crates.io/crates/angust_macros).
+
+### Status
+
+**Angust is in the mid-stages of development**. As such, it still contains various bugs, misses important features and has an unstable API. Users are advised to use Angust with caution. We welcome feedback and contributions to help shape the future of Angust.
 
 ### Features
+
 * Declaration of UI through standard **HTML - CSS**
 * **Custom Components** with: HTML templates, reflective and reactive Component State, inputs and outputs, lifetime hooks
 * HTML **Directives**: @if, @for, @onclick, supporting complex Rust expressions
@@ -16,12 +21,10 @@ This crate contains the core features provided by Angust. See also the [Angust C
 
 For comprehensive and up-to-date documentation, please visit our [official documentation website](https://TudorOrban.github.io/Angust). This website is the primary source for all documentation related to Angust, including API references, tutorials, and examples.
 
-### Status
-In mid stages of development.
-
 ### Contributing
+
 All contributions are warmly welcomed. Head over to [CONTRIBUTING.md](https://github.com/TudorOrban/Angust/blob/main/CONTRIBUTING.md) for details.
 
 ### License
 
-Angust is licensed under the MIT License. See the [LICENSE](https://github.com/TudorOrban/Angust/blob/main/LICENSE) file for more details.
+Angust is licensed under the MIT License. See the [LICENSE](https://github.com/TudorOrban/Angust/blob/main/LICENSE.md) file for more details.
