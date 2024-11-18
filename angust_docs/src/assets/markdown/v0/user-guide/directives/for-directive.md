@@ -76,6 +76,6 @@ Also, the array you want to iterate over can be further nested down in the compo
 
 ## Next step
 
-Lastly, check out the [onclick directive](https://tudororban.github.io/Angust/v0/user-guide/directives/onclick-directive).
+Lastly, check out the [onclick directive](https://tudororban.github.io/Angust/v0/user-guide/directives/on-click-directive).
 
 &nbsp;
