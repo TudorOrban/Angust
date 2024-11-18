@@ -2,6 +2,11 @@
 name = "angust"
 version = "0.1.0"
 edition = "2021"
+authors = ["Tudor Andrei Orban <tudoraorban@protonmail.com>"]
+description = "A Rust GUI framework in Angular style"
+repository = "https://github.com/TudorOrban/Angust"
+license = "MIT"
+documentation = "https://tudororban.github.io/Angust"
 
 [lib]
 name = "angust"

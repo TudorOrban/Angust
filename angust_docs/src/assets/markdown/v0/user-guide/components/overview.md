@@ -92,6 +92,6 @@ and the CLI tool will set up everything for you. Just ensure to specify the path
 &nbsp;
 
 ## Next Step
-Now that you have an idea of how components are defined in Angust, you can jump into the [Component State](https://tudorban.github.io/Angust/v0/user-guide/components/component-state) section.
+Now that you have an idea of how components are defined in Angust, you can jump into the [Component State](https://tudororban.github.io/Angust/v0/user-guide/components/component-state) section.
 
 &nbsp;

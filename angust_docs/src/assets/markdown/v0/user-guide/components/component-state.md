@@ -74,6 +74,6 @@ Now the `{{ content }}` placeholder in the template should be replaced with "Wel
 
 ## Next Step
 
-Next you can learn about how to define [Component Functions](https://tudorban.github.io/Angust/v0/user-guide/components/component-functions).
+Next you can learn about how to define [Component Functions](https://tudororban.github.io/Angust/v0/user-guide/components/component-functions).
 
 &nbsp;

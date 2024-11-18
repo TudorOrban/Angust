@@ -5,25 +5,23 @@ Angust is a Rust GUI framework designed to bridge the gap between the safety and
 This crate contains the core features provided by Angust. See also the [Angust CLI tool](TBA) and the [Angust Macros](TBA). 
 
 ### Features
-* Rendering of standard **HTML - CSS**
+* Declaration of UI through standard **HTML - CSS**
 * **Custom Components** with: HTML templates, reflective and reactive Component State, inputs and outputs, lifetime hooks
 * HTML **Directives**: @if, @for, @onclick, supporting complex Rust expressions
 * **Custom Services**: injectable singleton objects, supporting async operations and return to GUI thread for state updates
 * Pre-made **Router**: object encapsulating common navigation functionality (route configuration, history, page caching etc.)
 * **CLI tool**: provides commands for generating boilerplate Angust code for a smooth development experience
 
-### How to use
-To use Angust for your next app, follow these steps:
-1. Ensure you have a newer version of Rust and Cargo installed.
-2. Download the [Angust CLI tool](TBA) and add the path to environment variables.
-2. Open your terminal in an appropiate folder and run:
+ ## Documentation
 
-`angust_cli create_project <your_project_name>`
-
-That's it, you can now run the app with `cd <your_project_name>`, `cargo run`. Head over to the [Docs](https://tudorban.github.io/Angust/v0/user-guide/overview) to learn how to use Angust's features.
+For comprehensive and up-to-date documentation, please visit our [official documentation website](https://TudorOrban.github.io/Angust). This website is the primary source for all documentation related to Angust, including API references, tutorials, and examples.
 
 ### Status
 In mid stages of development.
 
 ### Contributing
 All contributions are warmly welcomed. Head over to [CONTRIBUTING.md](https://github.com/TudorOrban/Angust/blob/main/CONTRIBUTING.md) for details.
+
+### License
+
+Angust is licensed under the MIT License. See the [LICENSE](https://github.com/TudorOrban/Angust/blob/main/LICENSE) file for more details.

@@ -7,7 +7,7 @@ Angust is a Rust GUI framework designed to bridge the gap between the safety and
 ![ExampleAppResult](/screenshots/ExampleAppResult.png)
 
 ### Features
-* Rendering of standard **HTML - CSS**
+* Declaration of UI through standard **HTML - CSS**
 * **Custom Components** with: HTML templates, reflective and reactive Component State, inputs and outputs, lifetime hooks
 * HTML **Directives**: @if, @for, @onclick, supporting complex Rust expressions
 * **Custom Services**: injectable singleton objects, supporting async operations and return to GUI thread for state updates
