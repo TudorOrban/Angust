@@ -63,6 +63,8 @@ The directive supports:
 - state properties (or loop variables - see next section)
 - function calls, as long as the functions are registered as described in the [Component Functions](https://tudororban.github.io/Angust/v0/user-guide/components/component-functions) section.
 
+**Note**: The if directive currently works only for `div` elements. We will soon enable it for other elements as well.
+
 &nbsp;
 
 ## Next Step
