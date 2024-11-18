@@ -20,7 +20,9 @@ export class DynamicRoutesService {
         const mainNavItems = this.navigationManagerService.getNavItems(NavigationItemType.MainItem);
         const navItemsConfiguration = this.navigationManagerService.getNavItemsConfiguration();
 
-        const routes: Routes = [];
+        const routes: Routes = [
+            { path: '', redirectTo: '/v0/user-guide/overview', pathMatch: 'full' }
+        ];
 
         for (const version of versions) {
             for (const mainItem of mainNavItems) {
