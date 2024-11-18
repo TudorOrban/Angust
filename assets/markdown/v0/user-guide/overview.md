@@ -15,14 +15,14 @@ This [User Guide](https://tudororban.github.io/Angust/v0/user-guide/overview) ai
 
 ## Features
 
-- Rendering of standard [HTML - CSS](https://tudorban.github.io/Angust/v0/user-guide/html-and-css)
-- [Custom Components](https://tudorban.github.io/Angust/v0/user-guide/components/overview) with: HTML templates, reflective and reactive Component State, inputs and outputs, lifetime hooks
-- [HTML Directives](https://tudorban.github.io/Angust/v0/user-guide/directives/overview): @if, @for, @onclick, supporting complex Rust expressions
-- [Services](https://tudorban.github.io/Angust/v0/user-guide/services/overview): injectable singleton objects, supporting async operations and return to GUI thread for state updates
-- Pre-made [Router](https://tudorban.github.io/Angust/v0/user-guide/routing/overview): object encapsulating common navigation functionality (route configuration, history, page caching etc.)
-- [CLI tool](https://tudorban.github.io/Angust/v0/user-guide/angust-cli/overview): provides commands for generating boilerplate Angust code for a smooth development experience
+- Rendering of standard [HTML - CSS](https://tudororban.github.io/Angust/v0/user-guide/html-and-css)
+- [Custom Components](https://tudororban.github.io/Angust/v0/user-guide/components/overview) with: HTML templates, reflective and reactive Component State, inputs and outputs, lifetime hooks
+- [HTML Directives](https://tudororban.github.io/Angust/v0/user-guide/directives/overview): @if, @for, @onclick, supporting complex Rust expressions
+- [Services](https://tudororban.github.io/Angust/v0/user-guide/services/overview): injectable singleton objects, supporting async operations and return to GUI thread for state updates
+- Pre-made [Router](https://tudororban.github.io/Angust/v0/user-guide/routing/overview): object encapsulating common navigation functionality (route configuration, history, page caching etc.)
+- [CLI tool](https://tudororban.github.io/Angust/v0/user-guide/angust-cli/overview): provides commands for generating boilerplate Angust code for a smooth development experience
 
 &nbsp;
 
 ## Next Step
-Ready? Jump into the [Getting Started](https://tudorban.github.io/Angust/v0/user-guide/getting-started) tutorial!
+Ready? Jump into the [Getting Started](https://tudororban.github.io/Angust/v0/user-guide/getting-started) tutorial!

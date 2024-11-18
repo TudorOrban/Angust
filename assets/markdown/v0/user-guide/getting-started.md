@@ -39,6 +39,6 @@ cargo run
 &nbsp;
 
 ## Next Step
-Ready for the next step? Head over to the [HTML and CSS](https://tudorban.github.io/Angust/v0/user-guide/html-and-css) section.
+Ready for the next step? Head over to the [HTML and CSS](https://tudororban.github.io/Angust/v0/user-guide/html-and-css) section.
 
 &nbsp;

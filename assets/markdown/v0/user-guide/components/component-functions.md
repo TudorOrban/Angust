@@ -20,7 +20,7 @@ struct SomeComponentState {
 }
 
 impl SomeComponentState {
-git --work-tree angust_docs/dist/angust_docs add --all
+
     pub fn toggle_dark_theme(&mut self) {
         self.is_dark_theme = !self.is_dark_theme;
     }
@@ -70,11 +70,11 @@ impl SomeComponent {
 
 Here we pass the transformed function to the `ComponentFunctions` constructor and add `component_functions` to the component. Ignore the other arguments for now.
 
-We will see in the [Directives](https://tudorban.github.io/Angust/v0/user-guide/directives/overview) how you can trigger the `toggle_dark_theme` from the template.
+We will see in the [Directives](https://tudororban.github.io/Angust/v0/user-guide/directives/overview) section how you can trigger the `toggle_dark_theme` from the template.
 
 &nbsp;
 
 ## Next Step
-Next, dive into [Component Inputs and Outputs](https://tudorban.github.io/Angust/v0/user-guide/components/inputs-and-outputs).
+Next, dive into [Component Inputs and Outputs](https://tudororban.github.io/Angust/v0/user-guide/components/inputs-and-outputs).
 
 &nbsp;
