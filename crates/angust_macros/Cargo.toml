@@ -2,11 +2,16 @@
 name = "angust_macros"
 version = "0.1.0"
 edition = "2021"
+authors = ["Tudor Andrei Orban <tudoraorban@protonmail.com>"]
+description = "Procedural macros for the Angust GUI framework"
+repository = "https://github.com/TudorOrban/Angust"
+license = "MIT"
+documentation = "https://tudororban.github.io/Angust"
+
+[lib]
+proc-macro = true
 
 [dependencies]
 quote = "1.0.37"
 syn = { version = "2.0.79", features = ["full"] }
 proc-macro2 = "1.0.88"
-
-[lib]
-proc-macro = true

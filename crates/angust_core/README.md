@@ -17,7 +17,7 @@ This crate contains the core features provided by Angust. See also the [Angust C
 * Pre-made **Router**: object encapsulating common navigation functionality (route configuration, history, page caching etc.)
 * **CLI tool**: provides commands for generating boilerplate Angust code for a smooth development experience
 
- ## Documentation
+### Documentation
 
 For comprehensive and up-to-date documentation, please visit our [official documentation website](https://TudorOrban.github.io/Angust). This website is the primary source for all documentation related to Angust, including API references, tutorials, and examples.
 

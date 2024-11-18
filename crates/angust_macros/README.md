@@ -2,7 +2,7 @@
 
 Angust is a Rust GUI framework designed to bridge the gap between the safety and performance of Rust and the simplicity and scalability of web development. It provides an Angular-style API to develop dynamic UI applications, through reusable Components and associated HTML templates.
 
-This crate contains the CLI tool for Angust. See also the [core crate](https://crates.io/crates/angust) and the [Angust Macros](https://crates.io/crates/angust_macros).
+This crate contains the procedural macro needed for Angust. See also the [core crate](https://crates.io/crates/angust) and the [Angust CLI tool](https://crates.io/crates/angust_cli).
 
 ### Status
 

@@ -1,3 +1,6 @@
+#![doc(html_root_url = "https://docs.rs/Angust/0.1.0")]
+#![doc = include_str!("../README.md")]
+
 extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
