@@ -17,12 +17,12 @@ Angust is a Rust GUI framework designed to bridge the gap between the safety and
 ### How to use
 To use Angust for your next app, follow these steps:
 1. Ensure you have a newer version of Rust and Cargo installed.
-2. Download the [Angust CLI tool](TBA) and add the path to environment variables.
-2. Open your terminal in an appropiate folder and run:
+2. Download the [Angust CLI tool](https://crates.io/crates/angust_cli) and add the path to environment variables.
+3. Open your terminal in an appropiate folder and run:
 
 `angust_cli create_project <your_project_name>`
 
-That's it, you can now run the app with `cd <your_project_name>`, `cargo run`. Head over to the [Docs](TBA) to learn how to use Angust's features.
+That's it, you can now run the app with `cd <your_project_name>`, `cargo run`. Head over to the [Docs](https://tudororban.github.io/Angust) to learn how to use Angust's features.
 
 ### Status
 In mid stages of development.
