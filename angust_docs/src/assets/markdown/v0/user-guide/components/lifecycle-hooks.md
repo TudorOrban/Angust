@@ -72,6 +72,6 @@ Angust does not yet support other hooks, but some important ones will be added s
 &nbsp;
 
 ## Next Step
-Now that you know how to work with Components, you can dive into the other features provided by Angust. [Services](https://tudororban.github.io/Angust/v0/user-guide/services/overview) are a good next step.
+Now that you know how to work with Components, you can dive into the other features provided by Angust. [Directives](https://tudororban.github.io/Angust/v0/user-guide/directives/overview) are a good next step.
 
 &nbsp;
