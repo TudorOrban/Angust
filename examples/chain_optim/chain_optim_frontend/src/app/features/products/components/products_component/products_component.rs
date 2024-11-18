@@ -22,7 +22,7 @@ impl ProductsComponentState {
 
     fn init(&mut self) {
         let product_service: &ProductService = get_global_service("product-service").unwrap();
-        
+
         self.products = product_service.get_products();
     }
 }

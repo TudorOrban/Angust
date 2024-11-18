@@ -1,3 +1,5 @@
+use std::{thread::sleep, time::Duration};
+
 use crate::app::features::products::models::product::Product;
 
 
@@ -21,5 +23,14 @@ impl ProductService {
         vec![prod1, prod2, prod3, prod4]
     }
 
+    #[allow(dead_code)]
+    pub async fn get_products_async(&self) -> Vec<Product> {
+        sleep(Duration::from_secs(2)); // Simulate an asynchronous delay
+
+        let prod1 = Product::new(1, "Samsung Galaxy S21".to_string(), 1, "A brand-new entry in the Samsung Galaxy series".to_string(), 1000.0, vec!["phones".to_string()]);
+        let prod2 = Product::new(2, "Adobe Photoshop".to_string(), 1, "Adobe Photoshop is a raster graphics editor, image-editing software".to_string(), 200.0, vec!["software".to_string()]);
+        
+        vec![prod1, prod2]
+    }
 }
     
