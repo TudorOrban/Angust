@@ -84,9 +84,11 @@ and Angust will substitute it with `SomeComponent`'s template HTML.
 ## Generate Components automatically
 
 You don't need to write this boilerplate code every time you need a new component. You can just run:
+
 ```
 angust_cli generate component src/app/Some
 ```
+
 and the CLI tool will set up everything for you. Just ensure to specify the path starting with `src/app`, and to provide the component name without the `Component` part, which gets added automatically.
 
 &nbsp;

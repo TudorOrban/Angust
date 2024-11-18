@@ -98,3 +98,18 @@ Now you only need to provide the `is_dark_theme` like this:
     <!-- Rest of the content -->
 </div>
 ```
+
+&nbsp;
+
+## Defining Outputs
+
+Outputs are a way to notify parent components when changes occur in the state of children components. 
+
+**Outputs are not currently available**, but they will be in the near future. Stay tuned for updates and consider getting in touch with us to contribute to Angust's future!
+
+&nbsp;
+
+## Next Step
+Next, dive into [Lifecycle Hooks](https://tudororban.github.io/Angust/v0/user-guide/components/lifecycle-hooks).
+
+&nbsp;
