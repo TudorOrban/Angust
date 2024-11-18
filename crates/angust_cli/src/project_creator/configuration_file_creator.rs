@@ -4,12 +4,17 @@ use toml_edit::{value, ArrayOfTables, DocumentMut, Item, Table};
 
 use crate::shared::types::AngustConfiguration;
 
-pub fn create_configuration_files(project_root_path: &PathBuf, project_name: String) -> AngustConfiguration {
+pub fn create_configuration_files(
+    project_root_path: &PathBuf, 
+    project_name: String, 
+    angust_version: &str, 
+    angust_macros_version: &str
+) -> AngustConfiguration {
     create_git_ignore_file(&project_root_path);
 
     initialize_cargo_project(&project_root_path);
 
-    adjust_cargo_toml(&project_root_path, &project_name);
+    adjust_cargo_toml(&project_root_path, &project_name, angust_version, angust_macros_version);
 
     create_angust_configuration_file(&project_root_path)
 }
@@ -46,7 +51,12 @@ fn initialize_cargo_project(project_root_path: &PathBuf) {
     }
 }
 
-fn adjust_cargo_toml(project_root_path: &PathBuf, project_name: &String) {
+fn adjust_cargo_toml(
+    project_root_path: &PathBuf, 
+    project_name: &String, 
+    angust_version: &str, 
+    angust_macros_version: &str
+) {
     let cargo_toml_path = project_root_path.join("Cargo.toml");
 
     let cargo_toml_contents = fs::read_to_string(&cargo_toml_path)
@@ -60,8 +70,8 @@ fn adjust_cargo_toml(project_root_path: &PathBuf, project_name: &String) {
     doc["package"]["edition"] = value("2021");
 
     // Specify dependency to be a local path for development purposes
-    doc["dependencies"]["angust"]["path"] = value("../angust-core/");
-    doc["dependencies"]["angust_macros"]["path"] = value("../angust_macros/");
+    doc["dependencies"]["angust"] = value(format!("{}", angust_version));
+    doc["dependencies"]["angust_macros"] = value(format!("{}", angust_macros_version));
     doc["dependencies"]["tokio"] = value("1.41.0");
 
     // Define a binary target

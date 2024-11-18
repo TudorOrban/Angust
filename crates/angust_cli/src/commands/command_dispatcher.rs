@@ -3,11 +3,11 @@ use clap::ArgMatches;
 use crate::{object_generator::{component_generator, service_generator}, project_creator::project_creation_manager::create_project};
 
 
-pub fn dispatch_command(command_name: &str, arg_matches: &ArgMatches) {
+pub fn dispatch_command(command_name: &str, arg_matches: &ArgMatches, angust_version: &str, angust_macros_version: &str) {
     match command_name {
         "create_project" => {
             let name = arg_matches.get_one::<String>("name").unwrap();
-            create_project(&name);
+            create_project(&name, angust_version, angust_macros_version);
         },
         "generate" => {
             dispatch_generate_command(arg_matches);

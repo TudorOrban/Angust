@@ -8,7 +8,7 @@ use crate::{
 
 
 
-pub fn create_project(name: &str) {
+pub fn create_project(name: &str, angust_version: &str, angust_macros_version: &str) {
     println!("Creating a new Angust project with name: {}", name);
 
     let current_dir = env::current_dir().expect("Failed to get current directory");
@@ -17,7 +17,7 @@ pub fn create_project(name: &str) {
 
     create_root_directory(&project_root_path, &snake_case_name);
 
-    let angust_config = configuration_file_creator::create_configuration_files(&project_root_path, snake_case_name);
+    let angust_config = configuration_file_creator::create_configuration_files(&project_root_path, snake_case_name, angust_version, angust_macros_version);
     
     core_file_creator::create_core_app_files(&project_root_path, &angust_config.pathing_config.main_rs_path, &angust_config.pathing_config.index_html_path);
 

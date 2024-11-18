@@ -3,7 +3,7 @@ use clap::{Arg, Command};
 
 pub fn get_command_configuration() -> Command {
     Command::new("angust_cli")
-        .version("0.1.0")
+        .version("0.1.1")
         .author("Tudor Andrei Orban <tudoraorban@protonmail.com>")
         .about("CLI tool for the Angust GUI framework")
         .subcommand(
