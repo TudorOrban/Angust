@@ -7,7 +7,7 @@ At Angust we believe in the value of the open-source, community-driven approach 
 4. Submit a pull request (PR) to the main repository once you're ready to share your contributions. Describe the changes you've made and any additional context that might help the review process.
 
 ## Get started developing
-To work on Angust, you'll need to install Rust and Cargo. After installation, open a terminal in the root of the project. You can run an example project with `cargo run --package <example_project_name>`. To create your own example project, you can use the [Angust CLI tool](TBA) to generate a new project *in the `examples/dev` directory*. Head over to the [Developer's Guide](TBA) for an overview of the system, and see the [Roadmap](TBA) to see the project's current goals.
+To work on Angust, you'll need to install Rust and Cargo. After installation, open a terminal in the root of the project. You can run an example project with `cargo run --package <example_project_name>`. To create your own example project, you can use the [Angust CLI tool](https://crates.io/crates/angust_cli) to generate a new project *in the `examples/dev` directory*. Head over to the [Developer's Guide](https://tudororban.github.io/Angust/v0/contributor-guide/overview) for an overview of the system, and see the [Roadmap](https://tudororban.github.io/Angust/v0/contributor-guide/roadmap) to see the project's current goals.
 
 ## Style guides
 We aim to maintain a clean and consistent codebase. Detailed style guides will be added soon. In the meantime, please adhere to the following general principles:
