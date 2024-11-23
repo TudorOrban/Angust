@@ -4,6 +4,6 @@ angust_cli/target/
 
 examples/cli_create_project_example/target/
 examples/chain_optim/chain_optim_frontend/target/
-examples/dev/
+
 
 .idea/
